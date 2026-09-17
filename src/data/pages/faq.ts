@@ -36,7 +36,7 @@ export default {
           items: [
             'Press F12 to open DevTools, switch to the Network tab, and clear the list. Filter for Fetch/XHR, then drop a file into the workspace. No request carries the file: only GET requests for model weight files appear, and the model is fetched once per model, not once per document.',
             'Switch the Network tab to offline. Ask a question about the document you just imported: the answer, with its cited passages, still comes back, which is only possible if nothing needed the network.',
-            'In the Application tab, open IndexedDB for this site. The chunks and their vectors are there, in your browser profile, with the embedding size shown next to them. Clear site data and they are gone.',
+            'In the Application tab, expand IndexedDB, open the securerag database and its library store: the docs key holds one metadata record per document, and each document also has an index key holding its chunk text together with the Float32Array vectors. Clear site data and both disappear.',
           ],
         },
         { t: 'h2', text: 'Limits and formats at a glance' },
@@ -78,7 +78,7 @@ export default {
             },
             {
               q: 'Which files are rejected outright?',
-              a: 'Encrypted PDFs, scanned PDFs with no text layer, legacy .doc files, and any single file above 25 MB. Each of those produces a message naming the condition that failed instead of a generic error, so you know whether to remove a password, run OCR elsewhere, or split the document.',
+              a: 'Encrypted PDFs, scanned PDFs with no text layer, legacy .doc files, and any single file above 25 MB. Each rejection is reported by its own name — PDF_ENCRYPTED, PDF_NO_TEXT_LAYER, LEGACY_DOC, FILE_TOO_LARGE, UNSUPPORTED_FORMAT — instead of a generic failure, so you know whether to remove a password, run OCR, convert the format, or split the file. A PDF that yields fewer than 40 characters of text is treated as a scan rather than as an empty document.',
             },
             {
               q: 'Can I use it on a phone?',
@@ -187,7 +187,7 @@ export default {
           items: [
             '按 F12 打开开发者工具，切到 Network 面板并清空列表。筛选用 Fetch/XHR，然后往工作区里拖入一个文件。没有任何请求带着这个文件：出现的只有下载模型权重的 GET 请求，而模型是每个模型下载一次，不是每份文档一次。',
             '把 Network 面板切到 offline（离线）。再问一个关于刚导入文档的问题：带引用的回答照样返回，只有完全不依赖网络时才可能这样。',
-            '在 Application 面板里打开本站的 IndexedDB。文本块和它们的向量就在那里，位于你自己的浏览器配置目录下，旁边写着向量维度。清除站点数据，它们就消失。',
+            '在 Application 面板里展开 IndexedDB，打开 securerag 数据库下的 library 存储：docs 键里是每份文档一条的元数据记录，每份文档还有一个 index 开头的键，保存着文本块与对应的 Float32Array 向量。清除站点数据，两者一起消失。',
           ],
         },
         { t: 'h2', text: '格式与限额一览' },
@@ -229,7 +229,7 @@ export default {
             },
             {
               q: '哪些文件会被直接拒绝？',
-              a: '加密 PDF、没有文字层的扫描件 PDF、旧版 .doc，以及单文件超过 25MB。这几种情况给出的提示会写明失败的到底是哪一个条件，而不是一句「导入失败」，这样你就知道该去解密、该去别处做 OCR，还是该先拆分文档。',
+              a: '加密 PDF、没有文字层的扫描件 PDF、旧版 .doc，以及单文件超过 25MB。每一种都会报出自己的名字——PDF_ENCRYPTED、PDF_NO_TEXT_LAYER、LEGACY_DOC、FILE_TOO_LARGE、UNSUPPORTED_FORMAT——而不是一句笼统的「导入失败」，这样你就知道该去解密、该去别处做 OCR、该转换格式，还是该先拆分文件。一份 PDF 若只能抽出不到 40 个字符，会被当作扫描件处理，而不是当作空文档。',
             },
             {
               q: '手机上能用吗？',

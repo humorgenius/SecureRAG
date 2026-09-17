@@ -115,7 +115,7 @@ export default {
         { t: 'h3', text: 'Strictness' },
         {
           t: 'p',
-          text: 'Strictness is the setting that decides how much interpretation the answering step may apply: citations only, a composed sentence from the retrieved text, or the local generator. It is the first control to change when an answer is wrong, because it separates what was retrieved from what was inferred. It is confused with a quality score: it is a policy you choose, not a measurement of the answer you got.',
+          text: 'Strictness is the setting that decides how much interpretation the answering step may apply, and it has two states: “Documents only”, which refuses rather than guesses when the retrieved text does not contain an answer, and “Allow inference”, which may compose sentences that go beyond the source and marks them. It is the first control to change when an answer is wrong, because it separates what was retrieved from what was inferred. It is confused with a quality score: it is a policy you choose, not a measurement of the answer you got.',
         },
         { t: 'h3', text: 'IndexedDB' },
         {
@@ -271,7 +271,7 @@ export default {
         { t: 'h3', text: '严格度' },
         {
           t: 'p',
-          text: '严格度决定回答环节可以做多少解释：只给引用、基于检索文本组织句子，或者交给本地生成模型。回答不对时最先该动的就是它，因为它把「检索到了什么」和「推断出了什么」分开。它常和被当成质量分数：它是你选的策略，不是对你这次回答的测量。',
+          text: '严格度决定回答环节可以做多少解释，它有两个状态：「仅依据文档」在检索内容里找不到答案时直接拒答而不猜；「允许推理」会组织可能超出原文的句子，并把这些句子标出来。回答不对时最先该动的就是它，因为它把「检索到了什么」和「推断出了什么」分开。它常和被当成质量分数混淆：它是你选的策略，不是对这一次回答的测量。',
         },
         { t: 'h3', text: 'IndexedDB' },
         {

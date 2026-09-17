@@ -108,7 +108,7 @@ export default {
             },
             {
               title: 'Look at what is stored, and where',
-              text: 'In the Application tab, expand IndexedDB for this site and you will find the chunks and their vectors; expand Cache Storage and you will find the model weights. Clear site data and both are gone, with nothing left to ask us to delete.',
+              text: 'In the Application tab, expand IndexedDB and you will find a database called securerag, holding one metadata record per document and, under an index key, the chunk text with its Float32Array vectors; expand Cache Storage on the same origin and you will find the model weights. Clear site data and both are gone, with nothing left for us to delete.',
             },
             {
               title: 'Read the page source for what is missing',
@@ -238,7 +238,7 @@ export default {
             },
             {
               title: '看看到底存了什么、存在哪',
-              text: '在 Application 面板里展开本站的 IndexedDB，你会找到文本块及其向量；展开 Cache Storage，你会找到模型权重。清除站点数据，两者一起消失，也不会剩下任何需要请我们删除的东西。',
+              text: '在 Application 面板里展开 IndexedDB，你会找到一个名为 securerag 的数据库：里面是每份文档一条的元数据记录，以及在 index 键下保存的文本块与 Float32Array 向量；展开同一来源下的 Cache Storage，你会找到模型权重。清除站点数据，两者一起消失，也不会剩下任何需要我们删除的东西。',
             },
             {
               title: '去源码里找「本应出现却没有出现」的东西',

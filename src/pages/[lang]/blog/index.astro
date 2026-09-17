@@ -34,7 +34,7 @@ const copy =
           'These posts are not product marketing. They record the numbers we measured while running RAG inside a browser tab, the limits we hit, and the approaches that look plausible but do not work.',
       };
 
-const entries = (await getCollection('blog')).filter((entry) => entry.data.lang === lang);
+const entries = await getCollection(lang === 'zh' ? 'blogZh' : 'blogEn');
 const items = entries
   .sort((a, b) => (a.data.date < b.data.date ? 1 : -1))
   .map((entry) => ({

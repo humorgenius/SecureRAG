@@ -68,6 +68,18 @@ const dir = lang === 'zh' ? -1 : 1;
             </table>
           </div>
         );
+      case 'faq':
+        return (
+          <div class="faq-block">
+            {b.items.map((item) => (
+              <details>
+                <summary>{item.q}</summary>
+                <p>{item.a}</p>
+              </details>
+            ))}
+          </div>
+        );
+
       case 'callout':
         return (
           <div class={`note ${b.kind === 'good' ? 'good' : ''} ${b.kind === 'warn' ? 'warn' : ''}`}>

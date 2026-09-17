@@ -43,7 +43,7 @@ export default {
           rows: [
             [
               'A bug: an import fails, an answer is empty, a button does nothing',
-              'Browser name and full version (Chrome 140, Safari 18, for example), your operating system, the file type, the file size, and the exact wording of any message shown. If a document was involved, the kind of document is enough — never send the document itself.',
+              'Browser name and full version (Chrome 140, Safari 18, for example), your operating system, the file type, the file size, and the exact wording of the message shown, with its code if one appears (FILE_TOO_LARGE, PDF_ENCRYPTED, PDF_NO_TEXT_LAYER, LEGACY_DOC, UNSUPPORTED_FORMAT, MODEL_LOAD_FAILED). If a document was involved, the kind of document is enough — never send the document itself.',
             ],
             [
               'A wrong or missing model, licence or number on the models page',
@@ -145,7 +145,7 @@ export default {
           rows: [
             [
               '缺陷：导入失败、回答为空、按钮没反应',
-              '浏览器名称与完整版本（例如 Chrome 140、Safari 18）、操作系统、文件类型、文件大小，以及提示信息的原文。涉及文档时说明类型就够了，请不要把文档本身发给我们。',
+              '浏览器名称与完整版本（例如 Chrome 140、Safari 18）、操作系统、文件类型、文件大小，以及提示信息的原文；如果出现错误代码，请一并写上（FILE_TOO_LARGE、PDF_ENCRYPTED、PDF_NO_TEXT_LAYER、LEGACY_DOC、UNSUPPORTED_FORMAT、MODEL_LOAD_FAILED）。涉及文档时说明类型就够了，请不要把文档本身发给我们。',
             ],
             [
               '模型页面上的模型、许可或数字有误',

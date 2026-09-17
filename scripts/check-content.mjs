@@ -100,6 +100,28 @@ for (const f of files) {
   if (!/^##\s+/m.test(src)) problems.push(`${f.path}: no "## " heading — the page TOC would be empty`);
 }
 
+// ---------------------------------------------------------------------------
+// Every block type used in src/data/pages/*.ts must have a renderer case in
+// ContentBlocks.astro. The switch there ends in `default: return null`, so a
+// block type without a case renders as nothing at all — the page builds green
+// and silently ships a hole. (This is how the FAQ page shipped empty once.)
+// ---------------------------------------------------------------------------
+{
+  const renderer = readFileSync('src/components/marketing/ContentBlocks.astro', 'utf8');
+  const handled = new Set([...renderer.matchAll(/case '([a-z0-9]+)'/g)].map((m) => m[1]));
+  const dataDir = 'src/data/pages';
+  const used = new Set();
+  for (const file of readdirSync(dataDir)) {
+    if (!file.endsWith('.ts') || file === 'types.ts' || file === 'index.ts') continue;
+    const src = readFileSync(join(dataDir, file), 'utf8');
+    for (const m of src.matchAll(/\bt:\s*'([a-z0-9]+)'/g)) used.add(m[1]);
+  }
+  const unhandled = [...used].filter((t) => !handled.has(t));
+  if (unhandled.length) problems.push(`block type(s) with no renderer case: ${unhandled.join(', ')}`);
+  console.log(`block types in data: ${[...used].sort().join(', ')}`);
+  console.log(`renderer cases:      ${[...handled].sort().join(', ')}`);
+}
+
 const counts = {};
 for (const f of files) counts[f.collection] = (counts[f.collection] ?? 0) + 1;
 const byLang = {};

@@ -22,7 +22,22 @@ const article = z.object({
   related: z.array(z.string()).default([]),
 });
 
+/**
+ * One collection PER LANGUAGE, not one collection with `en/` and `zh/`
+ * subfolders.
+ *
+ * A single `glob({ base: './src/content/guides' })` over both locales derives
+ * the entry id from the file name and collapses `en/foo.mdx` with `zh/foo.mdx`
+ * onto the same id ("foo"). Entry ids must be unique, so one locale silently
+ * overwrites the other at build time — the build stays green while half the
+ * content is simply absent. Splitting the collections removes the possibility
+ * entirely, whatever the loader does with directory segments.
+ */
+const loader = (dir: string) => glob({ pattern: '**/*.mdx', base: `./src/content/${dir}` });
+
 export const collections = {
-  guides: defineCollection({ loader: glob({ pattern: '**/*.mdx', base: './src/content/guides' }), schema: article }),
-  blog: defineCollection({ loader: glob({ pattern: '**/*.mdx', base: './src/content/blog' }), schema: article }),
+  guidesEn: defineCollection({ loader: loader('guides/en'), schema: article }),
+  guidesZh: defineCollection({ loader: loader('guides/zh'), schema: article }),
+  blogEn: defineCollection({ loader: loader('blog/en'), schema: article }),
+  blogZh: defineCollection({ loader: loader('blog/zh'), schema: article }),
 };

@@ -8,9 +8,12 @@ import { t, localizePath, type Lang } from '../../../i18n/utils';
 import { articleSchema, breadcrumbSchema, faqSchema, orgSchema } from '../../../lib/seo/schema';
 
 export async function getStaticPaths() {
-  const entries = await getCollection('blog');
-  return entries.map((entry) => ({
-    params: { lang: entry.data.lang, slug: entry.data.slug },
+  const pairs = [
+    ...(await getCollection('blogEn')).map((entry) => ({ lang: 'en' as const, entry })),
+    ...(await getCollection('blogZh')).map((entry) => ({ lang: 'zh' as const, entry })),
+  ];
+  return pairs.map(({ lang, entry }) => ({
+    params: { lang, slug: entry.data.slug },
     props: { entry },
   }));
 }
@@ -29,9 +32,9 @@ const crumbs = [
 
 const toc = [...entry.body.matchAll(/^##\s+(.+)$/gm)].map((m, i) => ({ id: `h-${i + 1}`, text: m[1].trim() }));
 
-const siblings = (await getCollection('blog'))
-  .filter((e) => e.data.lang === lang)
-  .sort((a, b) => (a.data.date < b.data.date ? 1 : -1));
+const siblings = (await getCollection(lang === 'zh' ? 'blogZh' : 'blogEn')).sort((a, b) =>
+  a.data.date < b.data.date ? 1 : -1
+);
 const index = siblings.findIndex((e) => e.data.slug === entry.data.slug);
 const next = siblings[index + 1];
 const prev = siblings[index - 1];
