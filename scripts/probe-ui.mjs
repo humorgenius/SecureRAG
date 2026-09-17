@@ -22,7 +22,7 @@ const chrome = spawn(
     '--disable-gpu',
     '--no-proxy-server',
     '--no-first-run',
-    '--window-size=1440,900',
+    `--window-size=${process.env.VIEWPORT || '1440,900'}`,
     `--remote-debugging-port=${PORT}`,
     '--user-data-dir=E:/hermes-workspace/temp/cdp-diag2',
     'about:blank',
@@ -75,6 +75,12 @@ try {
     "actions:act?Array.prototype.map.call(act.querySelectorAll(\'button\'),function(b){return b.textContent.trim();}):[]};}" +
     "var ex=document.querySelector(\'.sr-export\');" +
     "o.exportGroup=ex?Array.prototype.map.call(ex.querySelectorAll(\'button\'),function(b){return b.textContent.trim();}):null;" +
+    "o.vp={inner:window.innerWidth,outer:window.outerWidth," +
+    "scrollW:document.documentElement.scrollWidth,bodyW:document.body.scrollWidth," +
+    "overflowX:document.documentElement.scrollWidth>window.innerWidth};" +
+    "var wide=[];document.querySelectorAll(\'body *\').forEach(function(el){var r=el.getBoundingClientRect();" +
+    "if(r.right>window.innerWidth+1)wide.push(el.tagName+\'.\'+(el.className||\'\').toString().split(\' \')[0]+\'@\'+Math.round(r.right));});" +
+    "o.overflowing=wide.slice(0,8);" +
     "var h1=document.querySelector(\'h1\');" +
     "o.h1=h1?{text:h1.innerText.replace(/\\n/g,\' | \').slice(0,100)," +
     "lines:Math.round(h1.getBoundingClientRect().height/parseFloat(getComputedStyle(h1).lineHeight))," +
@@ -92,6 +98,7 @@ try {
   console.log('BUTTONS / LABELS：');
   for (const b of data.buttons ?? []) console.log(`  h=${String(b.h).padStart(3)}px  class="${b.cls}"  "${b.t}"`);
   console.log('ANSWER NOTE：', (data.notes ?? []).length ? data.notes.join(' | ') : '(none)');
+  if (data.vp) console.log(`VIEWPORT：inner=${data.vp.inner} outer=${data.vp.outer} scrollW=${data.vp.scrollW} bodyW=${data.vp.bodyW} overflowX=${data.vp.overflowX}`, data.overflowing && data.overflowing.length ? `\n  溢出元素: ${data.overflowing.join(', ')}` : '');
   if (data.h1) console.log(`H1：lines=${data.h1.lines} width=${data.h1.w}px font=${data.h1.fs}\n     "${data.h1.text}"`);
   console.log('EXPORT GROUP：', data.exportGroup ? data.exportGroup.join(' ') : '(not on this page)');
   if (data.docRow) {

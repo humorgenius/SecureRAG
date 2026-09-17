@@ -97,7 +97,7 @@ export const home: Record<Lang, HomeContent> = {
     hero: {
       badge: 'Built for documents you are not allowed to upload',
       h1Lines: [
-        'Cross-format file indexing.',
+        'SecureRAG Cross-format file indexing.',
         'Runs locally. Never uploaded.',
         'AI retrieval, fast and simple.',
       ],
