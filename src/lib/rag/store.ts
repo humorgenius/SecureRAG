@@ -110,6 +110,8 @@ export interface SessionMessage {
   inferred?: string[];
   /** every sentence in the library that literally contains the question's terms */
   matches?: MatchResult;
+  /** which button produced this answer: exact phrase search or the AI search */
+  searchMode?: 'exact' | 'fuzzy';
   notFound?: boolean;
   /** why an empty answer was returned — drives the help text */
   kind?: 'notFound' | 'noDocs' | 'error';

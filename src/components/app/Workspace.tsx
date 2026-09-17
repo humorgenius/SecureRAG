@@ -325,7 +325,7 @@ export default function Workspace({ lang, sessionId }: Props) {
     });
   };
 
-  const ask = async (question: string) => {
+  const ask = async (question: string, mode: 'exact' | 'fuzzy' = 'fuzzy') => {
     if (!settings || busy) return;
     push({ id: uid(), role: 'user', text: question, at: Date.now() });
     setBusy(true);
@@ -338,6 +338,34 @@ export default function Workspace({ lang, sessionId }: Props) {
       if (chunks.length === 0) {
         // An empty library is not "not found" — say what to do instead.
         push({ id: uid(), role: 'assistant', text: '', at: Date.now(), notFound: true, kind: 'noDocs', citations: [] });
+        return;
+      }
+
+      if (mode === 'exact') {
+        // Exact search is pure string matching: no embedder, no model, no network.
+        // It works instantly even before the AI tier has been downloaded.
+        const exact = await request<{ chunks: ScoredChunk[]; best: number; matches: MatchResult }>({
+          type: 'search',
+          queryText: question,
+          chunks,
+          vectors: [],
+          modelId: settings.embeddingModel,
+          k: 0,
+          mode: 'exact',
+        });
+        setModelProgress(null);
+        push({
+          id: uid(),
+          role: 'assistant',
+          text:
+            exact.matches.total > 0
+              ? ta(lang, 'chat.exactFound', { n: exact.matches.total })
+              : ta(lang, 'chat.exactNone'),
+          at: Date.now(),
+          citations: [],
+          matches: exact.matches,
+          searchMode: 'exact',
+        });
         return;
       }
 
@@ -395,6 +423,7 @@ export default function Workspace({ lang, sessionId }: Props) {
           at: Date.now(),
           citations,
           matches,
+          searchMode: 'fuzzy',
           model: settings.generationModel,
           strictness: settings.strictness,
         });
@@ -411,6 +440,7 @@ export default function Workspace({ lang, sessionId }: Props) {
             at: Date.now(),
             citations: answer.citations,
             matches,
+            searchMode: 'fuzzy',
             inferred: answer.inferred,
             strictness: settings.strictness,
           });

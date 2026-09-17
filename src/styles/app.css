@@ -712,3 +712,9 @@
 }
 .sr-match-t:hover { color: var(--blue); }
 .sr-matches mark { padding: 0 2px; border-radius: 3px; background: var(--amber-soft); color: inherit; }
+
+/* The two send buttons: exact (literal string) next to fuzzy (the AI search). */
+.sr-send-group { display: inline-flex; gap: 8px; align-items: center; }
+.sr-send-group .btn { white-space: nowrap; }
+/* Exact mode answers with a count line instead of a quote. */
+.sr-exact-h { margin: 0 0 4px; font-weight: 600; }

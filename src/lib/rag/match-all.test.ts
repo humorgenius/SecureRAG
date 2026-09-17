@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { matchAll, queryTerms, MATCH_ITEM_CAP } from './match-all';
+import { matchAll, matchExact, normalizePhrase, queryTerms, MATCH_ITEM_CAP } from './match-all';
 import type { Chunk } from './types';
 
 function chunk(docId: string, docName: string, index: number, text: string, headingPath: string[] = []): Chunk {
@@ -116,5 +116,53 @@ describe('matchAll', () => {
     const chunks = [chunk('d1', 'a.pdf', 0, '任一方提前六十天书面通知即可解约。', ['服务协议', '8.2 解约'])];
     const result = matchAll(chunks, '解约');
     expect(result.docs[0].items[0].heading).toEqual(['服务协议', '8.2 解约']);
+  });
+});
+
+describe('matchExact', () => {
+  it('finds only the sentence containing the phrase as typed', () => {
+    const chunks = [
+      chunk('d1', 'a.pdf', 0, 'The potato harvest was late. The potatoes were small. A sweetpotato is not a potato.'),
+    ];
+    const result = matchExact(chunks, 'potato');
+    expect(result.total).toBe(2);
+    expect(result.docs[0].items.map((i) => i.text)).toEqual([
+      'The potato harvest was late.',
+      'A sweetpotato is not a potato.',
+    ]);
+  });
+
+  it('ignores letter case, because that is not a different word to a reader', () => {
+    const chunks = [chunk('d1', 'a.pdf', 0, 'The Potato harvest was late.')];
+    expect(matchExact(chunks, 'POTATO').total).toBe(1);
+    expect(matchExact(chunks, 'potato').total).toBe(1);
+  });
+
+  it('matches a multi-word phrase only as a whole', () => {
+    const chunks = [
+      chunk('d1', 'a.pdf', 0, 'The potato harvest was late. The potato price rose.'),
+    ];
+    expect(matchExact(chunks, 'potato harvest').total).toBe(1);
+    expect(matchExact(chunks, 'potato   harvest').total).toBe(1);
+    expect(matchExact(chunks, 'harvest potato').total).toBe(0);
+  });
+
+  it('matches Chinese phrases as substrings, with no word boundaries to respect', () => {
+    const chunks = [
+      chunk('d1', 'a.txt', 0, '员工的身份证号码登记在第 1 页。他的身份证件已经过期。'),
+    ];
+    expect(matchExact(chunks, '身份证').total).toBe(2);
+    expect(matchExact(chunks, '身份').total).toBe(2);
+    expect(matchExact(chunks, '员工证').total).toBe(0);
+  });
+
+  it('reports nothing when the phrase is absent, and handles an empty query', () => {
+    const chunks = [chunk('d1', 'a.pdf', 0, 'The potato harvest was late.')];
+    expect(matchExact(chunks, 'banana').total).toBe(0);
+    expect(matchExact(chunks, '   ').total).toBe(0);
+  });
+
+  it('normalises whitespace in the query', () => {
+    expect(normalizePhrase('  potato \n harvest  ')).toBe('potato harvest');
   });
 });

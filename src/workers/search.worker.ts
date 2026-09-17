@@ -3,7 +3,7 @@ import { LIMITS } from '../lib/rag/limits';
 import { buildPrompt } from '../lib/rag/answer/prompt';
 import { createEmbedder, createGenerator } from '../lib/rag/models';
 import { hybridRetrieve } from '../lib/rag/retrieve';
-import { matchAll, type MatchResult } from '../lib/rag/match-all';
+import { matchAll, matchExact, type MatchResult } from '../lib/rag/match-all';
 import type { Chunk, ScoredChunk, Strictness } from '../lib/rag/types';
 
 /**
@@ -17,6 +17,8 @@ export interface SearchRequest {
   vectors: Float32Array[];
   modelId: string;
   k: number;
+  /** 'exact' searches for the typed phrase only and never loads a model. */
+  mode?: 'exact' | 'fuzzy';
 }
 
 export interface GenerateRequest {
@@ -101,6 +103,17 @@ ctx.addEventListener('message', async (event: MessageEvent<SearchRequest | Gener
   }
   if (msg.type !== 'search') return;
   try {
+    // Exact mode is pure string matching: no embedder, no model download, no
+    // network. It answers instantly even before the AI tier is available.
+    if (msg.mode === 'exact') {
+      ctx.postMessage({
+        type: 'results',
+        chunks: [],
+        best: 1,
+        matches: matchExact(msg.chunks, msg.queryText),
+      } satisfies SearchEvent);
+      return;
+    }
     const embed = await embedderFor(msg.modelId);
     const [queryVector] = await embed([msg.queryText], 1);
     const result = hybridRetrieve({

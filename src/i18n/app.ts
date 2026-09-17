@@ -35,7 +35,7 @@ export const appStrings = {
     'docs.confirmDelete': 'Delete this document and its local index?',
 
     'chat.title': 'Ask your documents',
-    'chat.placeholder': 'Ask a question about your documents…',
+    'chat.placeholder': 'Type the words or sentence you want to find…',
     'chat.send': 'Send',
     'chat.thinking': 'Searching your documents…',
     'chat.generating': 'Writing an answer locally…',
@@ -52,6 +52,14 @@ export const appStrings = {
     'match.note': 'Literal matches, in document order: every sentence that contains a word you typed. Nothing is ranked away or filtered.',
     'match.capped': 'Very common word — showing the first {n} of {total} matches.',
     'match.none': 'No sentence contains those words.',
+    'match.titleExact': 'Exact matches · {n} sentence(s)',
+    'match.noteExact':
+      'Sentence-by-sentence search for exactly what you typed, in document order, with no AI rewriting or ranking. No model is loaded, so the result is instant.',
+    'chat.sendExact': 'Exact search',
+    'chat.sendExactHint': 'Find only the text you typed, character for character — no AI, no model, instant',
+    'chat.sendFuzzy': 'Fuzzy search',
+    'chat.exactFound': '{n} exact match(es)',
+    'chat.exactNone': 'No file contains exactly what you typed. Try fuzzy search, or shorter wording.',
     'chat.notFound': 'Not found in your documents.',
     'chat.notFoundHelp':
       'Nothing cleared the relevance threshold. Try different wording, or allow inference mode in settings.',
@@ -171,7 +179,7 @@ export const appStrings = {
     'docs.confirmDelete': '删除这份文档及其本地索引？',
 
     'chat.title': '向你的文档提问',
-    'chat.placeholder': '就你的文档提一个问题…',
+    'chat.placeholder': '请输入你要检索的词或句子……',
     'chat.send': '发送',
     'chat.thinking': '正在检索你的文档…',
     'chat.generating': '正在本地生成回答…',
@@ -188,6 +196,14 @@ export const appStrings = {
     'match.note': '字面匹配，按文档顺序排列：只要句子中出现你输入的词就会被列出，不做排序筛选，也不会因为重复而被丢掉。',
     'match.capped': '这个词太常见，先显示前 {n} 处（共 {total} 处）。',
     'match.none': '没有句子包含这些词。',
+    'match.titleExact': '完全匹配 · {n} 句',
+    'match.noteExact':
+      '逐句查找与你输入完全相同的字符串，按原文顺序，未经 AI 改写或排序；不加载模型，所以立即出结果。',
+    'chat.sendExact': '精准检索',
+    'chat.sendExactHint': '只找与你输入一模一样的原文，不经过 AI、不加载模型、立即出结果',
+    'chat.sendFuzzy': '模糊检索',
+    'chat.exactFound': '完全匹配 {n} 处',
+    'chat.exactNone': '所有文件里都没有与你的输入完全相同的内容。可以试试模糊检索，或换个更短的说法。',
     'chat.notFound': '文档中未找到相关内容。',
     'chat.notFoundHelp': '没有任何内容越过相关度阈值。换个说法，或在设置里允许推理模式。',
     'chat.export': '导出会话',

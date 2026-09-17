@@ -20,6 +20,8 @@ import { readFileSync } from 'node:fs';
 const DOC_FILE = process.env.DOC_FILE;
 const QUESTION = process.env.QUESTION ?? 'potato';
 const DOC_NAME = process.env.DOC_NAME ?? 'field-notes.txt';
+// Which button to press: 'exact' (精准检索) or 'fuzzy' (模糊检索).
+const BUTTON_RE = process.env.BUTTON === 'exact' ? '精准检索|Exact search' : '模糊检索|Fuzzy search';
 
 const CHROME = process.env.CHROME_PATH ?? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 // Named TARGET: a local `const URL` would shadow Node's global URL class.
@@ -181,7 +183,9 @@ try {
   const asked = await send('Runtime.evaluate', {
     expression: `(() => {
       const ta = document.querySelector('textarea');
-      const btn = [...document.querySelectorAll('button')].find((b) => /发送|Send/.test(b.innerText || ''));
+      const btn = [...document.querySelectorAll('button')].find((b) =>
+        new RegExp(${JSON.stringify(BUTTON_RE)}).test(b.innerText || '')
+      );
       if (!ta || !btn) return 'no composer: textarea=' + !!ta + ' btn=' + !!btn;
       ta.value = ${JSON.stringify(QUESTION)};
       ta.dispatchEvent(new Event('input', { bubbles: true }));
@@ -230,7 +234,8 @@ try {
   }
 
   const own = new URL(TARGET).origin;
-  console.log('\n=== 全部请求（含 worker）===');
+  console.log(`\n=== 全部请求（含 worker）===`);
+  console.log('  ort/模型相关请求数:', done.filter((d) => /ort\/|huggingface/.test(d.url)).length);
   if (done.length === 0) console.log('  (none)');
   for (const d of done.slice(0, 40)) {
     const mark = d.error ? `ERR ${d.error}` : String(d.status);

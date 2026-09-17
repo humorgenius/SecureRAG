@@ -3,7 +3,7 @@ import { sentencesWithHeading } from './answer/extractive';
 import type { Chunk } from './types';
 
 /**
- * Exhaustive literal matching — deliberately separate from the RAG answer path.
+ * Two kinds of literal search, both deliberately separate from the RAG answer path.
  *
  * The answer path is built to produce a *summary*: it fuses two retrievers, then
  * MMR discards chunks whose embeddings are near-duplicates of an already-picked
@@ -13,8 +13,14 @@ import type { Chunk } from './types';
  *
  * "Where does this word appear in my files?" is a different question and needs a
  * different pass: every chunk, every sentence, in document order, matched
- * literally, with no ranking, no dedup and no top-k. That is what this module
- * does, so the UI can say "34 matches in 2 files" instead of "2 results".
+ * literally, with no ranking, no dedup-by-similarity and no top-k.
+ *
+ *   matchAll   — fuzzy mode: a sentence qualifies if it contains any meaningful
+ *                term of the question. Word forms still match ("potato" finds
+ *                "potatoes"), question words are ignored.
+ *   matchExact — exact mode: a sentence qualifies only if it contains the query
+ *                as one unbroken string, and Latin matches must sit on word
+ *                boundaries, so "potato" does not find "potatoes" here.
  */
 
 export interface MatchTerm {
@@ -59,6 +65,7 @@ export const MATCH_ITEM_CAP = 400;
 const CJK = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\u3040-\u30ff]/;
 const LATIN_WORD = /[a-z0-9][a-z0-9'’-]*/g;
 const isCjkChar = (ch: string) => CJK.test(ch);
+const isWordChar = (ch: string) => /[a-z0-9]/.test(ch);
 
 /**
  * Turn a question into the terms a reader would search for.
@@ -107,6 +114,11 @@ export function queryTerms(query: string): MatchTerm[] {
   return out;
 }
 
+/** Trim and collapse whitespace: "potato   harvest" and a line break are one query. */
+export function normalizePhrase(query: string): string {
+  return query.trim().replace(/\s+/g, ' ');
+}
+
 /**
  * Left-boundary word match. Deliberately prefix-tolerant on the right: searching
  * "potato" should find "potatoes"; it should not find "sweetpotato".
@@ -116,8 +128,7 @@ function containsLatin(haystack: string, term: string): boolean {
   for (;;) {
     const at = haystack.indexOf(term, from);
     if (at === -1) return false;
-    const before = at > 0 ? haystack[at - 1] : '';
-    if (!/[a-z0-9]/.test(before)) return true;
+    if (!isWordChar(at > 0 ? haystack[at - 1] : '')) return true;
     from = at + 1;
   }
 }
@@ -129,59 +140,123 @@ function matchedTerms(sentenceLower: string, terms: MatchTerm[], into: string[])
   }
 }
 
-/** Every sentence in every chunk that contains at least one of the query's terms. */
-export function matchAll(chunks: Chunk[], query: string, cap = MATCH_ITEM_CAP): MatchResult {
-  const terms = queryTerms(query);
+/**
+ * Strict containment for exact mode: the whole phrase as typed must appear, and a
+ * Latin phrase must be bounded on BOTH sides — "potato" does not match "potatoes"
+ * or "sweetpotato". Chinese has no word boundaries, so a phrase matches as a
+ * substring: searching 身份 finds 身份证, which is what a Chinese reader expects.
+ */
+function containsExact(sentenceLower: string, phrase: string, latin: boolean): boolean {
+  const hay = normalizePhrase(sentenceLower);
+  if (!latin) return hay.includes(phrase);
+  let from = 0;
+  for (;;) {
+    const at = hay.indexOf(phrase, from);
+    if (at === -1) return false;
+    const before = at > 0 ? hay[at - 1] : '';
+    const after = hay[at + phrase.length] ?? '';
+    if (!isWordChar(before) && !isWordChar(after)) return true;
+    from = at + 1;
+  }
+}
+
+/**
+ * The shared walk: every sentence of every chunk, once, in library order, with
+ * `match` deciding whether it qualifies. Chunks overlap by 15%, so a sentence near
+ * a boundary lives in two chunks — without the de-duplication step a library would
+ * report matches it does not have.
+ */
+function collect(
+  chunks: Chunk[],
+  cap: number,
+  match: (sentenceLower: string, into: string[]) => void,
+  prefilter?: (chunkLower: string) => boolean
+): MatchResult {
   const byDoc = new Map<string, MatchesByDoc>();
+  const seen = new Set<string>();
   let total = 0;
   let returned = 0;
 
-  if (terms.length > 0) {
-    const lowercase = terms.filter((t) => !t.cjk).map((t) => t.term);
-    // Chunks overlap by 15%, so a sentence near a boundary lives in two chunks.
-    // Without this, a library would report matches it does not have.
-    const seen = new Set<string>();
+  chunks.forEach((chunk, chunkIndex) => {
+    const lower = chunk.text.toLowerCase();
+    if (prefilter && !prefilter(lower)) return;
 
-    chunks.forEach((chunk, chunkIndex) => {
-      const lower = chunk.text.toLowerCase();
-      // Cheap reject: a chunk that cannot contain any Latin term and has no CJK
-      // term inside it needs no sentence splitting at all.
-      if (lowercase.length > 0 && !lowercase.some((t) => lower.includes(t))) {
-        if (!terms.some((t) => t.cjk && lower.includes(t.term))) return;
+    let doc = byDoc.get(chunk.docId);
+    for (const { text, heading } of sentencesWithHeading(chunk.text, chunk.headingPath)) {
+      const key = `${chunk.docId}\u0000${text.trim()}`;
+      if (seen.has(key)) continue;
+
+      const hit: string[] = [];
+      match(text.toLowerCase(), hit);
+      if (hit.length === 0) continue;
+      seen.add(key);
+
+      total++;
+      if (returned >= cap) continue;
+      returned++;
+      if (!doc) {
+        doc = { docId: chunk.docId, docName: chunk.docName, count: 0, items: [] };
+        byDoc.set(chunk.docId, doc);
       }
-
-      let doc = byDoc.get(chunk.docId);
-      for (const { text, heading } of sentencesWithHeading(chunk.text, chunk.headingPath)) {
-        const key = `${chunk.docId}\u0000${text.trim()}`;
-        if (seen.has(key)) continue;
-        const hit: string[] = [];
-        matchedTerms(text.toLowerCase(), terms, hit);
-        if (hit.length === 0) continue;
-        seen.add(key);
-
-        total++;
-        if (returned >= cap) continue;
-        returned++;
-        if (!doc) {
-          doc = { docId: chunk.docId, docName: chunk.docName, count: 0, items: [] };
-          byDoc.set(chunk.docId, doc);
-        }
-        doc.count++;
-        doc.items.push({ heading, text, chunkId: chunk.chunkId, chunkIndex, page: chunk.page, terms: hit });
-      }
-    });
-  }
-
-  const docs = Array.from(byDoc.values());
-  // Chunks are visited in library order; keep the per-document lists in the same
-  // order the reader will find them in the file.
-  for (const doc of docs) doc.items.sort((a, b) => a.chunkIndex - b.chunkIndex);
+      doc.count++;
+      doc.items.push({ heading, text, chunkId: chunk.chunkId, chunkIndex, page: chunk.page, terms: hit });
+    }
+  });
 
   return {
-    terms: terms.map((t) => t.term),
+    terms: [],
     total,
-    docs,
+    docs: Array.from(byDoc.values()),
     capped: total > returned,
     scanned: chunks.length,
   };
+}
+
+/** Fuzzy literal search: every sentence containing any meaningful term of `query`. */
+export function matchAll(chunks: Chunk[], query: string, cap = MATCH_ITEM_CAP): MatchResult {
+  const terms = queryTerms(query);
+  if (terms.length === 0) {
+    return { terms: [], total: 0, docs: [], capped: false, scanned: chunks.length };
+  }
+  const latin = terms.filter((t) => !t.cjk).map((t) => t.term);
+
+  const result = collect(
+    chunks,
+    cap,
+    (sentenceLower, into) => matchedTerms(sentenceLower, terms, into),
+    // Cheap reject: a chunk that cannot contain any Latin term and no CJK term
+    // needs no sentence splitting at all.
+    (chunkLower) =>
+      latin.some((t) => chunkLower.includes(t)) ||
+      terms.some((t) => t.cjk && chunkLower.includes(t.term))
+  );
+
+  result.terms = terms.map((t) => t.term);
+  return result;
+}
+
+/**
+ * Exact search: every sentence containing the query as one unbroken phrase.
+ * Case-insensitive, because "Potato" and "potato" are the same word to a reader;
+ * whitespace in the query is collapsed, so a phrase typed with a line break in it
+ * still matches.
+ */
+export function matchExact(chunks: Chunk[], query: string, cap = MATCH_ITEM_CAP): MatchResult {
+  const phrase = normalizePhrase(query).toLowerCase();
+  if (phrase.length === 0) {
+    return { terms: [], total: 0, docs: [], capped: false, scanned: chunks.length };
+  }
+  const latin = /[a-z]/.test(phrase);
+
+  const result = collect(
+    chunks,
+    cap,
+    (sentenceLower, into) => {
+      if (containsExact(sentenceLower, phrase, latin)) into.push(phrase);
+    },
+    (chunkLower) => normalizePhrase(chunkLower).includes(phrase)
+  );
+
+  result.terms = [phrase];
+  return result;
 }

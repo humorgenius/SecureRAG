@@ -242,7 +242,7 @@ export const DocList: FunctionComponent<
 export const ChatPanel: FunctionComponent<
   Base & {
     messages: SessionMessage[];
-    onAsk: (question: string) => void;
+    onAsk: (question: string, mode: 'exact' | 'fuzzy') => void;
     busy: boolean;
     phase: 'idle' | 'searching' | 'generating';
     streamText: string;
@@ -254,10 +254,10 @@ export const ChatPanel: FunctionComponent<
 > = ({ lang, messages, onAsk, busy, phase, streamText, strictness, onExport, onClear, onOpenSource }) => {
   let input: HTMLTextAreaElement | undefined;
 
-  const submit = () => {
+  const submit = (mode: 'exact' | 'fuzzy' = 'fuzzy') => {
     const value = input?.value.trim();
     if (!value || busy) return;
-    onAsk(value);
+    onAsk(value, mode);
     if (input) input.value = '';
   };
 
@@ -319,6 +319,8 @@ export const ChatPanel: FunctionComponent<
                     </>
                   )}
                 </div>
+              ) : msg.searchMode === 'exact' ? (
+                <p class="sr-exact-h">{msg.text}</p>
               ) : (
                 <p class="sr-atext">
                   {msg.text.split(/(\[\d+\])/g).map((part) => {
@@ -363,12 +365,18 @@ export const ChatPanel: FunctionComponent<
               )}
 
               {msg.matches && msg.matches.total > 0 && (
-                <details class="sr-matches">
+                <details class="sr-matches" open={msg.searchMode === 'exact'}>
                   <summary>
-                    <span class="sr-matches-h">{ta(lang, 'match.title', { n: msg.matches.total })}</span>
+                    <span class="sr-matches-h">
+                      {ta(lang, msg.searchMode === 'exact' ? 'match.titleExact' : 'match.title', {
+                        n: msg.matches.total,
+                      })}
+                    </span>
                     <span class="sr-muted">{ta(lang, 'match.files', { n: msg.matches.docs.length })}</span>
                   </summary>
-                  <p class="sr-muted sr-matches-note">{ta(lang, 'match.note')}</p>
+                  <p class="sr-muted sr-matches-note">
+                    {ta(lang, msg.searchMode === 'exact' ? 'match.noteExact' : 'match.note')}
+                  </p>
                   {msg.matches.capped && (
                     <p class="sr-muted">
                       {ta(lang, 'match.capped', {
@@ -437,9 +445,20 @@ export const ChatPanel: FunctionComponent<
             }
           }}
         />
-        <button class="btn btn-blue" type="button" onClick={submit} disabled={busy}>
-          {ta(lang, 'chat.send')}
-        </button>
+        <span class="sr-send-group">
+          <button
+            class="btn btn-white"
+            type="button"
+            onClick={() => submit('exact')}
+            disabled={busy}
+            title={ta(lang, 'chat.sendExactHint')}
+          >
+            {ta(lang, 'chat.sendExact')}
+          </button>
+          <button class="btn btn-blue" type="button" onClick={() => submit('fuzzy')} disabled={busy}>
+            {ta(lang, 'chat.sendFuzzy')}
+          </button>
+        </span>
       </div>
     </section>
   );
