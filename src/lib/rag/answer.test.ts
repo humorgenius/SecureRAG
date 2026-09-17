@@ -30,11 +30,31 @@ describe('splitSentences', () => {
 describe('scoreSentence', () => {
   it('scores a sentence that covers more of the question higher', () => {
     const tokens = new Set(['解约', '通知', '期']);
-    const strong = scoreSentence('任一方提前 60 天书面通知即可解约。', tokens);
-    const weak = scoreSentence('本合同一式两份，双方各执一份。', tokens);
+    const question = '解约通知';
+    const strong = scoreSentence('任一方提前 60 天书面通知即可解约。', tokens, question);
+    const weak = scoreSentence('本合同一式两份，双方各执一份。', tokens, question);
+    expect(strong.qualified).toBe(true);
     expect(strong.hits).toBeGreaterThan(0);
+    expect(weak.qualified).toBe(false);
     expect(weak.hits).toBe(0);
     expect(strong.score).toBeGreaterThan(weak.score);
+  });
+
+  it('disqualifies a sentence that only shares single characters', () => {
+    const tokens = new Set(['身份', '份证']);
+    // 我的 / 是 used to be enough to quote a sentence. Now they are not tokens at all.
+    const noise = scoreSentence('我是本表格的填写人。', tokens, '身份证号');
+    expect(noise.qualified).toBe(false);
+    expect(noise.score).toBe(0);
+  });
+
+  it('rewards the longer shared run', () => {
+    const tokens = new Set(['身份', '份证', '证号']);
+    const question = '身份证号';
+    const exact = scoreSentence('身份证号码为 110101199003071234。', tokens, question);
+    const partial = scoreSentence('本人身份证明文件如下。', tokens, question);
+    expect(exact.run).toBeGreaterThan(partial.run);
+    expect(exact.score).toBeGreaterThan(partial.score);
   });
 });
 

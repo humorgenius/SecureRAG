@@ -1,6 +1,7 @@
 import { LIMITS } from '../limits';
 import { tokenize } from '../bm25';
 import { isHeadingLine } from '../chunk';
+import { contentChars, longestCommonRun } from '../stopwords';
 import type { AnswerResult, CitationRef, ScoredChunk, Strictness } from '../types';
 
 const SENTENCE_SPLIT = /(?<=[。！？；])|(?<=[.!?;])\s+/;
@@ -19,16 +20,36 @@ export function splitSentences(text: string): string[] {
  * Both matter: a long paragraph containing one query word is less useful than a
  * short clause containing three.
  */
-export function scoreSentence(sentence: string, queryTokens: Set<string>): { score: number; hits: number } {
+export function scoreSentence(
+  sentence: string,
+  queryTokens: Set<string>,
+  queryContent: string
+): { score: number; hits: number; run: number; qualified: boolean } {
+  // The "don't split my word" rule, measured rather than guessed: how many
+  // consecutive content characters does this sentence share with the question?
+  // Asking "身份证" then demands that 身份 actually appear — a sentence holding
+  // only 身份 or only 证 is not treated as containing the answer.
+  const run = longestCommonRun(queryContent, contentChars(sentence));
+
   const tokens = tokenize(sentence);
-  if (tokens.length === 0) return { score: 0, hits: 0 };
+  if (tokens.length === 0) return { score: 0, hits: 0, run, qualified: false };
+
   const unique = new Set(tokens);
   let hits = 0;
   for (const t of unique) if (queryTokens.has(t)) hits++;
+
   const coverage = hits / Math.max(1, queryTokens.size);
   const density = hits / Math.max(1, unique.size);
   const lengthPenalty = sentence.length > 420 ? 0.7 : 1;
-  return { score: (coverage * 0.7 + density * 0.3) * lengthPenalty, hits };
+  const runShare = queryContent.length ? Math.min(1, run / queryContent.length) : 0;
+  const qualified = run >= 2;
+
+  return {
+    score: qualified ? (runShare * 0.55 + coverage * 0.3 + density * 0.15) * lengthPenalty : 0,
+    hits,
+    run,
+    qualified,
+  };
 }
 
 interface Candidate {
@@ -40,6 +61,10 @@ interface Candidate {
   inferred: boolean;
   /** the section this sentence sits under — may be narrower than the chunk's */
   heading: string[];
+  /** longest run of content characters shared with the question */
+  run: number;
+  /** cleared the "shares a meaningful run" bar — only these may be quoted */
+  qualified: boolean;
 }
 
 /**
@@ -86,19 +111,29 @@ export function extractiveAnswer(chunks: ScoredChunk[], question: string, mode: 
   }
 
   const queryTokens = new Set(tokenize(question));
+  const queryContent = contentChars(question);
   const candidates: Candidate[] = [];
 
   chunks.forEach((chunk, chunkIndex) => {
     sentencesWithHeading(chunk.text, chunk.headingPath).forEach(({ text: sentence, heading }, sentenceIndex) => {
-      const { score, hits } = scoreSentence(sentence, queryTokens);
-      candidates.push({ chunkIndex, sentenceIndex, text: sentence, score, hits, inferred: hits === 0, heading });
+      const { score, hits, run, qualified } = scoreSentence(sentence, queryTokens, queryContent);
+      // Keep EVERY sentence as a candidate so balanced mode can still show the
+      // surrounding context; the gate only decides what may be presented as the
+      // answer. Filtering here instead would also remove the neighbours that
+      // balanced mode exists to provide.
+      candidates.push({ chunkIndex, sentenceIndex, text: sentence, score, hits, inferred: hits === 0, heading, run, qualified });
     });
   });
 
-  const direct = candidates.filter((c) => c.hits > 0).sort((a, b) => b.score - a.score || a.chunkIndex - b.chunkIndex);
+  // The answer pool. A sentence must share at least two consecutive content
+  // characters with the question: single characters like 我 / 的 / 是 are not
+  // evidence, and quoting them is what produced unreadable answers.
+  const direct = candidates
+    .filter((c) => c.qualified)
+    .sort((a, b) => b.run - a.run || b.score - a.score || a.chunkIndex - b.chunkIndex);
 
   if (direct.length === 0) {
-    // Nothing in the corpus echoes the question at all.
+    // Nothing in the corpus shares a meaningful run with the question.
     return { mode, text: '', citations: [], usedChunkIds: [], notFound: true, inferred: [] };
   }
 

@@ -1,24 +1,37 @@
+import { isStopToken } from './stopwords';
+
 /**
  * Minimal BM25 over a small in-memory corpus.
- * Tokenisation is CJK-aware: every CJK character becomes a unigram, and adjacent
- * CJK pairs become bigrams (which is what makes "解约通知期" match "通知期").
+ *
+ * Tokenisation is CJK-aware: adjacent CJK pairs become bigrams, which is what
+ * lets "解约通知期" match "通知期". Single CJK characters are deliberately NOT
+ * indexed (see stopwords.ts): one common character like 我 / 的 / 是 appears in
+ * almost every sentence, so indexing them made "我的身份证号是多少？" return every
+ * sentence containing 我 or 的 instead of the one sentence with the answer.
  */
-const CJK = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\u3040-\u30ff]/;
+const CJK_RUNS = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\u3040-\u30ff]+/g;
 
 export function tokenize(text: string): string[] {
   const tokens: string[] = [];
   const lower = text.toLowerCase();
-  const latin = lower.match(/[a-z0-9][a-z0-9._§#-]*/g) ?? [];
-  for (const w of latin) {
-    if (w.length > 1) tokens.push(w);
-    else if (/[0-9]/.test(w)) tokens.push(w);
+
+  for (const w of lower.match(/[a-z0-9][a-z0-9._§#-]*/g) ?? []) {
+    if (w.length > 1 || /[0-9]/.test(w)) {
+      if (!isStopToken(w)) tokens.push(w);
+    }
   }
 
-  const cjkRuns = lower.match(/[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\u3040-\u30ff]+/g) ?? [];
-  for (const run of cjkRuns) {
+  for (const run of lower.match(CJK_RUNS) ?? []) {
     const chars = Array.from(run);
-    for (const ch of chars) tokens.push(ch);
-    for (let i = 0; i < chars.length - 1; i++) tokens.push(chars[i] + chars[i + 1]);
+    if (chars.length === 1) {
+      // A one-character query must still be searchable.
+      if (!isStopToken(chars[0])) tokens.push(chars[0]);
+      continue;
+    }
+    for (let i = 0; i + 1 < chars.length; i++) {
+      const bigram = chars[i] + chars[i + 1];
+      if (!isStopToken(bigram)) tokens.push(bigram);
+    }
   }
   return tokens;
 }

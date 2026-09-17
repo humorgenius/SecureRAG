@@ -19,7 +19,21 @@ const TARGET = (process.argv[2] ?? 'http://localhost:4321/zh/app/').replace(/^--
 const PORT = 9337;
 const USE_PROXY = !process.argv.includes('--no-proxy');
 
-const SAMPLE = '# 服务协议\n\n## 8.2 解约\n任一方提前六十天书面通知即可解约。\n\n## 9.1 费用\n双方各自承担己方产生的费用。\n';
+// The document from the bug report: several sentences containing 我 / 的 / 是 and
+// exactly one line that answers the question.
+const SAMPLE = [
+  '# 个人资料',
+  '',
+  '我是本表格的填写人。',
+  '我的住址如下所述。',
+  '',
+  '## 证件',
+  '',
+  '身份证号码为 110101199003071234。',
+  '',
+  '本合同一式两份，双方各执一份。',
+  '',
+].join('\n');
 
 const chrome = spawn(
   CHROME,
@@ -146,7 +160,7 @@ try {
       const ta = document.querySelector('textarea');
       const btn = [...document.querySelectorAll('button')].find((b) => /发送|Send/.test(b.innerText || ''));
       if (!ta || !btn) return 'no composer: textarea=' + !!ta + ' btn=' + !!btn;
-      ta.value = '解约需要提前多久通知？';
+      ta.value = '我的身份证号是多少？';
       ta.dispatchEvent(new Event('input', { bubbles: true }));
       btn.click();
       return 'asked';

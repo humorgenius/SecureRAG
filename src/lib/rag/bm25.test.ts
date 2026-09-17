@@ -2,12 +2,26 @@ import { describe, expect, it } from 'vitest';
 import { Bm25Index, tokenize } from './bm25';
 
 describe('tokenize', () => {
-  it('produces CJK bigrams so partial phrases match', () => {
+  it('indexes CJK bigrams, not single characters', () => {
     const tokens = tokenize('解约通知期');
-    expect(tokens).toContain('解');
     expect(tokens).toContain('解约');
     expect(tokens).toContain('通知');
     expect(tokens).toContain('知期');
+    // 解 alone would match 解除 / 解决 / 理解 — the reason a question like
+    // "我的身份证号是多少？" used to return unrelated sentences.
+    expect(tokens).not.toContain('解');
+  });
+
+  it('still indexes a lone CJK character so one-character queries work', () => {
+    expect(tokenize('税')).toContain('税');
+  });
+
+  it('drops question words and function words', () => {
+    expect(tokenize('多少')).toHaveLength(0);
+    const tokens = tokenize('我的身份证号是多少');
+    expect(tokens).not.toContain('多少');
+    expect(tokens).toContain('身份');
+    expect(tokens).toContain('份证');
   });
 
   it('keeps latin words and numeric identifiers', () => {
