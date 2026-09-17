@@ -47,22 +47,40 @@ function tableRows(paragraphXml: string): string | null {
   return '| ' + cells.map((cell) => paragraphText(cell) || ' ').join(' | ') + ' |';
 }
 
-export async function parseDocx(buffer: ArrayBuffer, name: string, id: string): Promise<RawDoc> {
-  // JSZip is a static import on purpose. As a dynamic `import('jszip')` inside the
-  // ingest worker it could fail to resolve at runtime ("Failed to fetch
-  // dynamically imported module") — every .docx upload then died and was
-  // reported as "unsupported file format". Bundling it with the worker removes
-  // that failure mode entirely.
-  let zip: Awaited<ReturnType<typeof JSZip.loadAsync>>;
+/**
+ * Get `word/document.xml` out of either container shape:
+ *  - the normal OOXML ZIP
+ *  - a "flat OPC" document, which is a single XML file that a few converters and
+ *    exporters emit with a .docx extension. Treating that as "unsupported
+ *    format" is a false negative: the text is right there.
+ *
+ * JSZip is a static import on purpose. As a dynamic `import('jszip')` inside the
+ * ingest worker it could fail to resolve at runtime ("Failed to fetch
+ * dynamically imported module") — every .docx upload then died and was reported
+ * as "unsupported file format". Bundling it with the worker removes that
+ * failure mode entirely.
+ */
+async function readDocumentXml(buffer: ArrayBuffer, name: string): Promise<string> {
   try {
-    zip = await JSZip.loadAsync(buffer);
+    const zip = await JSZip.loadAsync(buffer);
+    // Lenient lookup: some producers store entries with a leading slash.
+    const key = Object.keys(zip.files).find((p) => p.replace(/^\//, '').toLowerCase() === 'word/document.xml');
+    if (key) return await zip.files[key].async('string');
   } catch {
-    throw new RagError('UNSUPPORTED_FORMAT', `${name}: not a readable .docx container`);
+    // Not a ZIP at all — fall through to the flat check below.
   }
 
-  const file = zip.file('word/document.xml');
-  if (!file) throw new RagError('UNSUPPORTED_FORMAT', `${name}: word/document.xml missing`);
-  const xml = await file.async('string');
+  const asText = new TextDecoder('utf-8', { fatal: false }).decode(buffer);
+  if (/<w:document[\s>]/.test(asText)) return asText;
+
+  throw new RagError(
+    'UNSUPPORTED_FORMAT',
+    `${name}: no readable .docx container and no flat OPC document (word/document.xml not found)`
+  );
+}
+
+export async function parseDocx(buffer: ArrayBuffer, name: string, id: string): Promise<RawDoc> {
+  const xml = await readDocumentXml(buffer, name);
 
   const body = xml.match(/<w:body>([\s\S]*)<\/w:body>/)?.[1] ?? xml;
   const blocks = body.match(/<w:tbl>[\s\S]*?<\/w:tbl>|<w:p\b[\s\S]*?<\/w:p>/g) ?? [];
