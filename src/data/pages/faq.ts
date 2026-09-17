@@ -114,11 +114,11 @@ export default {
             },
             {
               q: 'What can I export, and how?',
-              a: 'An answer copies to the clipboard with its citations attached, and browser printing turns any page into a PDF, which is the most reliable way to keep a cited answer next to its sources. Both are browser features rather than export jobs, because there is no server to run a job on.',
+              a: 'A session exports from the chat panel as Markdown, JSON or plain text, and the export carries the model name, the strictness setting and every citation, which is the most reliable way to keep an answer next to its sources. Answers also copy to the clipboard, and browser printing produces a PDF of any page. No part of the export touches a server, because there is no server to run the job.',
             },
             {
               q: 'The answer looks wrong. What should I do?',
-              a: 'Read the citations before doubting the tool. If the passage that contains the answer is not among them, the problem is retrieval rather than reading: raise strictness, ask a narrower question, or re-import the document when repeated headers and footers are crowding out the body text. If the right passage is cited and the answer still misreads it, switch strictness to citations-only and read the passage yourself.',
+              a: 'Read the citations before doubting the tool. If the passage that contains the answer is not among them, the problem is retrieval rather than reading: raise strictness, ask a narrower question, or re-import the document when repeated headers and footers are crowding out the body text. If the right passage is cited and the answer still misreads it, switch strictness to “Documents only” and read the passage yourself.',
             },
             {
               q: 'Can it read tables?',
@@ -265,11 +265,11 @@ export default {
             },
             {
               q: '能导出什么，怎么导？',
-              a: '回答可以连着引用一起复制到剪贴板，浏览器打印能把任意页面变成 PDF，这是把带引用的回答和来源放在一起保存最可靠的方式。这两条都是浏览器自带能力，而不是服务端的导出任务，因为这里没有服务器来跑任务。',
+              a: '在对话面板里可以把本次会话导出为 Markdown、JSON 或纯文本，导出内容包含模型名、严格度设置与全部引用，这是把回答和来源一起保存最可靠的方式。回答也可以复制到剪贴板，浏览器打印能把任意页面变成 PDF。整个导出过程不经过服务器，因为没有服务器来跑这个任务。',
             },
             {
               q: '回答看起来不对，该怎么办？',
-              a: '先看引用，再怀疑工具。如果含答案的那一段根本不在引用里，问题出在检索而不是在阅读：提高严格度、把问题问得更窄，或者在重复页眉页脚挤占正文时重新导入这份文档。如果正确的段落被引用了、回答还是读错，就把严格度切回「只给引用」，自己读那一段。',
+              a: '先看引用，再怀疑工具。如果含答案的那一段根本不在引用里，问题出在检索而不是在阅读：提高严格度、把问题问得更窄，或者在重复页眉页脚挤占正文时重新导入这份文档。如果正确的段落被引用了、回答还是读错，就把严格度切回「仅依据文档」，自己读那一段。',
             },
             {
               q: '能处理表格吗？',

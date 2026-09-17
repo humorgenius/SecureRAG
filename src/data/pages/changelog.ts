@@ -87,7 +87,7 @@ export default {
             ],
             [
               'Taking work out',
-              'An answer copies to the clipboard with its citations, and browser printing produces a PDF of any page. There is no server-side export.',
+              'A session exports from the chat panel as Markdown, JSON or plain text, carrying the model name, the strictness setting and every citation. Answers also copy to the clipboard, and browser printing produces a PDF of any page. No part of that export touches a server.',
             ],
           ],
         },
@@ -217,7 +217,7 @@ export default {
             ],
             [
               '把结果带走',
-              '回答可连同引用复制到剪贴板，浏览器打印能把任意页面导出成 PDF。没有服务端导出。',
+              '会话可以从对话面板导出为 Markdown、JSON 或纯文本，内容包含模型名、严格度设置与全部引用。回答也可以复制到剪贴板，浏览器打印能把任意页面导出成 PDF。整个导出过程不经过服务器。',
             ],
           ],
         },
