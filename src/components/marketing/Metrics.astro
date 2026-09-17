@@ -1,0 +1,83 @@
+---
+import { home } from '../../data/home';
+import type { Lang } from '../../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const metrics = home[lang].metrics;
+---
+
+<div class="band">
+  <div class="wrap">
+    <div class="metrics anim-in">
+      {
+        metrics.map((m) => (
+          <div class="metric">
+            <div class="n">
+              {m.n}
+              {m.unit && <small>{m.unit}</small>}
+            </div>
+            <div class="l">{m.label}</div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  .band {
+    background: var(--bg);
+    padding: 0 0 8px;
+  }
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--sh-1);
+    overflow: hidden;
+    margin-top: 58px;
+  }
+  .metric {
+    padding: 26px 24px;
+    border-right: 1px solid var(--line);
+  }
+  .metric:last-child {
+    border-right: 0;
+  }
+  .n {
+    font-size: 34px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -.04em;
+    line-height: 1;
+  }
+  .n small {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0;
+    margin-left: 4px;
+  }
+  .l {
+    margin-top: 9px;
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  @media (max-width: 880px) {
+    .metrics {
+      grid-template-columns: 1fr 1fr;
+      margin-top: 42px;
+    }
+    .metric:nth-child(2) {
+      border-right: 0;
+    }
+    .metric:nth-child(1),
+    .metric:nth-child(2) {
+      border-bottom: 1px solid var(--line);
+    }
+  }
+</style>

@@ -1,0 +1,65 @@
+---
+import { SITE } from '../../data/site';
+import { altLangPath } from '../../lib/i18n/route';
+import { HTML_LANG, type Lang } from '../../i18n/utils';
+
+interface Props {
+  title: string;
+  description: string;
+  lang: Lang;
+  /** locale-prefixed, trailing-slash path, e.g. '/en/models/' */
+  path: string;
+  type?: string;
+  image?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  lang,
+  path,
+  type = 'website',
+  image = '/og/og-default.png',
+  noindex = false,
+} = Astro.props;
+
+const canonical = new URL(path, SITE.url).href;
+const enUrl = new URL(altLangPath(Astro.url.pathname, 'en'), SITE.url).href;
+const zhUrl = new URL(altLangPath(Astro.url.pathname, 'zh'), SITE.url).href;
+/** The root gateway is the x-default target; every other page defers to /en/. */
+const xDefault = path === '/' ? canonical : lang === 'en' ? enUrl : new URL('/', SITE.url).href;
+const imageUrl = new URL(image, SITE.url).href;
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<link rel="alternate" hreflang="en" href={enUrl} />
+<link rel="alternate" hreflang="zh-Hans" href={zhUrl} />
+<link rel="alternate" hreflang="x-default" href={xDefault} />
+{noindex && <meta name="robots" content="noindex,follow" />}
+<meta name="theme-color" content="#0a1730" />
+<meta name="format-detection" content="telephone=no" />
+
+<meta property="og:type" content={type} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:image" content={imageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content={SITE.localeOf[lang]} />
+<meta property="og:locale:alternate" content={SITE.localeOf[lang === 'en' ? 'zh' : 'en']} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />
+<meta name="twitter:site" content={SITE.twitter} />
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="manifest" href="/manifest.webmanifest" />

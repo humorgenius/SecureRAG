@@ -1,0 +1,188 @@
+---
+import { PRIMARY_NAV, FOOTER_TRUST, FOOTER_RESOURCES } from '../../i18n/nav';
+import { localizePath, t, type Lang } from '../../i18n/utils';
+import LangSwitch from './LangSwitch.astro';
+
+interface Props {
+  lang: Lang;
+  path: string;
+  activeNav?: string;
+}
+
+const { lang, path, activeNav } = Astro.props;
+const homeHref = localizePath(lang, '/');
+const toolHref = localizePath(lang, '/app/');
+const mobileItems = [...PRIMARY_NAV, ...FOOTER_RESOURCES.slice(0, 3), ...FOOTER_TRUST.slice(0, 2)];
+---
+
+<header class="site-header">
+  <div class="wrap hdr">
+    <a class="brand" href={homeHref} aria-label={t(lang, 'nav.home')}>
+      <span class="mk" aria-hidden="true">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2.6 4.6 5.3v6c0 4.6 3.1 8.8 7.4 10.1 4.3-1.3 7.4-5.5 7.4-10.1v-6L12 2.6Z" stroke="#fff" stroke-width="1.6"></path>
+          <path d="M8.8 12.2l2.2 2.2 4.4-4.5" stroke="#fff" stroke-width="1.7" stroke-linecap="round"></path>
+        </svg>
+      </span>
+      SecureRAG
+    </a>
+
+    <nav class="primary" aria-label="Main">
+      {
+        PRIMARY_NAV.map((item) => {
+          const href = localizePath(lang, item.path);
+          const active = activeNav === item.path;
+          return (
+            <a href={href} class={active ? 'on' : ''} aria-current={active ? 'page' : undefined}>
+              {t(lang, item.key)}
+            </a>
+          );
+        })
+      }
+    </nav>
+
+    <div class="hdr-r">
+      <LangSwitch lang={lang} path={path} />
+      <a class="btn btn-blue" href={toolHref}>{t(lang, 'cta.open')}</a>
+    </div>
+
+    <details class="mnav">
+      <summary aria-label={t(lang, 'nav.menu')}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path>
+        </svg>
+      </summary>
+      <div class="mnav-panel">
+        {
+          mobileItems.map((item) => (
+            <a href={localizePath(lang, item.path)}>{t(lang, item.key)}</a>
+          ))
+        }
+        <div class="mnav-foot">
+          <LangSwitch lang={lang} path={path} />
+          <a class="btn btn-blue" href={toolHref}>{t(lang, 'cta.open')}</a>
+        </div>
+      </div>
+    </details>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    background: rgba(10, 23, 48, .92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, .09);
+  }
+  .hdr {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    height: 64px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    font-size: 16px;
+    white-space: nowrap;
+  }
+  .mk {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: linear-gradient(150deg, #3f7dff, #1f52c4);
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+  }
+  .primary {
+    display: flex;
+    gap: 22px;
+    margin-left: 10px;
+  }
+  .primary a {
+    font-size: 14px;
+    color: rgba(255, 255, 255, .66);
+    font-weight: 500;
+    transition: color .15s;
+    white-space: nowrap;
+  }
+  .primary a:hover,
+  .primary a.on {
+    color: #fff;
+  }
+  .hdr-r {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .mnav {
+    display: none;
+    margin-left: auto;
+    color: #fff;
+  }
+  .mnav > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 8px 10px;
+    border: 1px solid rgba(255, 255, 255, .2);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+  }
+  .mnav > summary::-webkit-details-marker {
+    display: none;
+  }
+  .mnav-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 64px;
+    background: #0a1730;
+    border-bottom: 1px solid rgba(255, 255, 255, .12);
+    padding: 14px var(--pad) 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+  }
+  .mnav-panel a {
+    color: rgba(255, 255, 255, .8);
+    font-size: 15px;
+    font-weight: 500;
+    padding: 11px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .07);
+  }
+  .mnav-foot {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 18px;
+    border-bottom: 0;
+    flex-wrap: wrap;
+  }
+  .mnav-foot a {
+    border-bottom: 0;
+    padding: 0;
+  }
+  @media (max-width: 1080px) {
+    .primary {
+      display: none;
+    }
+    .hdr-r {
+      display: none;
+    }
+    .mnav {
+      display: block;
+    }
+  }
+</style>

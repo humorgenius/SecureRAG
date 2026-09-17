@@ -1,0 +1,28 @@
+---
+import SectionPage from '../../components/marketing/SectionPage.astro';
+import { PAGES } from '../../data/pages';
+import { useTranslations, type Lang } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  const paths: { params: { lang: string; slug: string } }[] = [];
+  for (const slug of Object.keys(PAGES)) {
+    for (const lang of ['en', 'zh'] as const) paths.push({ params: { lang, slug } });
+  }
+  return paths;
+}
+
+const { lang: langParam, slug } = Astro.params as { lang: string; slug: string };
+const lang: Lang = langParam === 'zh' ? 'zh' : 'en';
+const t = useTranslations(lang);
+const page = PAGES[slug];
+const copy = page.copy[lang];
+---
+
+<SectionPage
+  lang={lang}
+  path={`/${lang}/${slug}/`}
+  copy={copy}
+  related={page.related}
+  ads={page.ads}
+  flags={page.schema}
+/>

@@ -1,0 +1,143 @@
+---
+import { FOOTER_PLATFORM, FOOTER_RESOURCES, FOOTER_TRUST } from '../../i18n/nav';
+import { localizePath, t, type Lang } from '../../i18n/utils';
+import { SITE } from '../../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const columns = [
+  { title: 'footer.colPlatform' as const, items: FOOTER_PLATFORM },
+  { title: 'footer.colResources' as const, items: FOOTER_RESOURCES },
+  { title: 'footer.colTrust' as const, items: FOOTER_TRUST },
+];
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="fg">
+      <div class="fbrand">
+        <a class="brand" href={localizePath(lang, '/')}>
+          <span class="mk" aria-hidden="true">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2.6 4.6 5.3v6c0 4.6 3.1 8.8 7.4 10.1 4.3-1.3 7.4-5.5 7.4-10.1v-6L12 2.6Z" stroke="#fff" stroke-width="1.6"></path>
+              <path d="M8.8 12.2l2.2 2.2 4.4-4.5" stroke="#fff" stroke-width="1.7" stroke-linecap="round"></path>
+            </svg>
+          </span>
+          SecureRAG
+        </a>
+        <p>{t(lang, 'footer.tagline')}</p>
+        <p class="mail"><a href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a></p>
+      </div>
+      {
+        columns.map((col) => (
+          <div>
+            <h5>{t(lang, col.title)}</h5>
+            {col.items.map((item) => (
+              <a href={localizePath(lang, item.path)}>{t(lang, item.key)}</a>
+            ))}
+          </div>
+        ))
+      }
+    </div>
+    <div class="fbot">
+      <span>{t(lang, 'footer.legal')}</span>
+      <span class="pledge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2.6 4.6 5.3v6c0 4.6 3.1 8.8 7.4 10.1 4.3-1.3 7.4-5.5 7.4-10.1v-6L12 2.6Z" stroke="currentColor" stroke-width="1.8"></path>
+        </svg>
+        {t(lang, 'footer.local')}
+      </span>
+      <span>{t(lang, 'footer.ads')}</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 70px;
+    background: #081228;
+    color: rgba(255, 255, 255, .6);
+    padding: 52px 0 34px;
+  }
+  .fg {
+    display: grid;
+    grid-template-columns: 1.7fr 1fr 1fr 1fr;
+    gap: 32px;
+  }
+  .fbrand p {
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 38ch;
+  }
+  .fbrand .mail {
+    margin-top: 10px;
+    font-size: 13.5px;
+  }
+  .fbrand .mail a:hover {
+    color: #fff;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    font-size: 16px;
+    margin-bottom: 14px;
+  }
+  .mk {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: linear-gradient(150deg, #3f7dff, #1f52c4);
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+  }
+  h5 {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, .42);
+    margin: 0 0 14px;
+  }
+  .fg a {
+    display: block;
+    font-size: 14px;
+    color: rgba(255, 255, 255, .62);
+    padding: 5px 0;
+    transition: color .15s;
+  }
+  .fg a:hover {
+    color: #fff;
+  }
+  .fbot {
+    margin-top: 38px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(255, 255, 255, .11);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 26px;
+    justify-content: space-between;
+    font-size: 13px;
+    color: rgba(255, 255, 255, .48);
+  }
+  .pledge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #7ee0b3;
+    font-weight: 600;
+  }
+  @media (max-width: 880px) {
+    .fg {
+      grid-template-columns: 1fr 1fr;
+    }
+    .fbrand {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

@@ -1,0 +1,135 @@
+---
+import { home } from '../../data/home';
+import { localizePath, type Lang } from '../../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const c = home[lang].tiers;
+---
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">{c.eyebrow}</p>
+    <h2 class="h2" style="margin-top:12px">{c.heading}</h2>
+    <div class="tiers">
+      {
+        c.items.map((tier) => (
+          <div class={tier.primary ? 'tier pick card' : 'tier card'}>
+            <span class={tier.primary ? 'rec' : 'rec dark'}>{tier.rec}</span>
+            <h3>{tier.title}</h3>
+            <p class="who">{tier.who}</p>
+            <div class="big">
+              {tier.big}
+              <small>{tier.bigNote}</small>
+            </div>
+            <ul>
+              {tier.items.map((item) => (
+                <li>
+                  {item.warn ? (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path
+                        d="M12 9v4m0 3h.01M10.3 3.9 2.6 17.4A2 2 0 0 0 4.3 20.4h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"
+                        stroke="#b54708"
+                        stroke-width="1.9"
+                        stroke-linecap="round"></path>
+                    </svg>
+                  ) : (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M5 13l4 4L19 7" stroke="#0f7a4f" stroke-width="2.6" stroke-linecap="round"></path>
+                    </svg>
+                  )}
+                  <span>{item.text}</span>
+                </li>
+              ))}
+            </ul>
+            <a class={tier.primary ? 'btn btn-blue' : 'btn btn-white'} href={localizePath(lang, '/models/')}>
+              {tier.cta}
+            </a>
+          </div>
+        ))
+      }
+    </div>
+    <p class="note" style="margin-top:20px">{c.note}</p>
+  </div>
+</section>
+
+<style>
+  .tiers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 36px;
+  }
+  .tier {
+    padding: 28px 26px;
+    position: relative;
+  }
+  .tier.pick {
+    border-color: #bcd2fb;
+    box-shadow: var(--sh-2);
+  }
+  .rec {
+    position: absolute;
+    top: -11px;
+    left: 26px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    background: var(--blue);
+    color: #fff;
+    border-radius: 999px;
+    padding: 4px 11px;
+  }
+  .rec.dark {
+    background: var(--ink);
+  }
+  h3 {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+  .who {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+  .big {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -.035em;
+  }
+  .big small {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0;
+    margin-left: 5px;
+  }
+  ul {
+    margin: 20px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+  li {
+    display: flex;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+  li svg {
+    flex: 0 0 auto;
+    margin-top: 4px;
+  }
+  .tier > a {
+    width: 100%;
+    margin-top: 22px;
+  }
+  @media (max-width: 820px) {
+    .tiers {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

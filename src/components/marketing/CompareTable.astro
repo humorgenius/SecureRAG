@@ -1,0 +1,41 @@
+---
+import { home } from '../../data/home';
+import type { Lang } from '../../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const c = home[lang].compare;
+---
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">{c.eyebrow}</p>
+    <h2 class="h2" style="margin-top:12px">{c.heading}</h2>
+    <div class="tw">
+      <table class="data">
+        <caption>{c.caption}</caption>
+        <thead>
+          <tr>
+            <th>{c.head.criterion}</th>
+            <th>{c.head.us}</th>
+            <th>{c.head.them}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            c.rows.map((row) => (
+              <tr>
+                <td>{row.criterion}</td>
+                <td class={row.edge === 'us' ? 'yes' : ''}>{row.us}</td>
+                <td class={row.edge === 'them' ? 'yes' : 'no'}>{row.them}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="note" style="margin-top:20px">
+      <b>{c.noteTitle}</b> {c.note}
+    </p>
+  </div>
+</section>

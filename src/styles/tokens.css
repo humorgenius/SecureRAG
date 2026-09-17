@@ -1,0 +1,56 @@
+/* ==========================================================================
+   SecureRAG design tokens — scheme E (Enterprise Trust)
+   Single source of truth for the visual language. Change values here only.
+   ========================================================================== */
+:root {
+  /* surfaces */
+  --navy: #0a1730;
+  --navy-2: #122550;
+  --navy-3: #1b3568;
+  --bg: #f7f9fc;
+  --card: #ffffff;
+
+  /* text */
+  --ink: #0e1a2b;
+  --ink-2: #2b3a4d;
+  --muted: #5b6b7f;
+  --muted-2: #8593a5;
+
+  /* lines */
+  --line: #e2e8f1;
+  --line-2: #cfd8e6;
+
+  /* brand */
+  --blue: #2f6bed;
+  --blue-d: #1f52c4;
+  --blue-soft: #eef3fe;
+
+  /* semantic */
+  --green: #0f7a4f;
+  --green-soft: #e9f6f0;
+  --amber: #b54708;
+  --amber-soft: #fdf4e7;
+  --red: #b4342a;
+  --red-soft: #fdecea;
+
+  /* radius */
+  --radius-s: 8px;
+  --radius-m: 12px;
+  --radius-l: 16px;
+  --radius-xl: 22px;
+
+  /* elevation — only two levels, by design */
+  --sh-1: 0 1px 2px rgba(16, 24, 40, .05), 0 6px 18px rgba(16, 24, 40, .05);
+  --sh-2: 0 2px 6px rgba(16, 24, 40, .06), 0 18px 44px rgba(16, 24, 40, .09);
+  --sh-blue: 0 24px 50px -28px rgba(47, 107, 237, .45);
+
+  /* layout — one text axis for the whole site */
+  --maxw: 1160px;
+  --pad: 28px;
+
+  /* type */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+@media (max-width: 900px) { :root { --pad: 22px; } }
+@media (max-width: 640px) { :root { --pad: 20px; } }

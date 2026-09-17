@@ -1,0 +1,15 @@
+---
+import SectionHub from '../../../components/marketing/SectionHub.astro';
+import { SECTIONS } from '../../../data/sections';
+import type { Lang } from '../../../i18n/utils';
+
+export function getStaticPaths() {
+  return [{ params: { lang: 'en' } }, { params: { lang: 'zh' } }];
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const section = SECTIONS['use-cases'];
+if (!section) throw new Error('src/data/sections/use-cases.ts is missing');
+---
+
+<SectionHub lang={lang} section="use-cases" />

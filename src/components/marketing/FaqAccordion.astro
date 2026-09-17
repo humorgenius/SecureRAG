@@ -1,0 +1,71 @@
+---
+import { home } from '../../data/home';
+import type { Lang } from '../../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const c = home[lang].faq;
+---
+
+<section class="section" id="faq">
+  <div class="wrap">
+    <p class="eyebrow">{c.eyebrow}</p>
+    <h2 class="h2" style="margin-top:12px">{c.heading}</h2>
+    <div class="faq">
+      {
+        c.items.map((item, i) => (
+          <details class="card" open={i === 0}>
+            <summary>
+              {item.q}
+              <svg class="chev" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              </svg>
+            </summary>
+            <div class="body">{item.a}</div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq {
+    margin-top: 34px;
+    max-width: 88ch;
+  }
+  details {
+    margin-bottom: 12px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 19px 22px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  .chev {
+    margin-left: auto;
+    color: var(--muted-2);
+    transition: transform .2s;
+    flex: 0 0 auto;
+  }
+  details[open] .chev {
+    transform: rotate(180deg);
+  }
+  .body {
+    padding: 0 22px 20px;
+    font-size: 14.5px;
+    color: var(--muted);
+    line-height: 1.75;
+  }
+</style>

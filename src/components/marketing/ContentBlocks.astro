@@ -1,0 +1,241 @@
+---
+import type { Block } from '../../data/pages/types';
+
+interface Props {
+  blocks: Block[];
+  lang: 'en' | 'zh';
+}
+
+const { blocks, lang } = Astro.props;
+const dir = lang === 'zh' ? -1 : 1;
+---
+
+{
+  blocks.map((b, i) => {
+    switch (b.t) {
+      case 'h2':
+        return (
+          <h2 id={`s-${i + 1}`}>
+            <a class="anchor" href={`#s-${i + 1}`} aria-hidden="true" tabindex="-1">
+              #
+            </a>
+            {b.text}
+          </h2>
+        );
+      case 'h3':
+        return <h3>{b.text}</h3>;
+      case 'p':
+        return <p class={b.lead ? 'lead' : ''}>{b.text}</p>;
+      case 'ul':
+        return <ul>{b.items.map((it) => <li>{it}</li>)}</ul>;
+      case 'ol':
+        return (
+          <ol>
+            {b.items.map((it) => (
+              <li>{it}</li>
+            ))}
+          </ol>
+        );
+      case 'steps':
+        return (
+          <div class="steps">
+            {b.items.map((s, si) => (
+              <div class="step">
+                <span class="sn">{String(si + 1).padStart(2, '0')}</span>
+                <div>
+                  <h3>{s.title}</h3>
+                  <p>{s.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      case 'table':
+        return (
+          <div class="tw">
+            <table class="data">
+              {b.caption && <caption>{b.caption}</caption>}
+              <thead>
+                <tr>{b.head.map((h) => <th>{h}</th>)}</tr>
+              </thead>
+              <tbody>
+                {b.rows.map((row) => (
+                  <tr>
+                    {row.map((cell, ci) => <td class={ci === 0 ? 'k' : ''}>{cell}</td>)}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      case 'callout':
+        return (
+          <div class={`note ${b.kind === 'good' ? 'good' : ''} ${b.kind === 'warn' ? 'warn' : ''}`}>
+            {b.title && <b>{b.title} </b>}
+            {b.text}
+          </div>
+        );
+      case 'cards':
+        return (
+          <div class="cards">
+            {b.items.map((card) => (
+              <a class="ccard" href={card.href}>
+                <h3>{card.title}</h3>
+                <p>{card.text}</p>
+                <span class="go" aria-hidden="true">
+                  →
+                </span>
+              </a>
+            ))}
+          </div>
+        );
+      default:
+        return null;
+    }
+  })
+}
+
+<style>
+  h2 {
+    font-size: 26px;
+    margin: 44px 0 14px;
+    position: relative;
+    scroll-margin-top: 84px;
+  }
+  h3 {
+    font-size: 19px;
+    margin: 30px 0 10px;
+  }
+  p {
+    margin: 14px 0;
+    line-height: 1.78;
+    color: var(--ink-2);
+  }
+  p.lead {
+    font-size: 17px;
+    color: var(--muted);
+    line-height: 1.72;
+  }
+  ul,
+  ol {
+    margin: 14px 0;
+    padding-left: 22px;
+    list-style: revert;
+  }
+  li {
+    margin: 8px 0;
+    line-height: 1.75;
+  }
+  .anchor {
+    position: absolute;
+    left: -22px;
+    color: var(--line-2);
+    font-weight: 400;
+    opacity: 0;
+    transition: opacity .15s;
+  }
+  h2:hover .anchor {
+    opacity: 1;
+  }
+  .steps {
+    margin: 26px 0;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: var(--sh-1);
+  }
+  .step {
+    display: grid;
+    grid-template-columns: 62px 1fr;
+    gap: 18px;
+    padding: 22px 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .step:last-child {
+    border-bottom: 0;
+  }
+  .sn {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--blue);
+    padding-top: 3px;
+  }
+  .step h3 {
+    margin: 0 0 8px;
+    font-size: 17px;
+  }
+  .step p {
+    margin: 0;
+    font-size: 14.5px;
+    color: var(--muted);
+  }
+  .note {
+    margin: 22px 0;
+  }
+  .note.warn {
+    border-left-color: var(--amber);
+  }
+  table.data td.k {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 26px 0;
+  }
+  .ccard {
+    position: relative;
+    display: block;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 24px 26px;
+    box-shadow: var(--sh-1);
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+  }
+  .ccard:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--sh-2);
+    border-color: var(--line-2);
+  }
+  .ccard h3 {
+    font-size: 16.5px;
+    margin: 0 0 9px;
+    color: var(--ink);
+  }
+  .ccard p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.68;
+  }
+  .ccard .go {
+    position: absolute;
+    right: 22px;
+    bottom: 18px;
+    color: var(--blue);
+    font-size: 15px;
+    opacity: 0;
+    transition: opacity .2s, transform .2s;
+  }
+  .ccard:hover .go {
+    opacity: 1;
+    transform: translateX(3px);
+  }
+  @media (max-width: 700px) {
+    .cards {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 640px) {
+    .step {
+      grid-template-columns: 40px 1fr;
+      gap: 12px;
+      padding: 18px;
+    }
+  }
+</style>

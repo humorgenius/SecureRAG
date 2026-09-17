@@ -1,0 +1,31 @@
+---
+import SectionPage from '../../../components/marketing/SectionPage.astro';
+import { SECTIONS } from '../../../data/sections';
+import { localizePath, type Lang } from '../../../i18n/utils';
+
+export function getStaticPaths() {
+  const section = SECTIONS['use-cases'];
+  if (!section) return [];
+  const paths: { params: { lang: string; item: string } }[] = [];
+  for (const item of section.items) {
+    for (const lang of ['en', 'zh'] as const) paths.push({ params: { lang, item: item.slug } });
+  }
+  return paths;
+}
+
+const { lang: langParam, item: itemSlug } = Astro.params as { lang: string; item: string };
+const lang: Lang = langParam === 'zh' ? 'zh' : 'en';
+const section = SECTIONS['use-cases'];
+const item = section.items.find((i) => i.slug === itemSlug);
+if (!item) throw new Error(`unknown use case: ${itemSlug}`);
+---
+
+<SectionPage
+  lang={lang}
+  path={`/${lang}/use-cases/${item.slug}/`}
+  copy={item.copy[lang]}
+  parent={{ name: section.label[lang], path: localizePath(lang, '/use-cases/') }}
+  related={item.related}
+  ads={item.ads}
+  flags={item.schema}
+/>

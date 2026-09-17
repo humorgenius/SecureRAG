@@ -1,0 +1,33 @@
+---
+import { t, type Lang } from '../../i18n/utils';
+
+/**
+ * Labeled ad slot with a reserved height (prevents layout shift).
+ * Renders a placeholder until the visitor consents to ad cookies — see ConsentBanner.
+ * Policy: never inside /app, /privacy, /terms, or above the primary action.
+ */
+interface Props {
+  lang: Lang;
+  /** optional AdSense unit id; without it the slot stays a labeled placeholder */
+  slot?: string;
+}
+
+const { lang, slot = '' } = Astro.props;
+---
+
+<aside class="ad-slot" role="complementary" aria-label={t(lang, 'ad.label')} data-ad-slot={slot}>
+  <div class="ad-inner">
+    <p class="ad-label">{t(lang, 'ad.label')}</p>
+    <p class="ad-note">
+      {t(lang, 'ad.pending')} · Google AdSense
+    </p>
+  </div>
+</aside>
+
+<style>
+  .ad-inner {
+    display: grid;
+    place-items: center;
+    gap: 6px;
+  }
+</style>

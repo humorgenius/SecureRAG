@@ -1,0 +1,42 @@
+---
+import ContentLayout from '../../layouts/ContentLayout.astro';
+import { t, localizePath, type Lang } from '../../i18n/utils';
+import type { PageCopy, RelatedLink, PageSchemaFlags } from '../../data/pages/types';
+import { buildPageSchema, relatedFor } from '../../lib/seo/page-schema';
+
+interface Props {
+  lang: Lang;
+  /** locale-prefixed path */
+  path: string;
+  copy: PageCopy;
+  parent?: { name: string; path: string };
+  related?: RelatedLink[];
+  ads?: number;
+  flags?: PageSchemaFlags;
+}
+
+const { lang, path, copy, parent, related, ads = 1, flags } = Astro.props;
+
+const crumbs = [
+  { name: t(lang, 'common.home'), path: localizePath(lang, '/') },
+  ...(parent ? [{ name: parent.name, path: parent.path }] : []),
+  { name: copy.h1, path },
+];
+
+const schema = buildPageSchema({ lang, path, copy, crumbs, flags: { article: true, ...flags } });
+---
+
+<ContentLayout
+  lang={lang}
+  path={path}
+  title={copy.title}
+  description={copy.description}
+  h1={copy.h1}
+  intro={copy.intro}
+  updated={copy.updated}
+  blocks={copy.blocks}
+  crumbs={crumbs}
+  related={relatedFor(lang, related)}
+  schema={schema}
+  ads={ads}
+/>

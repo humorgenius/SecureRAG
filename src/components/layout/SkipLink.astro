@@ -1,0 +1,6 @@
+---
+import type { Lang } from '../../i18n/utils';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<a class="skip" href="#main">{lang === 'zh' ? '跳到主要内容' : 'Skip to content'}</a>

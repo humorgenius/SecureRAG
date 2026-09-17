@@ -1,0 +1,39 @@
+---
+import BaseHead from '../components/seo/BaseHead.astro';
+import '../styles/global.css';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead
+      title="SecureRAG — private document Q&A in your browser"
+      description="Local, private document Q&A. Pick your language to continue: English or 简体中文."
+      lang="en"
+      path="/"
+      noindex={true}
+    />
+    <meta http-equiv="refresh" content="0;url=/en/" />
+    <script is:inline>
+      (function () {
+        try {
+          var saved = localStorage.getItem('securerag.lang');
+          var nav = ((navigator.languages && navigator.languages.join(',')) || navigator.language || 'en').toLowerCase();
+          var pick = saved === 'en' || saved === 'zh' ? saved : /(^|,)zh/.test(nav) ? 'zh' : 'en';
+          location.replace('/' + pick + '/');
+        } catch (e) {
+          location.replace('/en/');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="wrap" style="padding-top:56px">
+      <h1 class="h1">SecureRAG</h1>
+      <p class="lede" style="margin-top:16px">Choose your language · 选择语言</p>
+      <p style="margin-top:22px;display:flex;gap:12px">
+        <a class="btn btn-blue" href="/en/">English</a>
+        <a class="btn btn-white" href="/zh/">简体中文</a>
+      </p>
+    </div>
+  </body>
+</html>

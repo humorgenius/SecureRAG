@@ -1,0 +1,188 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '../components/seo/Breadcrumbs.astro';
+import ContentBlocks from '../components/marketing/ContentBlocks.astro';
+import AdSlot from '../components/marketing/AdSlot.astro';
+import JsonLd from '../components/seo/JsonLd.astro';
+import { localizePath, t, type Lang } from '../i18n/utils';
+import type { Block } from '../data/pages/types';
+
+interface Props {
+  lang: Lang;
+  path: string;
+  title: string;
+  description: string;
+  h1: string;
+  intro: string;
+  updated: string;
+  blocks: Block[];
+  crumbs: { name: string; path: string }[];
+  related?: { path: string; label: string }[];
+  schema?: Record<string, unknown>[];
+  ads?: number;
+}
+
+const { lang, path, title, description, h1, intro, updated, blocks, crumbs, related = [], schema = [], ads = 1 } = Astro.props;
+
+/** Table of contents is derived from the h2 blocks — no manual duplication. */
+const toc = blocks
+  .map((b, i) => ({ b, id: `s-${i + 1}` }))
+  .filter((entry) => entry.b.t === 'h2')
+  .map((entry) => ({ id: entry.id, text: (entry.b as Extract<Block, { t: 'h2' }>).text }));
+---
+
+<BaseLayout lang={lang} path={path} title={title} description={description} type="article">
+  <Breadcrumbs items={crumbs} />
+
+  <article class="wrap page">
+    <div class="main">
+      <header class="page-head">
+        <h1>{h1}</h1>
+        <p class="lede">{intro}</p>
+        <p class="stamp">
+          {t(lang, 'common.lastUpdated')}: <time datetime={updated}>{updated}</time>
+        </p>
+      </header>
+
+      <div class="body">
+        <ContentBlocks blocks={blocks} lang={lang} />
+      </div>
+
+      {ads > 0 && <AdSlot lang={lang} />}
+
+      {
+        related.length > 0 && (
+          <aside class="related">
+            <h2 class="rh">{t(lang, 'common.related')}</h2>
+            <ul>
+              {related.map((link) => (
+                <li>
+                  <a href={localizePath(lang, link.path)}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )
+      }
+    </div>
+
+    {
+      toc.length > 2 && (
+        <nav class="toc" aria-label={t(lang, 'common.onThisPage')}>
+          <p>{t(lang, 'common.onThisPage')}</p>
+          <ol>
+            {toc.map((item) => (
+              <li>
+                <a href={`#${item.id}`}>{item.text}</a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+  </article>
+
+  {schema.length > 0 && <JsonLd data={schema} />}
+</BaseLayout>
+
+<style>
+  .page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 56px;
+    align-items: start;
+    padding-top: 22px;
+  }
+  .main {
+    min-width: 0;
+  }
+  .page-head {
+    padding-bottom: 8px;
+  }
+  h1 {
+    font-size: clamp(28px, 3.6vw, 42px);
+    letter-spacing: -.03em;
+    max-width: 24ch;
+  }
+  .lede {
+    margin-top: 16px;
+    font-size: 17px;
+    line-height: 1.72;
+    color: var(--muted);
+    max-width: 66ch;
+  }
+  .stamp {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--muted-2);
+  }
+  .body {
+    max-width: 74ch;
+  }
+  .related {
+    margin-top: 46px;
+    border-top: 1px solid var(--line);
+    padding-top: 22px;
+  }
+  .rh {
+    font-size: 15px;
+    letter-spacing: 0;
+    margin-bottom: 12px;
+  }
+  .related ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .related a {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 999px;
+    padding: 8px 15px;
+    transition: border-color .15s, color .15s;
+  }
+  .related a:hover {
+    border-color: var(--line-2);
+    color: var(--blue-d);
+  }
+  .toc {
+    position: sticky;
+    top: 88px;
+    font-size: 13.5px;
+  }
+  .toc p {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+    margin-bottom: 12px;
+  }
+  .toc ol {
+    border-left: 1px solid var(--line);
+    padding-left: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .toc a {
+    color: var(--muted);
+    line-height: 1.5;
+    display: block;
+  }
+  .toc a:hover {
+    color: var(--blue-d);
+  }
+  @media (max-width: 1020px) {
+    .page {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .toc {
+      display: none;
+    }
+  }
+</style>

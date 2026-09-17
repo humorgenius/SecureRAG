@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/marketing/Hero.astro';
+import Metrics from '../../components/marketing/Metrics.astro';
+import CapabilityGrid from '../../components/marketing/CapabilityGrid.astro';
+import TrustCenter from '../../components/marketing/TrustCenter.astro';
+import CompareTable from '../../components/marketing/CompareTable.astro';
+import TierCards from '../../components/marketing/TierCards.astro';
+import AdSlot from '../../components/marketing/AdSlot.astro';
+import FaqAccordion from '../../components/marketing/FaqAccordion.astro';
+import EndCta from '../../components/marketing/EndCta.astro';
+import { home } from '../../data/home';
+import { orgSchema, websiteSchema, softwareAppSchema, faqSchema } from '../../lib/seo/schema';
+import type { Lang } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return [{ params: { lang: 'en' } }, { params: { lang: 'zh' } }];
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const c = home[lang];
+const jsonLd = [
+  orgSchema(lang),
+  websiteSchema(lang),
+  softwareAppSchema(lang),
+  faqSchema(c.faq.items),
+];
+---
+
+<BaseLayout
+  lang={lang}
+  path={`/${lang}/`}
+  title={c.meta.title}
+  description={c.meta.description}
+>
+  <Hero lang={lang} />
+  <Metrics lang={lang} />
+  <CapabilityGrid lang={lang} />
+  <TrustCenter lang={lang} />
+  <CompareTable lang={lang} />
+  <TierCards lang={lang} />
+  <div class="wrap"><AdSlot lang={lang} /></div>
+  <FaqAccordion lang={lang} />
+  <EndCta lang={lang} />
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+</BaseLayout>

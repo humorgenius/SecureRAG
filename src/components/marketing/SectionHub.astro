@@ -1,0 +1,64 @@
+---
+import ContentLayout from '../../layouts/ContentLayout.astro';
+import { t, localizePath, type Lang } from '../../i18n/utils';
+import { SECTIONS } from '../../data/sections';
+import { buildPageSchema, relatedFor } from '../../lib/seo/page-schema';
+import { itemListSchema } from '../../lib/seo/schema';
+import type { RelatedLink } from '../../data/pages/types';
+
+interface Props {
+  lang: Lang;
+  section: string;
+  related?: RelatedLink[];
+  ads?: number;
+}
+
+const { lang, section, related, ads = 1 } = Astro.props;
+const mod = SECTIONS[section];
+const copy = mod.copy[lang];
+
+/** Hub pages list their children as linked cards, generated from the section data. */
+const cards = {
+  t: 'cards' as const,
+  items: mod.items.map((item) => ({
+    href: localizePath(lang, `/${section}/${item.slug}/`),
+    title: item.copy[lang].h1,
+    text: item.copy[lang].intro,
+  })),
+};
+
+const blocks = copy.blocks.some((b) => b.t === 'cards') ? copy.blocks : [cards, ...copy.blocks];
+
+const path = `/${lang}/${section}/`;
+const crumbs = [
+  { name: t(lang, 'common.home'), path: localizePath(lang, '/') },
+  { name: mod.label[lang], path },
+];
+
+const schema = [
+  ...buildPageSchema({ lang, path, copy: { ...copy, blocks }, crumbs, flags: { article: false } }),
+  itemListSchema({
+    lang,
+    name: copy.h1,
+    items: mod.items.map((item) => ({
+      name: item.copy[lang].h1,
+      path: `/${lang}/${section}/${item.slug}/`,
+    })),
+  }),
+];
+---
+
+<ContentLayout
+  lang={lang}
+  path={path}
+  title={copy.title}
+  description={copy.description}
+  h1={copy.h1}
+  intro={copy.intro}
+  updated={copy.updated}
+  blocks={blocks}
+  crumbs={crumbs}
+  related={relatedFor(lang, related)}
+  schema={schema}
+  ads={ads}
+/>

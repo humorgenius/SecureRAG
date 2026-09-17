@@ -1,0 +1,58 @@
+---
+import { t, type Lang } from '../../i18n/utils';
+
+interface Props {
+  lang: Lang;
+  /** hero / dark sections use the dark variant */
+  variant?: 'light' | 'dark';
+}
+
+const { lang, variant = 'light' } = Astro.props;
+const promises = ['promise.noLeave', 'promise.noAccount', 'promise.noTraining', 'promise.offline'] as const;
+---
+
+<ul class="promises" data-variant={variant}>
+  {
+    promises.map((key) => (
+      <li>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" />
+        </svg>
+        {t(lang, key)}
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .promises {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .promises li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 7px 14px;
+  }
+  .promises[data-variant='light'] li {
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink-2);
+  }
+  .promises[data-variant='light'] svg {
+    color: var(--green);
+  }
+  .promises[data-variant='dark'] li {
+    border: 1px solid rgba(255, 255, 255, .14);
+    background: rgba(255, 255, 255, .07);
+    color: rgba(255, 255, 255, .82);
+  }
+  .promises[data-variant='dark'] svg {
+    color: #7ee0b3;
+  }
+</style>

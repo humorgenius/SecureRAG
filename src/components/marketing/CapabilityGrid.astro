@@ -1,0 +1,93 @@
+---
+import { home, type Capability } from '../../data/home';
+import type { Lang } from '../../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const c = home[lang].capabilities;
+
+const paths: Record<Capability['icon'], string> = {
+  shield: 'M12 2.6 4.6 5.3v6c0 4.6 3.1 8.8 7.4 10.1 4.3-1.3 7.4-5.5 7.4-10.1v-6L12 2.6Z',
+  docs: 'M4 6h16M4 12h16M4 18h10',
+  cite: 'M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4M14 4h6v6M20 4l-8 8',
+  offline: 'M12 3v13m0 0-5-5m5 5 5-5M5 20h14',
+  dial: 'M5 7h14M9 12h6M11 17h2',
+  export: 'M4 7h16v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Zm0 0 2-3h12l2 3M12 12v4m0 0-2-2m2 2 2-2',
+};
+---
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">{c.eyebrow}</p>
+    <h2 class="h2" style="margin-top:12px">{c.heading}</h2>
+    <div class="fgrid3">
+      {
+        c.items.map((item) => (
+          <article class="fc card-hover">
+            <div class="ic">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d={paths[item.icon]} stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+            <div class="rt">{item.foot}</div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .fgrid3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 38px;
+  }
+  .fc {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 26px 24px;
+    box-shadow: var(--sh-1);
+  }
+  .ic {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--blue-soft);
+    color: var(--blue-d);
+    display: grid;
+    place-items: center;
+    margin-bottom: 16px;
+  }
+  h3 {
+    font-size: 17px;
+    margin-bottom: 9px;
+  }
+  p {
+    font-size: 14.5px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .rt {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--blue-d);
+  }
+  @media (max-width: 960px) {
+    .fgrid3 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 660px) {
+    .fgrid3 {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

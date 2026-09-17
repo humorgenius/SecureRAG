@@ -1,0 +1,13 @@
+{
+  "name": "SecureRAG — local document Q&A",
+  "short_name": "SecureRAG",
+  "description": "Ask questions across your documents without uploading them. Parsing, indexing and answering run entirely in your browser.",
+  "start_url": "/en/app/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f9fc",
+  "theme_color": "#0a1730",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

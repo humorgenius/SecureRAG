@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SecureRAG — 方案 D · Terminal Native（首页设计稿）</title>
+<!--
+  设计稿 D：Terminal Native（开发者工具 / 终端原生风）
+  参考视觉语言：Supabase 的暗色 + 祖母绿、x.ai/Ollama 的全等宽排版、控制台式信息层级
+  说明：纯静态设计稿，用于确认设计方向。正式实现时语言切换为路由级（/en/ 与 /zh/）。
+-->
+<style>
+  :root{
+    --bg:#0e0e10; --bg-2:#151517; --bg-3:#1b1b1e; --bg-4:#232327;
+    --fg:#f4f4f5; --fg-2:#b7b7bd; --dim:#7c7c85; --dim-2:#55555c;
+    --green:#3ecf8e; --green-d:#00c573; --amber:#e3b341; --red:#f2777a; --cyan:#79c0ff;
+    --line:#26262b; --line-2:#33333a;
+    --mono:ui-monospace,SFMono-Regular,"JetBrains Mono","SF Mono",Menlo,Consolas,"Liberation Mono","Courier New",monospace;
+    --maxw:1180px; --pad:26px;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg-2);font-family:var(--mono);font-size:14px;line-height:1.62;
+    -webkit-font-smoothing:antialiased;font-variant-ligatures:none}
+  h1,h2,h3,h4{margin:0;color:var(--fg);font-weight:400;line-height:1.14;letter-spacing:-.02em}
+  p{margin:0}
+  a{color:var(--green);text-decoration:none}
+  a:hover{text-decoration:underline;text-underline-offset:3px}
+  ul{margin:0;padding:0;list-style:none}
+  img,svg{display:block;max-width:100%}
+  button{font:inherit;color:inherit}
+  code{font-family:var(--mono)}
+  :focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad)}
+  .skip{position:absolute;left:-9999px}
+  .skip:focus{left:20px;top:10px;z-index:99;background:var(--green);color:#0b0b0c;padding:8px 14px}
+
+  body.lang-en .t-zh{display:none!important}
+  body.lang-zh .t-en{display:none!important}
+
+  /* nav */
+  header.nav{position:sticky;top:0;z-index:50;background:rgba(14,14,16,.86);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;gap:22px;height:56px}
+  .brand{display:flex;align-items:center;gap:9px;color:var(--fg);font-size:14px;letter-spacing:-.01em}
+  .brand .br{color:var(--green)}
+  .navlinks{display:flex;gap:20px;margin-left:12px}
+  .navlinks a{font-size:13px;color:var(--dim)}
+  .navlinks a:hover{color:var(--fg);text-decoration:none}
+  .navlinks a.on{color:var(--fg)}
+  .navlinks a.on::before{content:"[";color:var(--dim-2)}
+  .navlinks a.on::after{content:"]";color:var(--dim-2)}
+  .nav-r{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .langsw{display:flex;border:1px solid var(--line-2);border-radius:999px;overflow:hidden}
+  .langsw button{background:none;border:0;padding:4px 11px;font-size:12px;color:var(--dim);cursor:pointer}
+  .langsw button[aria-pressed="true"]{background:var(--bg-4);color:var(--fg)}
+  .btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:8px 18px;font-size:13px;
+    border:1px solid var(--fg);background:var(--bg-2);color:var(--fg);cursor:pointer;transition:background .16s,color .16s,border-color .16s}
+  .btn:hover{background:var(--fg);color:#0b0b0c;text-decoration:none}
+  .btn-green{border-color:var(--green);color:var(--green)}
+  .btn-green:hover{background:var(--green);color:#07120c;border-color:var(--green)}
+  .btn-lg{padding:10px 24px;font-size:14px}
+  @media(max-width:1000px){.navlinks{display:none}}
+
+  /* hero */
+  .hero{padding:0 0 60px;position:relative;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.55;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:52px 52px;
+    mask-image:radial-gradient(70% 60% at 50% 0%,#000,transparent 78%);
+    -webkit-mask-image:radial-gradient(70% 60% at 50% 0%,#000,transparent 78%)}
+  .hero-in{position:relative;padding-top:64px}
+  .tag{display:inline-flex;align-items:center;gap:9px;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--dim);border:1px solid var(--line-2);border-radius:999px;padding:5px 12px;background:rgba(255,255,255,.02)}
+  .led{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  h1{font-size:clamp(30px,4.6vw,54px);line-height:1.06;letter-spacing:-.035em;margin:24px 0 0;max-width:27ch}
+  h1 .acc{color:var(--green)}
+  .lede{margin-top:20px;font-size:15px;line-height:1.75;color:var(--dim);max-width:74ch}
+  .lede .k{color:var(--fg-2)}
+  .ctas{display:flex;flex-wrap:wrap;gap:11px;align-items:center;margin-top:28px}
+  .hint{font-size:12px;color:var(--dim-2)}
+  .kv{display:flex;flex-wrap:wrap;gap:6px 26px;margin-top:34px;padding-top:20px;border-top:1px solid var(--line);font-size:12.5px}
+  .kv div{color:var(--dim)}
+  .kv b{color:var(--fg-2);font-weight:400}
+  .kv .ok{color:var(--green)}
+
+  /* terminal */
+  .term{margin-top:44px;border:1px solid var(--line-2);border-radius:10px;background:var(--bg-2);overflow:hidden;
+    box-shadow:0 30px 70px -40px rgba(0,0,0,.9)}
+  .term-h{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg-3);border-bottom:1px solid var(--line)}
+  .term-h .t{font-size:12px;color:var(--dim-2)}
+  .term-h .live{margin-left:auto;font-size:11px;letter-spacing:.1em;color:var(--green)}
+  .term-b{padding:18px 20px 22px;font-size:13px;line-height:1.85}
+  .ln{display:flex;gap:12px;white-space:pre-wrap;word-break:break-word}
+  .ln .p{color:var(--dim-2);flex:0 0 auto}
+  .ln .c{color:var(--fg-2)}
+  .g{color:var(--green)} .a{color:var(--amber)} .cy{color:var(--cyan)} .dm{color:var(--dim)} .rd{color:var(--red)}
+  .cursor{display:inline-block;width:8px;height:15px;background:var(--green);vertical-align:-2px;animation:blink 1.1s steps(1) infinite}
+  @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+
+  /* sections */
+  section{padding:72px 0 0}
+  .slab{display:flex;align-items:center;gap:12px;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim-2);
+    border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:28px}
+  .slab b{color:var(--green);font-weight:400}
+  h2{font-size:clamp(22px,2.8vw,32px);max-width:40ch}
+  .sub{margin-top:14px;font-size:14px;color:var(--dim);max-width:76ch;line-height:1.75}
+
+  .pipe{margin-top:32px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .prow{display:grid;grid-template-columns:74px 1fr 260px;gap:22px;padding:20px 22px;border-bottom:1px solid var(--line);transition:background .18s}
+  .prow:last-child{border-bottom:0}
+  .prow:hover{background:var(--bg-2)}
+  .prow .i{font-size:12px;color:var(--green)}
+  .prow h3{font-size:14.5px;margin-bottom:8px}
+  .prow p{font-size:13px;color:var(--dim);line-height:1.72}
+  .prow .spec{font-size:11.5px;color:var(--dim-2);line-height:1.95;align-self:start}
+  @media(max-width:860px){.prow{grid-template-columns:1fr;gap:10px}.prow .spec{padding-top:4px}}
+
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:30px}
+  .box{border:1px solid var(--line);border-radius:10px;background:var(--bg-2);padding:20px;transition:border-color .2s,transform .2s}
+  .box:hover{border-color:var(--line-2);transform:translateY(-2px)}
+  .box h3{font-size:14px;margin-bottom:9px}
+  .box p{font-size:12.5px;color:var(--dim);line-height:1.72}
+  .box .prop{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:11.5px;color:var(--dim-2)}
+  .box.hi{border-color:rgba(62,207,142,.34);background:linear-gradient(180deg,rgba(62,207,142,.055),transparent)}
+  .box.hi h3{color:var(--fg)}
+  @media(max-width:980px){.grid3{grid-template-columns:1fr 1fr}}
+  @media(max-width:680px){.grid3{grid-template-columns:1fr}}
+
+  pre.diff{margin-top:30px;border:1px solid var(--line);border-radius:10px;background:var(--bg-2);padding:0;overflow-x:auto}
+  pre.diff .hd{padding:11px 16px;border-bottom:1px solid var(--line);background:var(--bg-3);font-size:11.5px;color:var(--dim-2);
+    letter-spacing:.08em;text-transform:uppercase}
+  pre.diff .bd{padding:16px 18px;font-size:12.5px;line-height:1.9;color:var(--dim)}
+  .add{color:var(--green)} .del{color:var(--red)} .cmt{color:var(--dim-2)} .hl{color:var(--fg-2)}
+
+  table{width:100%;border-collapse:collapse;margin-top:30px;font-size:12.5px}
+  caption{text-align:left;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim-2);padding-bottom:12px}
+  th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{font-size:11.5px;letter-spacing:.08em;color:var(--dim-2);border-bottom:1px solid var(--line-2);font-weight:400}
+  thead th:nth-child(2){color:var(--green)}
+  tbody td:first-child{color:var(--fg-2)}
+  tbody td{color:var(--dim)}
+  .y{color:var(--green)} .n{color:var(--red)}
+  .tw{overflow-x:auto}
+
+  .manifest{margin-top:30px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .man{border:1px solid var(--line);border-radius:10px;background:var(--bg-2);padding:0;overflow:hidden}
+  .man .mh{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--bg-3);font-size:12.5px}
+  .man .mh .b{font-size:11px;letter-spacing:.08em;color:var(--dim-2)}
+  .man dl{margin:0;padding:16px;display:grid;grid-template-columns:1fr auto;gap:9px 14px;font-size:12.5px}
+  .man dt{color:var(--dim)} .man dd{margin:0;color:var(--fg-2)}
+  .man .mf{padding:0 16px 16px;font-size:11.5px;color:var(--dim-2);line-height:1.7}
+  .man .mf.warn{border-left:2px solid var(--amber);margin:0 16px 16px;padding:0 0 0 11px}
+  @media(max-width:820px){.manifest{grid-template-columns:1fr}}
+
+  .ad{margin-top:32px;border:1px dashed var(--line-2);border-radius:10px;min-height:96px;display:grid;place-items:center;background:rgba(255,255,255,.012)}
+  .ad span{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim-2)}
+
+  details{border-bottom:1px solid var(--line)}
+  details summary{cursor:pointer;list-style:none;padding:16px 0;font-size:14px;color:var(--fg);display:flex;gap:12px;align-items:baseline}
+  details summary::-webkit-details-marker{display:none}
+  details summary .pr{color:var(--green);flex:0 0 auto}
+  details summary .ar{margin-left:auto;color:var(--dim-2)}
+  details p{padding-bottom:18px;font-size:13px;color:var(--dim);line-height:1.8;max-width:92ch}
+
+  .end{margin-top:64px;border:1px solid var(--line-2);border-radius:12px;background:var(--bg-2);padding:36px 32px}
+  .end h2{max-width:30ch}
+  .end p{margin-top:12px;color:var(--dim);font-size:13.5px;max-width:70ch}
+
+  footer{margin-top:64px;border-top:1px solid var(--line);background:var(--bg-2);padding:42px 0 32px}
+  .fgrid{display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr;gap:28px}
+  .fgrid h5{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim-2);font-weight:400;margin:0 0 12px}
+  .fgrid a{display:block;font-size:12.5px;color:var(--dim);padding:4px 0}
+  .fgrid a:hover{color:var(--fg);text-decoration:none}
+  .fbot{margin-top:32px;border-top:1px solid var(--line);padding-top:18px;display:flex;flex-wrap:wrap;gap:10px 24px;
+    justify-content:space-between;font-size:11.5px;color:var(--dim-2)}
+  .pledge{color:var(--green)}
+  @media(max-width:880px){.fgrid{grid-template-columns:1fr 1fr}}
+
+  @keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .u{animation:up .55s cubic-bezier(.2,.7,.3,1) both}
+  .u1{animation-delay:.04s}.u2{animation-delay:.12s}.u3{animation-delay:.2s}.u4{animation-delay:.28s}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media(max-width:900px){:root{--pad:20px}}
+</style>
+</head>
+<body class="lang-en">
+<a class="skip" href="#main"><span class="t-en">Skip to content</span><span class="t-zh">跳到主要内容</span></a>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#"><span class="br">▚</span>SecureRAG</a>
+    <nav class="navlinks" aria-label="Main">
+      <a class="on" href="#"><span class="t-en">index</span><span class="t-zh">首页</span></a>
+      <a href="#pipeline"><span class="t-en">pipeline</span><span class="t-zh">管线</span></a>
+      <a href="#"><span class="t-en">guides</span><span class="t-zh">指南</span></a>
+      <a href="#"><span class="t-en">models</span><span class="t-zh">模型</span></a>
+      <a href="#faq">faq</a>
+    </nav>
+    <div class="nav-r">
+      <div class="langsw" role="group" aria-label="Language">
+        <button type="button" aria-pressed="true" onclick="setLang('en')">en</button>
+        <button type="button" aria-pressed="false" onclick="setLang('zh')">zh</button>
+      </div>
+      <a class="btn btn-green" href="#">cd /app<span class="dm" style="color:var(--dim)">↵</span></a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" style="padding-top:0">
+    <div class="wrap hero-in">
+      <span class="tag u u1"><i class="led"></i><span class="t-en">browser-native · zero-upload rag</span><span class="t-zh">浏览器原生 · 零上传 RAG</span></span>
+
+      <h1 class="u u2">
+        <span class="t-en">Ship your documents through a pipeline that runs <span class="acc">entirely on the client</span>.</span>
+        <span class="t-zh">把文档送进一条<span class="acc">完全跑在客户端</span>的处理管线。</span>
+      </h1>
+
+      <p class="lede u u3">
+        <span class="t-en">Parse → normalise → chunk → embed → hybrid retrieve → answer. Every stage is JavaScript you can read, running in a Web Worker on your machine. <span class="k">There is no server process to trust, because there is no server.</span> The only network call the app ever makes is the one-time model weight download.</span>
+        <span class="t-zh">解析 → 规范化 → 分块 → 向量化 → 混合检索 → 生成回答。每个阶段都是你能读的 JavaScript，跑在你机器上的 Web Worker 里。<span class="k">没有需要信任的服务端进程，因为根本没有服务端。</span>应用唯一的外发请求是一次性的模型权重下载。</span>
+      </p>
+
+      <div class="ctas u u4">
+        <a class="btn btn-green btn-lg" href="#">./upload --docs</a>
+        <a class="btn btn-lg" href="#pipeline"><span class="t-en">read the pipeline</span><span class="t-zh">看处理管线</span></a>
+        <span class="hint"><span class="t-en">free · no account · first download ≈ 25 MB</span><span class="t-zh">免费 · 无账号 · 首次下载约 25MB</span></span>
+      </div>
+
+      <div class="kv u u4">
+        <div><span class="t-en">outbound requests</span><span class="t-zh">外发请求</span> <b class="ok">1</b> <span class="dm">(model weights, cached)</span></div>
+        <div><span class="t-en">documents uploaded</span><span class="t-zh">上传的文档</span> <b class="ok">0</b></div>
+        <div><span class="t-en">accounts created</span><span class="t-zh">创建的账号</span> <b class="ok">0</b></div>
+        <div><span class="t-en">works offline</span><span class="t-zh">离线可用</span> <b class="ok">true</b></div>
+      </div>
+
+      <!-- terminal -->
+      <div class="term u u4">
+        <div class="term-h">
+          <span class="t">securerag://local-session</span>
+          <span class="live">● <span class="t-en">offline-ready</span><span class="t-zh">可离线</span></span>
+        </div>
+        <div class="term-b">
+          <div class="ln"><span class="p">$</span><span class="c"><span class="t-en">securerag ingest ./contracts</span><span class="t-zh">securerag ingest ./合同目录</span></span></div>
+          <div class="ln"><span class="p">›</span><span class="dm">sniff</span><span class="c">服务协议_2026.pdf → pdf · 42 pages · text layer ok</span></div>
+          <div class="ln"><span class="p">›</span><span class="dm">sniff</span><span class="c">Q3 产品评审.docx → docx · 18 pages · outlines 12</span></div>
+          <div class="ln"><span class="p">›</span><span class="dm">chunk</span><span class="c">structure-aware · 700 chars · overlap 15% → <span class="g">142 chunks</span></span></div>
+          <div class="ln"><span class="p">›</span><span class="dm">embed</span><span class="c">bge-small-zh-v1.5 q8 · batch 16 · <span class="g">142/142</span> ✓ 1.9s</span></div>
+          <div class="ln"><span class="p">›</span><span class="dm">index</span><span class="c">Float32 · dim 512 · L2-normalised → IndexedDB <span class="g">ok</span></span></div>
+          <div class="ln"><span class="p">$</span><span class="c"><span class="t-en">ask "what is the termination notice period?"</span><span class="t-zh">ask "解约通知期是多久？"</span></span></div>
+          <div class="ln"><span class="p">›</span><span class="dm">retrieve</span><span class="c">dense top-20 ∪ bm25 top-20 → rrf(60) → mmr(λ=.7) → <span class="cy">top-6</span></span></div>
+          <div class="ln"><span class="p">›</span><span class="dm">answer</span><span class="c"><span class="t-en">Either party may terminate on <span class="a">60 days'</span> written notice<span class="g">[1]</span>; breach carries a 30-day cure period<span class="g">[2]</span>.</span><span class="t-zh">任一方提前 <span class="a">60 天</span>书面通知即可解约<span class="g">[1]</span>；违约另有 30 天补救期<span class="g">[2]</span>。</span></span></div>
+          <div class="ln"><span class="p">›</span><span class="dm">cite</span><span class="c"><span class="g">[1]</span> 服务协议_2026.pdf · p.14 · §8.2</span></div>
+          <div class="ln"><span class="p">›</span><span class="dm">net</span><span class="c">outbound requests this session: <span class="g">0</span> <span class="dm">· nothing was sent anywhere</span></span></div>
+          <div class="ln"><span class="p">$</span><span class="c"><span class="cursor"></span></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pipeline" class="wrap">
+    <div class="slab"><b>01</b><span class="t-en">pipeline</span><span class="t-zh">处理管线</span><span class="dm" style="margin-left:auto">client-side only</span></div>
+    <h2><span class="t-en">Four stages, one browser tab</span><span class="t-zh">四个阶段，一个浏览器标签页</span></h2>
+    <p class="sub"><span class="t-en">Each stage is inspectable: open DevTools, watch the network tab stay empty, and read the same numbers in the in-app shield panel.</span><span class="t-zh">每个阶段都可查：打开开发者工具，看网络面板始终空白，站内盾牌面板会显示同一组数字。</span></p>
+    <div class="pipe">
+      <div class="prow">
+        <div class="i">01 ingest</div>
+        <div>
+          <h3><span class="t-en">Parse anything you can drag in</span><span class="t-zh">能拖进来的都能解析</span></h3>
+          <p><span class="t-en">Magic-byte sniffing picks the parser, not the file extension. PDF via PDF.js (page numbers preserved), DOCX via jszip with heading levels intact, plus TXT, Markdown, CSV, HTML. Legacy .doc is refused with a conversion hint.</span><span class="t-zh">用魔数嗅探决定解析器，而不是看扩展名。PDF 走 PDF.js（保留页码），DOCX 走 jszip 并保留标题层级，另有 TXT、Markdown、CSV、HTML。旧版 .doc 会被拒绝并给出转换提示。</span></p>
+        </div>
+        <div class="spec">max 40 files<br>25 MB / file · 200 MB total<br>rejects: encrypted, no-text-layer</div>
+      </div>
+      <div class="prow">
+        <div class="i">02 chunk</div>
+        <div>
+          <h3><span class="t-en">Structure-aware splitting</span><span class="t-zh">结构感知切分</span></h3>
+          <p><span class="t-en">Headings first, then paragraphs, then sentence boundaries — never mid-sentence unless a single paragraph exceeds the budget. Tables and code blocks are kept whole.</span><span class="t-zh">先按标题，再按段落，再按句子边界切——除非单段就超预算，否则绝不在句中切断。表格与代码块整块保留。</span></p>
+        </div>
+        <div class="spec">700 chars · 15% overlap<br>heading path stored per chunk<br>default 2,000 chunk ceiling</div>
+      </div>
+      <div class="prow">
+        <div class="i">03 embed</div>
+        <div>
+          <h3><span class="t-en">ONNX in a worker, WebGPU when available</span><span class="t-zh">Worker 内跑 ONNX，有 WebGPU 就用</span></h3>
+          <p><span class="t-en">Quantised transformer embeddings, mean-pooled and L2-normalised, batched 16 at a time. WebGPU first, WASM SIMD fallback — the same code path either way.</span><span class="t-zh">量化 Transformer 向量化，均值池化 + L2 归一化，批量 16 条。优先 WebGPU，回退 WASM SIMD——两种路径代码一致。</span></p>
+        </div>
+        <div class="spec">dim 512 · q8 ONNX<br>~1.9 s / 142 chunks (desktop)<br>cached by the browser, then offline</div>
+      </div>
+      <div class="prow">
+        <div class="i">04 answer</div>
+        <div>
+          <h3><span class="t-en">Hybrid retrieval, cited output</span><span class="t-zh">混合检索，带引用的输出</span></h3>
+          <p><span class="t-en">Dense vectors catch paraphrases; BM25 catches contract numbers and model codes. RRF merges the rankings, MMR drops redundancy, and every sentence that leaves the panel carries a bracket number you can click.</span><span class="t-zh">稠密向量负责语义近似，BM25 负责合同编号与型号。RRF 融合排序，MMR 去冗余，输出的每一句都带可点击的方括号编号。</span></p>
+        </div>
+        <div class="spec">top-k 6 · RRF k=60 · MMR λ 0.7<br>strict: refuse when nothing matches<br>export: md · json · txt</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="slab"><b>02</b><span class="t-en">capabilities</span><span class="t-zh">能力清单</span></div>
+    <h2><span class="t-en">What the runtime gives you</span><span class="t-zh">运行时提供了什么</span></h2>
+    <div class="grid3">
+      <div class="box hi"><h3><span class="t-en">verify_network()</span><span class="t-zh">verify_network()</span></h3><p><span class="t-en">A live panel listing every outbound request with domain, bytes and purpose. Our claim is testable in two clicks, so we make it testable in two clicks.</span><span class="t-zh">实时面板列出每一次外发请求的域名、字节数与用途。我们的说法两下点击就能验证，所以我们把它做成两下点击就能验证。</span></p><div class="prop">PerformanceObserver · no DevTools needed</div></div>
+      <div class="box"><h3><span class="t-en">manage_collection()</span><span class="t-zh">manage_collection()</span></h3><p><span class="t-en">Rename, group, disable, delete, re-index after switching embedding models. Scope a question to a subset of files at ask-time.</span><span class="t-zh">重命名、分组、停用、删除，切换嵌入模型后重建索引。提问时可临时把范围限定在部分文件。</span></p><div class="prop">≤ 40 docs · ≤ 20k chunks</div></div>
+      <div class="box"><h3><span class="t-en">follow_up()</span><span class="t-zh">follow_up()</span></h3><p><span class="t-en">Conversation context is kept for the last N turns, and the previous question is used to expand the next search query so pronouns still hit the right paragraph.</span><span class="t-zh">保留最近 N 轮上下文，并用上一轮问题扩展下一次检索的关键词，代词也能命中正确的段落。</span></p><div class="prop">context turns: 6 (adjustable)</div></div>
+      <div class="box"><h3><span class="t-en">set_strictness()</span><span class="t-zh">set_strictness()</span></h3><p><span class="t-en"><code>strict</code> returns "not found in your documents" instead of guessing. <code>balanced</code> may summarise across chunks but flags every inferred sentence.</span><span class="t-zh"><code>strict</code> 在找不到时返回「文档中未找到」而不是猜；<code>balanced</code> 可跨片段归纳，但会标注每个推断句。</span></p><div class="prop">two modes, no hidden third</div></div>
+      <div class="box"><h3><span class="t-en">export_session()</span><span class="t-zh">export_session()</span></h3><p><span class="t-en">Dump the whole conversation with model name, strictness setting and citation list, so a reviewer can reproduce your answer.</span><span class="t-zh">导出整段对话，含模型名、严格度设置与引用清单，复核的人可以复现你的答案。</span></p><div class="prop">.md · .json · .txt</div></div>
+      <div class="box"><h3><span class="t-en">fail_loudly()</span><span class="t-zh">fail_loudly()</span></h3><p><span class="t-en">Unsupported format, encrypted PDF, missing text layer, out of memory, model download failure — each maps to a specific message and a suggested fix.</span><span class="t-zh">格式不支持、加密 PDF、缺文字层、内存不足、模型下载失败——每种都有明确信息和处理建议。</span></p><div class="prop">error codes documented</div></div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="slab"><b>03</b><span class="t-en">diff</span><span class="t-zh">对比</span><span class="dm" style="margin-left:auto"><span class="t-en">vs. cloud file upload</span><span class="t-zh">对比云端上传</span></span></div>
+    <h2><span class="t-en">What changes when the file never leaves</span><span class="t-zh">当文件不离开本地，哪些东西变了</span></h2>
+    <pre class="diff"><div class="hd"><span class="t-en">Table 1 — document lifecycle</span><span class="t-zh">表 1 — 文档生命周期</span></div><div class="bd"><span class="cmt"># cloud assistant:          # SecureRAG:</span>
+<span class="del">- file → upload → vendor storage</span>      <span class="add">+ file → File API → tab memory</span>
+<span class="del">- index → vendor vector DB</span>            <span class="add">+ index → your IndexedDB</span>
+<span class="del">- account required, logged</span>            <span class="add">+ no account, nothing logged</span>
+<span class="del">- offline: fails</span>                      <span class="add">+ offline: works after cache</span>
+<span class="del">- quota: free tier caps</span>               <span class="add">+ quota: your own hardware</span>
+<span class="del">- citations: inconsistent</span>             <span class="add">+ citations: paragraph + page</span>
+<span class="hl">+ prose quality: better in the cloud</span>  <span class="cmt"># the trade-off, stated plainly</span></div></pre>
+    <div class="tw">
+      <table>
+        <caption><span class="t-en">Table 2 — capability matrix</span><span class="t-zh">表 2 — 能力矩阵</span></caption>
+        <thead><tr>
+          <th><span class="t-en">capability</span><span class="t-zh">能力</span></th>
+          <th>SecureRAG</th>
+          <th><span class="t-en">cloud upload</span><span class="t-zh">云端上传</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td>data_leaves_device</td><td class="y">false</td><td class="n">true</td></tr>
+          <tr><td>account_required</td><td class="y">false</td><td class="n">true</td></tr>
+          <tr><td>offline_capable</td><td class="y">true</td><td class="n">false</td></tr>
+          <tr><td>citation_granularity</td><td class="y">paragraph + page</td><td>varies</td></tr>
+          <tr><td>cost_model</td><td>your hardware</td><td><span class="t-en">free tier → paid</span><span class="t-zh">免费额度 → 付费</span></td></tr>
+          <tr><td>answer_fluency</td><td>local model (0.5–1.5B)</td><td class="y"><span class="t-en">frontier model</span><span class="t-zh">前沿大模型</span></td></tr>
+          <tr><td>vendor_retention_policy</td><td class="y">n/a</td><td><span class="t-en">plan-dependent</span><span class="t-zh">视套餐而定</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="slab"><b>04</b><span class="t-en">manifest</span><span class="t-zh">模型清单</span><span class="dm" style="margin-left:auto"><span class="t-en">you approve every download</span><span class="t-zh">每次下载都由你确认</span></span></div>
+    <h2><span class="t-en">Exact sizes, before anything starts</span><span class="t-zh">开始之前，体积写清楚</span></h2>
+    <div class="manifest">
+      <div class="man">
+        <div class="mh"><span class="g">●</span><span class="t-en">lightweight · default</span><span class="t-zh">轻量档 · 默认</span><span class="b" style="margin-left:auto">no consent needed</span></div>
+        <dl>
+          <dt>embedding</dt><dd>bge-small-zh-v1.5 / all-MiniLM-L6-v2</dd>
+          <dt>bytes_first_run</dt><dd>≈ 25 MB</dd>
+          <dt>answer_mode</dt><dd>extractive</dd>
+          <dt>requires</dt><dd><span class="t-en">any modern browser</span><span class="t-zh">任意现代浏览器</span></dd>
+        </dl>
+        <div class="mf"><span class="t-en">Instant start, works on phones, always quotable. This is what the tool runs unless you ask for more.</span><span class="t-zh">秒开，手机可用，句句可引。除非你主动要求更多，工具就一直用它。</span></div>
+      </div>
+      <div class="man">
+        <div class="mh"><span class="a">●</span><span class="t-en">generation · opt-in</span><span class="t-zh">生成档 · 手动开启</span><span class="b" style="margin-left:auto">consent required</span></div>
+        <dl>
+          <dt>models</dt><dd>Qwen2.5 0.5B / 1.5B q4</dd>
+          <dt>bytes_first_run</dt><dd>400 MB – 1.0 GB</dd>
+          <dt>runtime</dt><dd>WebLLM (WebGPU) / Transformers.js (WASM)</dd>
+          <dt>throughput</dt><dd><span class="t-en">15–40 tok/s on GPU, 3–8 on CPU</span><span class="t-zh">GPU 15–40 tok/s，CPU 3–8</span></dd>
+        </dl>
+        <div class="mf warn"><span class="t-en">Download size is stated in a confirmation dialog before the first byte. No model above 30 MB is fetched without you clicking accept.</span><span class="t-zh">第一个字节下载前，确认框里已写明确切体积。任何超过 30MB 的模型，不点同意就不会拉取。</span></div>
+      </div>
+    </div>
+    <div class="ad" role="complementary" aria-label="Advertisement">
+      <span><span class="t-en">Advertisement</span><span class="t-zh">广告</span> · Google AdSense</span>
+    </div>
+  </section>
+
+  <section id="faq" class="wrap">
+    <div class="slab"><b>05</b><span class="t-en">faq</span><span class="t-zh">常见问题</span></div>
+    <h2><span class="t-en">Answers, with the mechanism</span><span class="t-zh">回答，附带机制说明</span></h2>
+    <div style="margin-top:26px">
+      <details open>
+        <summary><span class="pr">?</span><span class="t-en">How do I verify nothing is uploaded?</span><span class="t-zh">怎么验证没有上传？</span><span class="ar">▾</span></summary>
+        <p><span class="t-en">Run the same test we do: open DevTools → Network, add a document, ask three questions. Expected result — one request to fetch model weights on first use, zero afterwards. The in-app shield panel reports the identical list.</span><span class="t-zh">跑一遍我们自己的测试：打开开发者工具 → Network，添加文档，连问三个问题。预期结果——首次使用时有一次模型权重请求，之后为零。站内盾牌面板会显示完全相同的列表。</span></p>
+      </details>
+      <details>
+        <summary><span class="pr">?</span><span class="t-en">Does the index survive a refresh?</span><span class="t-zh">刷新后索引还在吗？</span><span class="ar">▾</span></summary>
+        <p><span class="t-en">Yes — chunks and vectors are written to IndexedDB. Clearing site data removes them, and that is also the cleanup path. Nothing needs a server round-trip to come back.</span><span class="t-zh">在——分块与向量都会写入 IndexedDB。清除站点数据即删除，这也是清理方式。恢复时不需要任何服务器往返。</span></p>
+      </details>
+      <details>
+        <summary><span class="pr">?</span><span class="t-en">Which files get rejected?</span><span class="t-zh">哪些文件会被拒绝？</span><span class="ar">▾</span></summary>
+        <p><span class="t-en">Encrypted PDFs, scanned PDFs without a text layer, legacy .doc, files above 25 MB, and collections past 20,000 chunks. Each rejection names the file, the reason and the workaround.</span><span class="t-zh">加密 PDF、无文字层的扫描件 PDF、旧版 .doc、超过 25MB 的文件，以及超过 2 万块的文档集。每次拒绝都会写明文件名、原因与替代做法。</span></p>
+      </details>
+      <details>
+        <summary><span class="pr">?</span><span class="t-en">Why do you show ads?</span><span class="t-zh">为什么要放广告？</span><span class="ar">▾</span></summary>
+        <p><span class="t-en">Because running the site costs money and the tool cannot charge you — it runs on your hardware. Ads are labeled, capped at three per page, and never placed inside the chat workspace or above the primary action.</span><span class="t-zh">因为网站有成本，而这个工具没法向你收费——它跑在你自己的硬件上。广告有明确标注，每页最多三个，绝不放进聊天工作区，也不会压在主要操作上方。</span></p>
+      </details>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="end">
+      <h2><span class="t-en">$ git clone nothing — it's already in your tab</span><span class="t-zh">$ git clone nothing — 它已经在你的标签页里了</span></h2>
+      <p><span class="t-en">Add one document, watch the pipeline log scroll, then check the network tab. That is the entire pitch.</span><span class="t-zh">加一份文档，看管线日志滚动，然后检查网络面板。这就是全部卖点。</span></p>
+      <div class="ctas">
+        <a class="btn btn-green btn-lg" href="#">./start</a>
+        <a class="btn btn-lg" href="#"><span class="t-en">privacy policy</span><span class="t-zh">隐私政策</span></a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div>
+        <a class="brand" href="#" style="margin-bottom:12px"><span class="br">▚</span>SecureRAG</a>
+        <p style="font-size:12.5px;color:var(--dim);max-width:42ch;line-height:1.75"><span class="t-en">A static site with a client-side document engine. No backend, no accounts, no upload — verified in the network tab.</span><span class="t-zh">一个带客户端文档引擎的静态网站。没有后端、没有账号、没有上传——网络面板可验证。</span></p>
+      </div>
+      <div><h5><span class="t-en">product</span><span class="t-zh">产品</span></h5><a href="#">./app</a><a href="#pipeline">./pipeline</a><a href="#">./models</a><a href="#">./tools</a></div>
+      <div><h5><span class="t-en">docs</span><span class="t-zh">文档</span></h5><a href="#">./guides</a><a href="#">./compare</a><a href="#">./glossary</a><a href="#">./blog</a></div>
+      <div><h5><span class="t-en">trust</span><span class="t-zh">信任</span></h5><a href="#">./privacy</a><a href="#">./terms</a><a href="#">./security</a><a href="#">./accessibility</a></div>
+    </div>
+    <div class="fbot">
+      <span>© 2026 SecureRAG · securerag.app</span>
+      <span class="pledge">● <span class="t-en">all processing is local</span><span class="t-zh">全部处理在本地完成</span></span>
+      <span><span class="t-en">ads labeled · never inside the workspace</span><span class="t-zh">广告有标注 · 不进工作区</span></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function setLang(l){
+    document.body.classList.toggle('lang-zh', l==='zh');
+    document.body.classList.toggle('lang-en', l==='en');
+    document.documentElement.lang = l==='zh' ? 'zh-Hans' : 'en';
+    document.querySelectorAll('.langsw button').forEach(b=>b.setAttribute('aria-pressed', String(b.textContent.trim()===l)));
+  }
+</script>
+</body>
+</html>

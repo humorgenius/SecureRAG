@@ -1,0 +1,67 @@
+---
+import { home } from '../../data/home';
+import { localizePath, type Lang } from '../../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const c = home[lang].end;
+---
+
+<div class="wrap">
+  <div class="endband">
+    <h2>{c.heading}</h2>
+    <p>{c.body}</p>
+    <div class="ctas">
+      <a class="btn btn-blue btn-lg" href={localizePath(lang, '/app/')}>{c.ctaPrimary}</a>
+      <a class="btn btn-ghost-d btn-lg" href={localizePath(lang, '/privacy/')}>{c.ctaSecondary}</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .endband {
+    margin-top: 70px;
+    background: linear-gradient(120deg, #0a1730, #15305f 60%, #1c3f7d);
+    border-radius: 22px;
+    padding: 52px 44px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .endband::after {
+    content: "";
+    position: absolute;
+    right: -140px;
+    top: -160px;
+    width: 520px;
+    height: 520px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(47, 107, 237, .5), transparent 66%);
+  }
+  h2 {
+    color: #fff;
+    position: relative;
+    max-width: 28ch;
+    font-size: clamp(25px, 3vw, 36px);
+    letter-spacing: -.03em;
+  }
+  p {
+    position: relative;
+    margin-top: 14px;
+    color: rgba(255, 255, 255, .72);
+    font-size: 16.5px;
+    max-width: 56ch;
+  }
+  .ctas {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 30px;
+  }
+  @media (max-width: 640px) {
+    .endband {
+      padding: 34px 24px;
+    }
+  }
+</style>
