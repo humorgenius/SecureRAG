@@ -88,6 +88,28 @@ try {
   console.log('=== 首屏（未搜索）===');
   console.log(' ', await evalJs(measure));
 
+  // Capture the initial state too: the card's height is content-driven, so the
+  // question "does it look empty now that the index rows are gone" can only be
+  // answered by looking at both states.
+  {
+    const b0 = JSON.parse(
+      (await evalJs(
+        "(function(){var n=document.querySelector('.herocard');if(!n)return 'null';var r=n.getBoundingClientRect();" +
+          "return JSON.stringify({x:r.left+window.scrollX,y:r.top+window.scrollY,w:r.width,h:r.height});})()"
+      )) ?? 'null'
+    );
+    const s0 = await send('Page.captureScreenshot', {
+      format: 'png',
+      captureBeyondViewport: true,
+      ...(b0 ? { clip: { x: b0.x, y: b0.y, width: b0.w, height: b0.h, scale: 1 } } : {}),
+    });
+    if (s0.result?.data) {
+      const { writeFileSync } = await import('node:fs');
+      writeFileSync('E:/hermes-workspace/outputs/securerag/demo-initial.png', Buffer.from(s0.result.data, 'base64'));
+      console.log('  首屏截图: E:/hermes-workspace/outputs/securerag/demo-initial.png');
+    }
+  }
+
   console.log('=== 输入「' + QUERY + '」并点检索 ===');
   console.log(
     ' ',

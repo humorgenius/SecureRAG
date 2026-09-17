@@ -75,18 +75,6 @@ const p = c.preview;
               </div>
             ))
           }
-          <h4 class="mt">{p.indexTitle}</h4>
-          {
-            p.indexRows.map((row) => (
-              <div class="doc">
-                <span class="ft dim">{row.tag}</span>
-                <span class="dm2">
-                  <b class="muted">{row.title}</b>
-                  <span>{row.meta}</span>
-                </span>
-              </div>
-            ))
-          }
         </div>
         <div class="hc-right">
           {/* The right column is a live demo: it first paints the same mock answer,
@@ -249,9 +237,6 @@ const p = c.preview;
     text-transform: uppercase;
     color: var(--muted-2);
     margin-bottom: 12px;
-  }
-  .hc-left h4.mt {
-    margin-top: 20px;
   }
   .doc {
     display: flex;

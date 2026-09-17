@@ -59,8 +59,6 @@ export interface HomeContent {
       live: string;
       docsTitle: string;
       docs: { tag: string; kind: 'pdf' | 'docx' | 'md'; name: string; meta: string }[];
-      indexTitle: string;
-      indexRows: { tag: string; title: string; meta: string }[];
       question: string;
       answerLabel: string;
       answer: { a: string; strong: string; b: string; c1: string; mid: string; c2: string };
@@ -128,11 +126,6 @@ export const home: Record<Lang, HomeContent> = {
           { tag: 'PDF', kind: 'pdf', name: 'Example file (1)', meta: '42 pages · 84 chunks' },
           { tag: 'DOC', kind: 'docx', name: 'Example file (2)', meta: '18 pages · 41 chunks' },
           { tag: 'MD', kind: 'md', name: 'Example file (3)', meta: '9 chunks' },
-        ],
-        indexTitle: 'Index health',
-        indexRows: [
-          { tag: '512', title: 'dim · float32', meta: 'IndexedDB · persisted' },
-          { tag: 'BM', title: '+ BM25 hybrid', meta: 'RRF fused · top-k 6' },
         ],
         question: 'What is the termination notice period?',
         answerLabel: 'Answer · generated locally',
@@ -345,11 +338,6 @@ export const home: Record<Lang, HomeContent> = {
           { tag: 'PDF', kind: 'pdf', name: '示例文件（1）', meta: '42 页 · 84 块' },
           { tag: 'DOC', kind: 'docx', name: '示例文件（2）', meta: '18 页 · 41 块' },
           { tag: 'MD', kind: 'md', name: '示例文件（3）', meta: '9 块' },
-        ],
-        indexTitle: '索引状态',
-        indexRows: [
-          { tag: '512', title: '维 · float32', meta: 'IndexedDB · 已持久化' },
-          { tag: 'BM', title: '+ BM25 混合检索', meta: 'RRF 融合 · top-k 6' },
         ],
         question: '合同里的解约通知期是多久？',
         answerLabel: '回答 · 本地生成',
