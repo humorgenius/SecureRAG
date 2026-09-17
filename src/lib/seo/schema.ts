@@ -13,8 +13,8 @@ export const orgSchema = (lang: Lang) => ({
   email: SITE.contactEmail,
   description:
     lang === 'zh'
-      ? 'SecureRAG 是一个 100% 在浏览器本地运行的多文档问答工具，文件永不离开你的设备。'
-      : 'SecureRAG is a multi-document question-answering tool that runs entirely inside your browser. Files never leave your device.',
+      ? 'SecureRAG 是一个跨格式文件索引工具：支持 PDF、DOCX、TXT、Markdown、CSV、HTML、JSON 等格式，借助 AI 在浏览器本地统一检索文件内容，文件永不离开你的设备。'
+      : 'SecureRAG is a cross-format file indexing tool: it searches PDF, DOCX, TXT, Markdown, CSV, HTML and JSON with AI entirely inside your browser. Files never leave your device.',
   sameAs: [SITE.repo, `https://huggingface.co/spaces`],
 });
 

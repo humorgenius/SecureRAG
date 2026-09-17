@@ -90,9 +90,9 @@ export interface HomeContent {
 export const home: Record<Lang, HomeContent> = {
   en: {
     meta: {
-      title: 'SecureRAG — private document Q&A that never uploads your files',
+      title: 'SecureRAG — cross-format indexing, files never uploaded',
       description:
-        'Drop in PDFs, Word files or Markdown and ask questions. Parsing, indexing and answering run entirely in your browser. No account, no upload, works offline.',
+        'Search PDF, DOCX, TXT, Markdown, CSV, HTML and JSON with AI in one place. Parsing, indexing and answering run entirely in your browser — no account, nothing uploaded.',
     },
     hero: {
       badge: 'Built for documents you are not allowed to upload',
@@ -301,9 +301,9 @@ export const home: Record<Lang, HomeContent> = {
 
   zh: {
     meta: {
-      title: 'SecureRAG — 本地运行、绝不上传的文档问答工具',
+      title: 'SecureRAG — 跨格式文件索引工具，本地运行、文件不上传',
       description:
-        '拖入 PDF、Word 或 Markdown 文档即可提问。解析、建索引与回答全部在你的浏览器内完成，无需账号、不上传，缓存后可离线使用。',
+        '支持 PDF、DOCX、TXT、Markdown、CSV、HTML、JSON 等格式，借助 AI 统一检索文件内容。解析、建索引与回答全部在浏览器本地完成，无需账号，文件不上传。',
     },
     hero: {
       badge: '为那些“不允许上传”的文档而建',
