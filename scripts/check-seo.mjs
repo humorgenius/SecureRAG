@@ -110,8 +110,22 @@ if (warnings.length > 25) console.log(`  … ${warnings.length - 25} more warnin
     if (!html.includes('<astro-island')) continue;
     islands++;
     const hrefs = [...html.matchAll(/<link[^>]+href="(\/[^"]+\.css)"/g)].map((m) => m[1]);
-    if (!hrefs.some((href) => readCss(href).includes('.sr-'))) {
-      errors.push(`${rel}: ships an interactive island but loads no island stylesheet (.sr-*)`);
+    const cssText = hrefs.map((href) => readCss(href)).join('\n');
+    // Compare against the classes the island actually rendered rather than one
+    // hard-coded prefix: the hero demo island uses .demo-*, the tool islands use
+    // .sr-*, and a new island should not need this gate edited to be checked.
+    const islandClasses = new Set(
+      [...html.matchAll(/<astro-island[\s\S]*?<\/astro-island>/g)]
+        .flatMap((block) => [...block[0].matchAll(/class="([^"]+)"/g)])
+        .flatMap((m) => m[1].split(/\s+/))
+        .filter((name) => name.length > 0 && !name.startsWith('astro-'))
+    );
+    if (islandClasses.size === 0) {
+      warnings.push(`${rel}: island renders no class names, so its styling cannot be checked`);
+    } else if (![...islandClasses].some((name) => cssText.includes(`.${name}`))) {
+      errors.push(
+        `${rel}: ships an interactive island but none of its classes (${[...islandClasses].slice(0, 3).join(', ')} …) appear in any stylesheet it loads`
+      );
     }
   }
   if (islands === 0) errors.push('gate is inspecting nothing: no page in dist/ contains an astro-island');
