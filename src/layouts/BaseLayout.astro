@@ -18,9 +18,11 @@ interface Props {
   image?: string;
   noindex?: boolean;
   activeNav?: string;
+  /** the homepage opens with its own hero, so it carries no top banner */
+  noTopAd?: boolean;
 }
 
-const { title, description, lang, path, type, image, noindex, activeNav } = Astro.props;
+const { title, description, lang, path, type, image, noindex, activeNav, noTopAd = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -38,9 +40,11 @@ const { title, description, lang, path, type, image, noindex, activeNav } = Astr
     <AdSlotUnit lang={lang} variant="rail" id="rail-right" />
 
     <main id="main">
-      <div class="wrap">
-        <AdSlotUnit lang={lang} variant="banner" id="banner-top" />
-      </div>
+      {!noTopAd && (
+        <div class="wrap">
+          <AdSlotUnit lang={lang} variant="banner" id="banner-top" />
+        </div>
+      )}
       <slot />
       <div class="wrap">
         <AdSlotUnit lang={lang} variant="banner" id="banner-bottom" />

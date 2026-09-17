@@ -46,10 +46,12 @@ const label = t(lang, 'ad.label');
           type="button"
           data-ad-collapse
           aria-expanded="true"
-          data-label-hide={t(lang, 'ad.collapse')}
-          data-label-show={t(lang, 'ad.expand')}
+          aria-label={`${t(lang, 'ad.collapse')} / ${t(lang, 'ad.expand')}`}
+          title={`${t(lang, 'ad.collapse')} / ${t(lang, 'ad.expand')}`}
+          data-label-hide="▾"
+          data-label-show="▴"
         >
-          {t(lang, 'ad.collapse')}
+          ▾
         </button>
       )
     }
@@ -163,8 +165,52 @@ const label = t(lang, 'ad.label');
   .ad-slot-anchor[data-collapsed='1'] .ad-body {
     display: none;
   }
+
+  /*
+   * Collapsed, the whole slot shrinks to a single arrow in the corner. Hiding
+   * only the ad body left the label row behind, and that row still covered the
+   * last line of the page — the complaint this fixes. The spacer shrinks with it
+   * so the arrow sits in its own band instead of over the footer.
+   */
+  .ad-slot-anchor[data-collapsed='1'] {
+    left: auto;
+    right: 14px;
+    transform: none;
+    width: auto;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+  .ad-slot-anchor[data-collapsed='1'] .ad-head {
+    height: 38px;
+    padding: 0;
+    justify-content: flex-end;
+  }
+  /* Explicit box: without it the slot kept the height of its hidden body. */
+  .ad-slot-anchor[data-collapsed='1'] {
+    height: 38px;
+    overflow: visible;
+  }
+  .ad-slot-anchor[data-collapsed='1'] .ad-label {
+    display: none;
+  }
+  .ad-slot-anchor[data-collapsed='1'] .ad-collapse {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(10, 23, 48, .16);
+    font-size: 14px;
+    color: var(--ink-2);
+  }
   .ad-anchor-spacer {
     height: 148px;
+  }
+  .ad-anchor-spacer[data-collapsed='1'] {
+    height: 46px;
   }
   .ad-anchor-spacer[hidden] {
     display: none;

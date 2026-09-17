@@ -26,6 +26,7 @@ const jsonLd = [
 ---
 
 <BaseLayout
+  noTopAd
   lang={lang}
   path={`/${lang}/`}
   title={c.meta.title}
@@ -33,10 +34,10 @@ const jsonLd = [
 >
   <Hero lang={lang} />
   <Metrics lang={lang} />
+  <div class="wrap"><AdSlot lang={lang} /></div>
   <CapabilityGrid lang={lang} />
   <TrustCenter lang={lang} />
   <CompareTable lang={lang} />
-  <div class="wrap"><AdSlot lang={lang} /></div>
   <FaqAccordion lang={lang} />
   <Fragment slot="head">
     <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />

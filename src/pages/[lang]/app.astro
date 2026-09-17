@@ -96,6 +96,11 @@ const jsonLd = [
     <Workspace client:only="preact" lang={lang} sessionId={`main-${lang}`} />
   </section>
 
+  {/* Directly under the tool: the banner follows the thing the visitor came for. */}
+  <div class="wrap">
+    <AdSlot lang={lang} />
+  </div>
+
   <section class="wrap section">
     <p class="eyebrow">{lang === 'zh' ? '使用步骤' : 'How to use it'}</p>
     <h2 class="h2">{lang === 'zh' ? '三步完成一次可溯源的问答' : 'Three steps to a cited answer'}</h2>
@@ -130,7 +135,6 @@ const jsonLd = [
       <a class="btn btn-white" href={localizePath(lang, '/security/')}>{t(lang, 'nav.trust')}</a>
       <a class="btn btn-white" href={localizePath(lang, '/guides/')}>{t(lang, 'nav.guides')}</a>
     </div>
-    <AdSlot lang={lang} />
     <p class="note ads-note">{copy.adsNote}</p>
   </section>
 

@@ -88,6 +88,18 @@ try {
       consentAsked: !!(gate && !gate.hidden),
       anchorCollapsed: anchor ? anchor.dataset.collapsed : null,
       spacerHidden: spacer ? !!spacer.hidden : null,
+      midPct: (function () {
+        var m = document.querySelector('[data-ad-id="banner-mid"]');
+        var d = document.documentElement.scrollHeight;
+        if (!m || !d) return null;
+        return Math.round(((m.getBoundingClientRect().top + window.scrollY) / d) * 100);
+      })(),
+      anchorBox: (function () {
+        var a = document.querySelector('[data-ad-variant="anchor"]');
+        if (!a) return null;
+        var r = a.getBoundingClientRect();
+        return Math.round(r.width) + 'x' + Math.round(r.height);
+      })(),
     });
   })()`;
 
@@ -96,6 +108,8 @@ try {
   console.log('  广告位数量:', before.count, '| 视口:', before.viewport);
   for (const row of before.rows ?? []) console.log('    ', row);
   console.log('  询问同意（未作答前）:', before.consentAsked, '| 折叠状态:', before.anchorCollapsed, '| 占位隐藏:', before.spacerHidden);
+  console.log('  中部横幅位置:', before.midPct === null ? '（本页没有中部横幅）' : `约整页的 ${before.midPct}%`);
+  console.log('  底部广告位占地:', before.anchorBox);
 
   console.log('  --- 点击底部广告位的「收起」 ---');
   await evalJs(`(function(){var b=document.querySelector('[data-ad-collapse]');if(b){b.click();return 'clicked';}return 'no button';})()`);
@@ -103,7 +117,7 @@ try {
   const after = JSON.parse((await evalJs(survey)) ?? '{}');
   console.log('  折叠状态:', after.anchorCollapsed, '| 占位隐藏:', after.spacerHidden);
   const anchorRow = (after.rows ?? []).find((r) => r.startsWith('anchor'));
-  console.log('  底部广告位尺寸:', anchorRow);
+  console.log('  折叠后尺寸:', anchorRow, '| 折叠后占地:', after.anchorBox);
 
   console.log('  --- 页面在作答前发出的站外请求 ---');
   console.log('  站外请求:', external.length === 0 ? '无（符合承诺）' : external.slice(0, 5));

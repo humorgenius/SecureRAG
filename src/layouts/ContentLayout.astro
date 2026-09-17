@@ -24,6 +24,9 @@ interface Props {
 
 const { lang, path, title, description, h1, intro, updated, blocks, crumbs, related = [], schema = [], ads = 1 } = Astro.props;
 
+/** Block index the middle banner is inserted at: roughly the first third. */
+const adCut = Math.max(1, Math.floor(blocks.length / 3));
+
 /** Table of contents is derived from the h2 blocks — no manual duplication. */
 const toc = blocks
   .map((b, i) => ({ b, id: `s-${i + 1}` }))
@@ -45,12 +48,15 @@ const toc = blocks
       </header>
 
       <div class="body">
-        <ContentBlocks blocks={blocks} lang={lang} />
+        {/* The middle banner sits a third of the way down, not at the end: the page
+            is read in order, and an ad after the last block is an ad nobody sees. */}
+        <ContentBlocks blocks={blocks.slice(0, adCut)} lang={lang} />
       </div>
 
       {/* Every page carries the middle banner — the top and bottom ones, the two
           rails and the anchor are added by BaseLayout. */}
       <AdSlot lang={lang} />
+      <ContentBlocks blocks={blocks.slice(adCut)} lang={lang} />
 
       {
         related.length > 0 && (
