@@ -12,6 +12,8 @@ import { CONSENT_EVENT, adMode, currentTimeZone, readConsent, type AdMode } from
  */
 
 const SCRIPT_SRC = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+/** Share of the scrollable page after which the bottom slot folds itself away. */
+const AUTO_COLLAPSE_AT = 0.35;
 
 let booted = false;
 let scriptRequested = false;
@@ -150,7 +152,34 @@ function bootAnchor(): void {
   // is not remembered. A remembered collapse left a small arrow in a corner that
   // readers could not find, which reads as "the ad disappeared".
   setCollapsed(false);
-  button.addEventListener('click', () => setCollapsed(anchor.dataset.collapsed !== '1'));
+
+  let autoDone = false;
+  let userTookOver = false;
+
+  /**
+   * Collapse by itself once the reader is a third of the way down the page.
+   *
+   * Depth is measured over the scrollable distance (0 at the top, 1 at the
+   * bottom), not the raw page height, so the trigger lands in the same place on a
+   * long article and a short page. It fires once: if the reader expands the slot
+   * again by hand, that wins and nothing re-collapses it.
+   */
+  const onScroll = () => {
+    if (autoDone || userTookOver) return;
+    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+    if (scrollable <= 0) return;
+    if (window.scrollY / scrollable >= AUTO_COLLAPSE_AT) {
+      autoDone = true;
+      setCollapsed(true);
+    }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll(); // a restored scroll position may already be past the mark
+
+  button.addEventListener('click', () => {
+    userTookOver = true;
+    setCollapsed(anchor.dataset.collapsed !== '1');
+  });
 }
 
 export function bootAds(): void {

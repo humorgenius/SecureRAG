@@ -167,6 +167,15 @@ try {
   await sleep(3500);
   console.log('  跳转/刷新之后:', await evalJs(railState));
 
+  console.log('  --- 自动折叠阈值（35%）---');
+  const atDepth = async (fraction) => {
+    await evalJs(`(function(){var s=document.documentElement.scrollHeight-window.innerHeight;window.scrollTo(0,Math.round(s*${fraction}));return 'ok';})()`);
+    await sleep(700);
+    return evalJs(`(function(){var a=document.querySelector('[data-ad-variant="anchor"]');var s=document.documentElement.scrollHeight-window.innerHeight;return document.querySelector('[data-ad-collapse]').textContent + ' | collapsed=' + a.dataset.collapsed + ' | 深度=' + Math.round(window.scrollY/s*100) + '%';})()`);
+  };
+  console.log('  滚到 30%:', await atDepth(0.3));
+  console.log('  滚到 40%:', await atDepth(0.4));
+
   console.log('  --- 回到顶部按钮 ---');
   const topCheck = await evalJs(`(function(){
     window.scrollTo(0, 1200);
