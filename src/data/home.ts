@@ -66,8 +66,23 @@ export interface HomeContent {
       answer: { a: string; strong: string; b: string; c1: string; mid: string; c2: string };
       sourceLabel: string;
       source: { pre: string; mark: string; post: string };
-      placeholder: string;
-      send: string;
+      /**
+       * Copy for the live demo that now sits where the decorative input used to
+       * be. `{n}` is substituted by the island.
+       */
+      demo: {
+        placeholder: string;
+        button: string;
+        matches: string;
+        /** same, for a count of exactly one — "1 matches" reads as a bug */
+        matchesOne: string;
+        files: string;
+        filesOne: string;
+        none: string;
+        note: string;
+        openTool: string;
+        reset: string;
+      };
     };
   };
   metrics: Metric[];
@@ -135,8 +150,18 @@ export const home: Record<Lang, HomeContent> = {
           mark: 'notice',
           post: ' is delivered to the other party.”',
         },
-        placeholder: 'Ask a follow-up…',
-        send: 'Send',
+        demo: {
+          placeholder: 'Try “termination”, or any word of your own…',
+          button: 'Search',
+          matches: '{n} matches',
+          matchesOne: '{n} match',
+          files: 'in {n} files',
+          filesOne: 'in {n} file',
+          none: 'Nothing in these three documents contains that.',
+          note: 'Matched in your browser, against documents that ship with this page. Nothing is uploaded and no model is downloaded.',
+          openTool: 'Open the full tool',
+          reset: 'Start over',
+        },
       },
     },
     metrics: [
@@ -342,8 +367,18 @@ export const home: Record<Lang, HomeContent> = {
           mark: '通知',
           post: '送达对方六十（60）日后生效。”',
         },
-        placeholder: '继续追问…',
-        send: '发送',
+        demo: {
+          placeholder: '试试搜「解约」，或输入你自己的词……',
+          button: '检索',
+          matches: '{n} 处匹配',
+          matchesOne: '{n} 处匹配',
+          files: '来自 {n} 份文档',
+          filesOne: '来自 {n} 份文档',
+          none: '这三份文档里没有包含这个词的句子。',
+          note: '在你的浏览器本地完成匹配，语料随页面一起发布。不上传任何内容，也不下载模型。',
+          openTool: '打开完整工具',
+          reset: '重新开始',
+        },
       },
     },
     metrics: [

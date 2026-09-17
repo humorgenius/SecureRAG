@@ -1,4 +1,5 @@
 ---
+import PreviewDemo from './PreviewDemo.tsx';
 import { home } from '../../data/home';
 import { t, localizePath, type Lang } from '../../i18n/utils';
 import PrivacyBadge from './PrivacyBadge.astro';
@@ -52,8 +53,10 @@ const p = c.preview;
       <PrivacyBadge lang={lang} variant="dark" />
     </div>
 
-    <!-- Product preview: a static illustration of the workspace (no data, no scripts). -->
-    <div class="herocard anim-in d5" role="img" aria-label={`${t(lang, 'nav.app')} — SecureRAG workspace`}>
+    <!-- Product preview. It used to be a static illustration (role="img"); it now
+         hosts a live demo, so it must stay reachable by assistive tech — role="img"
+         would hide the input and the buttons inside it. -->
+    <div class="herocard anim-in d5" role="group" aria-label={`${t(lang, 'nav.app')} — SecureRAG workspace`}>
       <div class="hc-top">
         <span class="mono url">{p.url}</span>
         <span class="live">● {p.live}</span>
@@ -86,22 +89,21 @@ const p = c.preview;
           }
         </div>
         <div class="hc-right">
-          <div class="q2">{p.question}</div>
-          <div class="a2">
-            <div class="who">● {p.answerLabel}</div>
-            <p>
-              {p.answer.a}<strong>{p.answer.strong}</strong>{p.answer.b}<span class="cite">{p.answer.c1}</span>{p.answer.mid}<span
-                class="cite">{p.answer.c2}</span>
-            </p>
-            <div class="srcline">
-              <div class="sh">{p.sourceLabel}</div>
-              <div class="sb">{p.source.pre}<mark>{p.source.mark}</mark>{p.source.post}</div>
-            </div>
-            <div class="hc-foot">
-              <span class="ph2">{p.placeholder}</span>
-              <span class="btn btn-blue">{p.send}</span>
-            </div>
-          </div>
+          {/* The right column is a live demo: it first paints the same mock answer,
+              then answers real searches over three bundled documents. */}
+          <PreviewDemo
+            client:load
+            lang={lang}
+            mock={{
+              question: p.question,
+              answerLabel: p.answerLabel,
+              answer: p.answer,
+              sourceLabel: p.sourceLabel,
+              source: p.source,
+            }}
+            labels={p.demo}
+            toolHref={localizePath(lang, '/app/')}
+          />
         </div>
       </div>
     </div>
@@ -312,92 +314,6 @@ const p = c.preview;
   }
   .hc-right {
     padding: 20px 22px;
-  }
-  .q2 {
-    background: var(--blue-soft);
-    border: 1px solid #d8e4fb;
-    border-radius: 12px;
-    padding: 11px 14px;
-    font-size: 14px;
-    color: var(--ink);
-    margin-left: auto;
-    max-width: 80%;
-  }
-  .a2 {
-    margin-top: 16px;
-  }
-  .who {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 11.5px;
-    font-weight: 700;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    color: var(--muted-2);
-    margin-bottom: 9px;
-  }
-  .a2 p {
-    font-size: 14.5px;
-    line-height: 1.68;
-    color: var(--ink-2);
-  }
-  .a2 strong {
-    color: var(--ink);
-  }
-  .cite {
-    display: inline-block;
-    font-family: var(--font-mono);
-    font-size: 10.5px;
-    vertical-align: super;
-    color: var(--blue-d);
-    background: var(--blue-soft);
-    border: 1px solid #cfdcf9;
-    border-radius: 4px;
-    padding: 1px 5px;
-    margin-left: 3px;
-  }
-  .srcline {
-    margin-top: 13px;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  .sh {
-    padding: 9px 12px;
-    background: #fbfcfe;
-    border-bottom: 1px solid var(--line);
-    font-size: 11.5px;
-    font-weight: 600;
-    color: var(--muted);
-    font-family: var(--font-mono);
-  }
-  .sb {
-    padding: 11px 12px;
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.62;
-  }
-  .sb mark {
-    background: #fff2c9;
-    color: var(--ink);
-    border-radius: 3px;
-    padding: 0 2px;
-  }
-  .hc-foot {
-    margin-top: 16px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-  .ph2 {
-    flex: 1;
-    border: 1px solid var(--line);
-    border-radius: 9px;
-    padding: 10px 13px;
-    font-size: 13.5px;
-    color: var(--muted-2);
-    background: #fbfcfe;
   }
   @media (max-width: 880px) {
     .hc-body {
