@@ -121,13 +121,13 @@ export const home: Record<Lang, HomeContent> = {
       ctaPrimary: 'Start with a document',
       ctaSecondary: 'How to verify us',
       preview: {
-        url: 'securerag.app/app',
+        url: 'Tool demo',
         live: 'LOCAL SESSION · 0 REQUESTS',
         docsTitle: 'Documents · 3 indexed',
         docs: [
-          { tag: 'PDF', kind: 'pdf', name: '服务协议_2026.pdf', meta: '42 pages · 84 chunks' },
-          { tag: 'DOC', kind: 'docx', name: 'Q3 产品评审.docx', meta: '18 pages · 41 chunks' },
-          { tag: 'MD', kind: 'md', name: 'deployment-notes.md', meta: '9 chunks' },
+          { tag: 'PDF', kind: 'pdf', name: 'Example file (1)', meta: '42 pages · 84 chunks' },
+          { tag: 'DOC', kind: 'docx', name: 'Example file (2)', meta: '18 pages · 41 chunks' },
+          { tag: 'MD', kind: 'md', name: 'Example file (3)', meta: '9 chunks' },
         ],
         indexTitle: 'Index health',
         indexRows: [
@@ -144,7 +144,7 @@ export const home: Record<Lang, HomeContent> = {
           mid: '. A material breach carries a 30-day cure period before termination rights activate',
           c2: '2',
         },
-        sourceLabel: 'Source 1 · 服务协议_2026.pdf · p.14 · §8.2',
+        sourceLabel: 'Source 1 · Example file (1) · p.14 · §8.2',
         source: {
           pre: '“…termination shall be effective sixty (60) days after written ',
           mark: 'notice',
@@ -338,13 +338,13 @@ export const home: Record<Lang, HomeContent> = {
       ctaPrimary: '从一份文档开始',
       ctaSecondary: '如何验证我们',
       preview: {
-        url: 'securerag.app/app',
+        url: '工具示例',
         live: '本地会话 · 0 请求',
         docsTitle: '文档库 · 已索引 3 份',
         docs: [
-          { tag: 'PDF', kind: 'pdf', name: '服务协议_2026.pdf', meta: '42 页 · 84 块' },
-          { tag: 'DOC', kind: 'docx', name: 'Q3 产品评审.docx', meta: '18 页 · 41 块' },
-          { tag: 'MD', kind: 'md', name: 'deployment-notes.md', meta: '9 块' },
+          { tag: 'PDF', kind: 'pdf', name: '示例文件（1）', meta: '42 页 · 84 块' },
+          { tag: 'DOC', kind: 'docx', name: '示例文件（2）', meta: '18 页 · 41 块' },
+          { tag: 'MD', kind: 'md', name: '示例文件（3）', meta: '9 块' },
         ],
         indexTitle: '索引状态',
         indexRows: [
@@ -361,7 +361,7 @@ export const home: Record<Lang, HomeContent> = {
           mid: '。重大违约在解约权生效前另有 30 天补救期',
           c2: '2',
         },
-        sourceLabel: '来源 1 · 服务协议_2026.pdf · 第 14 页 · §8.2',
+        sourceLabel: '来源 1 · 示例文件（1） · 第 14 页 · §8.2',
         source: {
           pre: '“……解约于书面',
           mark: '通知',

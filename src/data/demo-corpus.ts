@@ -27,7 +27,7 @@ const DOCS: Record<Lang, DemoDoc[]> = {
   zh: [
     {
       id: 'demo-agreement',
-      name: '服务协议_2026.pdf',
+      name: '示例文件（1）',
       kind: 'pdf',
       text: `服务协议（2026 版）
 
@@ -43,7 +43,7 @@ const DOCS: Record<Lang, DemoDoc[]> = {
     },
     {
       id: 'demo-review',
-      name: 'Q3 产品评审.docx',
+      name: '示例文件（2）',
       kind: 'docx',
       text: `Q3 产品评审纪要
 
@@ -60,7 +60,7 @@ const DOCS: Record<Lang, DemoDoc[]> = {
     },
     {
       id: 'demo-deploy',
-      name: 'deployment-notes.md',
+      name: '示例文件（3）',
       kind: 'md',
       text: `# 部署说明
 
@@ -79,7 +79,7 @@ const DOCS: Record<Lang, DemoDoc[]> = {
   en: [
     {
       id: 'demo-agreement',
-      name: '服务协议_2026.pdf',
+      name: 'Example file (1)',
       kind: 'pdf',
       text: `Service Agreement (2026 edition)
 
@@ -96,7 +96,7 @@ notice, and fees already paid are prorated by days actually used.`,
     },
     {
       id: 'demo-review',
-      name: 'Q3 产品评审.docx',
+      name: 'Example file (2)',
       kind: 'docx',
       text: `Q3 product review minutes
 
@@ -113,7 +113,7 @@ Next quarter we re-test retrieval quality on long documents and add sampling of 
     },
     {
       id: 'demo-deploy',
-      name: 'deployment-notes.md',
+      name: 'Example file (3)',
       kind: 'md',
       text: `# Deployment notes
 
