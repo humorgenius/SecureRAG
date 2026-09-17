@@ -94,7 +94,7 @@ export default {
             },
             {
               q: 'How is a free site funded?',
-              a: 'By Google AdSense, on some pages, at most three labelled slots per page, loaded only after you agree to them. There is no paid tier, no account and no data product; advertising is the entire business model, and the pages in the trust set (privacy, terms, security, this FAQ) carry few slots or none. Declining the consent message changes nothing about how the tool behaves.',
+              a: 'By Google AdSense, on every page, up to six labelled slots (three in-page banners, two side rails, one collapsible anchor). Personalized ads load personalized only after you agree. Decline and the tool behaves identically: outside the EEA, UK and Switzerland you still get non-personalized ads, and inside them no ad script loads at all. There is no paid tier, no account and no data product.',
             },
             {
               q: 'Do you train models on my documents?',
@@ -146,7 +146,7 @@ export default {
             },
             {
               q: 'Do the ads receive my documents or my questions?',
-              a: 'Ad slots sit outside the chat workspace, and no document text, chunk or question is handed to the advertising script. What an ad request carries is the page address plus the standard device and browser details any ad request includes. If you would rather have no third-party script in the page at all, decline the consent message: the tool behaves identically with ads switched off.',
+              a: 'Ad slots sit outside the chat workspace, and no document text, chunk or question is handed to the advertising script. What an ad request carries is the page address plus the standard device and browser details any ad request includes. If you would rather have no third-party script at all, decline the consent message — inside the EEA, UK and Switzerland that stops every ad request outright; elsewhere it narrows requests to non-personalized ones.',
             },
           ],
         },
@@ -158,8 +158,8 @@ export default {
         {
           t: 'callout',
           kind: 'info',
-          title: 'This page carries one ad slot.',
-          text: 'It sits below the article and outside the chat workspace, and no document text or question is passed to it. The privacy policy, the terms and the security pages carry no advertising at all.',
+          title: 'This page carries ad slots too.',
+          text: 'It sits below the article and outside the chat workspace, and no document text or question is passed to it. The privacy policy, the terms and the security pages carry ad slots at all.',
         },
       ],
     },
@@ -245,7 +245,7 @@ export default {
             },
             {
               q: '免费站点靠什么维持？',
-              a: '靠 Google AdSense，只出现在部分页面，单页最多三个标注清楚的广告位，而且只在你同意之后才加载。没有付费档、没有账号、也没有数据产品，广告就是全部收入来源；信任类页面（隐私政策、条款、安全、这一页）广告位很少或没有。拒绝同意提示不影响工具的任何行为。',
+              a: '靠 Google AdSense，每个页面最多六个标注清楚的广告位（页内三条横幅、两侧两条竖幅、底部一条可折叠）。个性化广告只在你同意之后加载。拒绝后工具行为完全相同：在欧盟、英国、瑞士以外你仍会看到非个性化广告，在这三个地区内则完全不加载广告脚本。没有付费档、没有账号、也没有数据产品。',
             },
             {
               q: '会用我的文档训练模型吗？',
@@ -297,7 +297,7 @@ export default {
             },
             {
               q: '广告会拿到我的文档或提问吗？',
-              a: '广告位在聊天工作区之外，没有任何文档正文、文本块或提问交给广告脚本。广告请求携带的是页面地址，以及任何广告请求都会带的设备与浏览器信息。如果你希望页面里完全不出现第三方脚本，在同意提示里选择拒绝：关掉广告之后，工具行为和开着广告完全一样。',
+              a: '广告位在聊天工作区之外，没有任何文档正文、文本块或提问交给广告脚本。广告请求携带的是页面地址，以及任何广告请求都会带的设备与浏览器信息。如果你希望页面里完全不出现第三方脚本，在同意提示里选择拒绝——在欧盟、英国、瑞士境内，拒绝会彻底停止一切广告请求；在其他地区则只保留非个性化广告请求。',
             },
           ],
         },
@@ -309,8 +309,8 @@ export default {
         {
           t: 'callout',
           kind: 'info',
-          title: '这一页有一个广告位。',
-          text: '它位于正文下方、聊天工作区之外，不会有任何文档正文或提问传到它那里。隐私政策、条款和安全页面完全没有广告。',
+          title: '这一页也有广告位。',
+          text: '它位于正文下方、聊天工作区之外，不会有任何文档正文或提问传到它那里。每个页面都是同样的安排，包括隐私政策与条款页。',
         },
       ],
     },

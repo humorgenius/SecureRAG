@@ -1,0 +1,172 @@
+---
+import { t, type Lang } from '../../i18n/utils';
+import type { AdSlotId } from '../../data/ads';
+
+/**
+ * One labeled ad position. Six of these exist on every page:
+ *
+ *   banner  ×3 — in the page flow (top, middle, bottom)
+ *   rail    ×2 — fixed to the left and right gutters while the page scrolls
+ *   anchor  ×1 — fixed above the bottom edge, collapsible
+ *
+ * Two policies are encoded in the markup rather than in someone's memory:
+ * the slot reserves its own height (so filling it cannot shift the layout), and
+ * it is labelled before any ad exists — AdSense allows only "Advertisement" or
+ * "Sponsored links" as a label, and an unlabelled slot is a policy problem even
+ * when it is empty.
+ *
+ * Nothing is requested until lib/ads/client.ts decides it may be: see consent.ts
+ * for why a declined visitor in the EEA gets no request at all while a declined
+ * visitor elsewhere gets a non-personalized one.
+ */
+interface Props {
+  lang: Lang;
+  variant: 'banner' | 'rail' | 'anchor';
+  id: AdSlotId;
+}
+
+const { lang, variant, id } = Astro.props;
+const label = t(lang, 'ad.label');
+---
+
+<aside
+  class={`ad-slot ad-slot-${variant}`}
+  data-ad-id={id}
+  data-ad-variant={variant}
+  data-collapsed="0"
+  role="complementary"
+  aria-label={label}
+>
+  <div class="ad-head">
+    <p class="ad-label">{label}</p>
+    {
+      variant === 'anchor' && (
+        <button
+          class="ad-collapse"
+          type="button"
+          data-ad-collapse
+          aria-expanded="true"
+          data-label-hide={t(lang, 'ad.collapse')}
+          data-label-show={t(lang, 'ad.expand')}
+        >
+          {t(lang, 'ad.collapse')}
+        </button>
+      )
+    }
+  </div>
+  <div class="ad-body" data-ad-body>
+    <p class="ad-note">{t(lang, 'ad.pending')}</p>
+  </div>
+</aside>
+
+{
+  variant === 'anchor' && <div class="ad-anchor-spacer" data-ad-spacer aria-hidden="true" />
+}
+
+<script>
+  import { bootAds } from '../../lib/ads/client';
+  bootAds();
+</script>
+
+<style>
+  .ad-slot {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fbfcfe;
+    overflow: hidden;
+  }
+  .ad-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 6px 10px;
+  }
+  .ad-label,
+  .ad-note {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+  .ad-note {
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--muted-2);
+  }
+  .ad-body {
+    display: grid;
+    place-items: center;
+    min-height: 90px;
+    padding: 10px;
+    text-align: center;
+  }
+  .ad-collapse {
+    border: 0;
+    background: none;
+    padding: 0;
+    font: inherit;
+    font-size: 11px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .ad-collapse:hover {
+    color: var(--ink-2);
+  }
+
+  /* ---- in-page banners ---- */
+  .ad-slot-banner {
+    margin: 34px 0;
+  }
+
+  /* ---- side rails: only where the gutters can hold them ---- */
+  .ad-slot-rail {
+    display: none;
+    position: fixed;
+    top: 132px;
+    width: 150px;
+    z-index: 20;
+  }
+  .ad-slot-rail .ad-body {
+    min-height: 420px;
+  }
+  .ad-slot-rail[data-ad-id='rail-left'] {
+    left: 12px;
+  }
+  .ad-slot-rail[data-ad-id='rail-right'] {
+    right: 12px;
+  }
+  @media (min-width: 1500px) {
+    .ad-slot-rail {
+      display: block;
+    }
+  }
+
+  /* ---- collapsible anchor above the bottom edge ---- */
+  .ad-slot-anchor {
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: min(970px, calc(100vw - 24px));
+    border-radius: 12px 12px 0 0;
+    border-bottom: 0;
+    background: #fff;
+    box-shadow: var(--sh-2, 0 -6px 24px rgba(10, 23, 48, .12));
+    z-index: 30;
+  }
+  .ad-slot-anchor .ad-body {
+    min-height: 60px;
+  }
+  .ad-slot-anchor[data-collapsed='1'] .ad-body {
+    display: none;
+  }
+  .ad-anchor-spacer {
+    height: 148px;
+  }
+  .ad-anchor-spacer[hidden] {
+    display: none;
+  }
+</style>

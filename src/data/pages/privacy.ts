@@ -33,7 +33,7 @@ export default {
             'No registration, no login, no email address required, ever.',
             'Documents, questions and answers stay in your browser tab. They are not transmitted, logged or backed up.',
             'The application makes one outbound request: a model file download carrying nothing but a file name.',
-            'Advertising is the only third-party element on the site, it appears only on some pages, and it loads only after you agree.',
+            'Advertising is the only third-party element on the site, it appears only on some pages, and it loads personalized only after you agree.',
             'Deleting your data means clearing site data in your browser. Nothing is left on our side to delete, because nothing was ever there.',
           ],
         },
@@ -161,7 +161,7 @@ export default {
         { t: 'h2', text: 'Advertising and cookies' },
         {
           t: 'p',
-          text: 'The site is funded by advertising through Google AdSense, and we would rather describe how that works than hide it. Ad slots appear on a limited number of pages, never more than three on a page, each one labelled “Advertisement”, and never inside the chat workspace where your documents are open. Pages like this privacy policy, the terms, the security page and the models page carry no advertising at all.',
+          text: 'The site is funded by advertising through Google AdSense, and we would rather describe how that works than hide it. Ad slots appear on a limited number of pages, never more than three on a page, each one labelled “Advertisement”, and never inside the chat workspace where your documents are open. Pages like this privacy policy, the terms, the security page and the models page carry ad slots at all.',
         },
         {
           t: 'p',
@@ -227,7 +227,7 @@ export default {
             '不需要注册，不需要登录，永远不要你填邮箱。',
             '文档、提问、回答都留在你的浏览器标签页里，不传输、不记日志、不备份。',
             '应用只发一个外发请求：下载模型文件，里面除了文件名什么都没有。',
-            '广告是站内唯一的第三方内容，只出现在部分页面，而且只在你同意之后才加载。',
+            '广告是站内唯一的第三方内容，只出现在部分页面，而且个性化广告只在你同意后加载。',
             '删除数据就是在浏览器里清除站点数据。我们这边没有东西可删，因为从来没有过。',
           ],
         },
@@ -293,7 +293,7 @@ export default {
         { t: 'h2', text: '广告与 Cookie' },
         {
           t: 'p',
-          text: '本站通过 Google AdSense 获得收入，与其把这件事藏起来，不如说清楚它怎么运转。广告位只出现在有限的几个页面，单页不超过三个，每一个都标注「广告 / Advertisement」，并且绝不进入你打开文档的聊天工作区。像这份隐私政策，以及条款、安全、模型页面，完全没有广告。',
+          text: '本站通过 Google AdSense 获得收入，与其把这件事藏起来，不如说清楚它怎么运转。广告位只出现在有限的几个页面，每页最多六个，每一个都标注「广告 / Advertisement」，并且绝不进入你打开文档的聊天工作区。每一个页面（包括这一页）都带广告位。',
         },
         {
           t: 'p',

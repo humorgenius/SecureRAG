@@ -109,7 +109,7 @@ export default {
         { t: 'h2', text: '7. Advertising' },
         {
           t: 'p',
-          text: 'The site is supported by Google AdSense. Ad slots are labelled, capped at three per page, and kept out of the chat workspace. Ad scripts load only after you agree, and the privacy policy describes what those cookies do and how to refuse them. If you paid for the site in any other way, no advertising would be necessary, and there is no way to pay, which is why it is there.',
+          text: 'The site is supported by Google AdSense. Ad slots are labelled, up to six per page, and kept out of the chat workspace. Ad scripts load personalized only after you agree, and the privacy policy describes what those cookies do and how to refuse them. If you paid for the site in any other way, no advertising would be necessary, and there is no way to pay, which is why it is there.',
         },
         { t: 'h2', text: '8. Changes to these terms' },
         {
@@ -220,7 +220,7 @@ export default {
         { t: 'h2', text: '七、广告' },
         {
           t: 'p',
-          text: '本站由 Google AdSense 支持。广告位都有标注，单页不超过三个，并且不进入聊天工作区。广告脚本只在你同意之后加载，隐私政策里说明了那些 Cookie 的作用以及如何拒绝。如果有别的方式为这个站点付费，广告就没有必要，但这里没有付费渠道——这就是它存在的原因。',
+          text: '本站由 Google AdSense 支持。广告位都有标注，每页最多六个，并且不进入聊天工作区。广告脚本只在你同意之后加载，隐私政策里说明了那些 Cookie 的作用以及如何拒绝。如果有别的方式为这个站点付费，广告就没有必要，但这里没有付费渠道——这就是它存在的原因。',
         },
         { t: 'h2', text: '八、条款变更' },
         {

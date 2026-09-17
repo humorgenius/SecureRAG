@@ -89,7 +89,7 @@ export default {
             ],
             [
               'Advertising, on the pages that carry it',
-              'Google AdSense, and only after you agree to ad scripts',
+              'Google AdSense, and personalized only after you agree to ad scripts',
               'Yes — page level only, and never inside the chat workspace',
             ],
             [
@@ -246,7 +246,7 @@ export default {
         { t: 'h3', text: '一、代码层：不存在可以关掉的上传路径' },
         {
           t: 'p',
-          text: '整个站点是一组静态 HTML、CSS 和 JavaScript 文件。没有服务端代码、没有数据库、没有账号系统，也没有接收文档的接口，所以也不存在以后被错误配置的可能。每个页面都带内容安全策略（CSP），限制页面能连接到哪里：模型托管站及其文件分发域名，以及在少数带广告的页面上，Google 的广告域名。像这一页就没有任何广告位，那些域名在这儿根本不被允许。',
+          text: '整个站点是一组静态 HTML、CSS 和 JavaScript 文件。没有服务端代码、没有数据库、没有账号系统，也没有接收文档的接口，所以也不存在以后被错误配置的可能。每个页面都带内容安全策略（CSP），限制页面能连接到哪里：模型托管站及其文件分发域名，以及在少数带广告的页面上，Google 的广告域名。这一页也带广告位。',
         },
         {
           t: 'ul',

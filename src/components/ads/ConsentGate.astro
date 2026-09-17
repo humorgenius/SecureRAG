@@ -1,0 +1,107 @@
+---
+import { t, type Lang } from '../../i18n/utils';
+
+/**
+ * The consent choice, asked once and remembered.
+ *
+ * It exists because the ads cannot be honest without it: personalized ads are
+ * only legal with consent, and the site's own privacy page tells visitors to
+ * decline if they would rather have no ad script at all. Hiding until a choice
+ * is stored, and reachable again from the footer, means the answer is never
+ * taken by default.
+ */
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+---
+
+<div class="consent" data-consent-gate hidden>
+  <p class="consent-title">{t(lang, 'consent.title')}</p>
+  <p class="consent-body">{t(lang, 'consent.body')}</p>
+  <div class="consent-actions">
+    <button type="button" class="btn btn-blue" data-consent="granted">{t(lang, 'consent.accept')}</button>
+    <button type="button" class="btn btn-white" data-consent="denied">{t(lang, 'consent.decline')}</button>
+  </div>
+  <a class="consent-link" href={`/${lang}/privacy/`}>{t(lang, 'consent.more')}</a>
+</div>
+
+<script>
+  import { CONSENT_EVENT, CONSENT_KEY } from '../../lib/ads/consent';
+
+  const gate = document.querySelector<HTMLElement>('[data-consent-gate]');
+
+  const read = (): string | null => {
+    try {
+      return window.localStorage.getItem(CONSENT_KEY);
+    } catch {
+      return null;
+    }
+  };
+
+  const write = (choice: 'granted' | 'denied') => {
+    try {
+      window.localStorage.setItem(CONSENT_KEY, choice);
+    } catch {
+      /* private mode: the choice lasts for this page view only */
+    }
+    if (gate) gate.hidden = true;
+    document.dispatchEvent(new CustomEvent(CONSENT_EVENT, { detail: choice }));
+  };
+
+  if (gate) {
+    gate.hidden = read() !== null;
+    gate.querySelectorAll<HTMLButtonElement>('[data-consent]').forEach((button) => {
+      button.addEventListener('click', () => write(button.dataset.consent as 'granted' | 'denied'));
+    });
+  }
+
+  // Anything in the page can reopen the question (the footer link does).
+  document.querySelectorAll<HTMLElement>('[data-consent-open]').forEach((trigger) => {
+    trigger.addEventListener('click', (event) => {
+      event.preventDefault();
+      if (gate) gate.hidden = false;
+    });
+  });
+</script>
+
+<style>
+  .consent {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    z-index: 60;
+    width: min(360px, calc(100vw - 32px));
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 18px 48px rgba(10, 23, 48, .18);
+  }
+  .consent[hidden] {
+    display: none;
+  }
+  .consent-title {
+    margin: 0 0 6px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .consent-body {
+    margin: 0 0 12px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  .consent-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .consent-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: var(--blue-d);
+  }
+</style>

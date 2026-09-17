@@ -251,7 +251,7 @@ export const home: Record<Lang, HomeContent> = {
         },
         {
           q: 'How does the site fund itself?',
-          a: 'Labeled display advertising, capped at three units per page and never placed inside the chat workspace or above the primary action. There is no subscription, no data sale, and no tracking beyond what the ad network itself requires — with a consent gate before any ad script loads.',
+          a: 'Labeled display advertising, up to six units per page (three in-page banners, two side rails, one collapsible anchor) and never placed inside the chat workspace or above the primary action. There is no subscription and no data sale. Personalized ads load personalized only after you agree; outside the EEA, UK and Switzerland a refusal still shows non-personalized ads.',
         },
       ],
     },
@@ -418,7 +418,7 @@ export const home: Record<Lang, HomeContent> = {
         },
         {
           q: '这个网站靠什么维持？',
-          a: '明确标注的展示广告，每页最多三个，绝不放进聊天工作区，也不压在主要操作上方。没有订阅制、不卖数据、除广告网络自身必需之外没有额外追踪——且广告脚本加载前会有同意门。',
+          a: '明确标注的展示广告，每页最多六个（页内三条横幅、两侧两条竖幅、底部一条可折叠），绝不放进聊天工作区，也不压在主要操作上方。没有订阅制、不卖数据。个性化广告只在你同意后加载；在欧盟、英国、瑞士以外，拒绝后仍会展示非个性化广告。',
         },
       ],
     },

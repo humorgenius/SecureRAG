@@ -47,8 +47,17 @@ export const ui = {
 
     // advertising
     'ad.label': 'Advertisement',
-    'ad.pending': 'Ad slot · loads only after you consent',
-    'ad.policy': 'Ads are labeled and never placed inside the chat workspace.',
+    'ad.pending': 'Ad slot · space reserved, nothing loaded yet',
+    'ad.policy':
+      'Ads are labeled, never placed inside the chat workspace, and no ad script loads until you answer the consent question.',
+    'ad.collapse': 'Hide',
+    'ad.expand': 'Show',
+    'consent.title': 'Advertising on this site',
+    'consent.body':
+      'Personalized ads need your consent. Decline and the tool behaves exactly the same — outside the EEA, UK and Switzerland you will still see non-personalized ads; inside them, no ad script loads at all. Nothing is requested before you answer.',
+    'consent.accept': 'Allow personalized ads',
+    'consent.decline': 'Decline',
+    'consent.more': 'How ads work here',
 
     // footer
     'footer.tagline': 'A static site with a client-side document engine. No backend, no accounts, no upload.',
@@ -56,7 +65,7 @@ export const ui = {
     'footer.colResources': 'Resources',
     'footer.colTrust': 'Trust',
     'footer.local': 'All processing is local to your device',
-    'footer.ads': 'Ads labeled · consent-gated · never inside the workspace',
+    'footer.ads': 'Ads labeled · personalized only with consent · never inside the workspace',
     'footer.legal': '© 2026 SecureRAG · securerag.app',
 
     // shared
@@ -119,8 +128,16 @@ export const ui = {
 
     // 广告
     'ad.label': '广告',
-    'ad.pending': '广告位 · 仅在你同意后加载',
-    'ad.policy': '广告有明确标注，且不会出现在聊天工作区内。',
+    'ad.pending': '广告位 · 已预留空间，尚未加载',
+    'ad.policy': '广告有明确标注，不会出现在聊天工作区内；在你回答同意问题之前，不会加载任何广告脚本。',
+    'ad.collapse': '收起',
+    'ad.expand': '展开',
+    'consent.title': '本站的广告',
+    'consent.body':
+      '个性化广告需要你的同意。拒绝后工具行为完全不变——在欧盟、英国、瑞士以外，你仍会看到非个性化广告；在这三个地区内，则不加载任何广告脚本。在你作答之前，不会发出任何请求。',
+    'consent.accept': '同意个性化广告',
+    'consent.decline': '拒绝',
+    'consent.more': '广告在这里怎么运作',
 
     // 页脚
     'footer.tagline': '一个带客户端文档引擎的静态网站。没有后端，没有账号，没有上传。',

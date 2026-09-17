@@ -83,7 +83,7 @@ export default {
             ],
             [
               'Advertising',
-              'Google AdSense, consent-gated, at most three labelled slots per page, never inside the chat workspace. The privacy, terms, security, accessibility, about, contact and changelog pages carry no advertising.',
+              'Google AdSense, up to six labelled slots per page (three in-page banners, two side rails, one collapsible anchor), never inside the chat workspace. Personalized ads load only with consent; elsewhere a refusal narrows requests to non-personalized ones.',
             ],
             [
               'Taking work out',
@@ -213,7 +213,7 @@ export default {
             ],
             [
               '广告',
-              'Google AdSense，需先经同意，单页最多三个标注清楚的广告位，绝不进入聊天工作区。隐私、条款、安全、无障碍、关于、联系与更新日志页面不含广告。',
+              'Google AdSense，每个页面最多六个标注清楚的广告位（页内三条横幅、两侧两条竖幅、底部一条可折叠），绝不进入聊天工作区。个性化广告仅在同意后加载；在其他地区拒绝后会收窄为非个性化请求。',
             ],
             [
               '把结果带走',

@@ -1,33 +1,20 @@
 ---
-import { t, type Lang } from '../../i18n/utils';
+import AdSlotUnit from '../ads/AdSlot.astro';
 
 /**
- * Labeled ad slot with a reserved height (prevents layout shift).
- * Renders a placeholder until the visitor consents to ad cookies — see ConsentBanner.
- * Policy: never inside /app, /privacy, /terms, or above the primary action.
+ * In-page banner, at the position each page already used for its ad slot.
+ *
+ * Kept as a wrapper so the pages that call it did not have to change; the actual
+ * slot (variants, consent handling, reserved height) lives in components/ads.
+ * Every page also gets a top and a bottom banner, two side rails and a
+ * collapsible anchor from BaseLayout.
  */
 interface Props {
   lang: Lang;
-  /** optional AdSense unit id; without it the slot stays a labeled placeholder */
-  slot?: string;
 }
+import type { Lang } from '../../i18n/utils';
 
-const { lang, slot = '' } = Astro.props;
+const { lang } = Astro.props;
 ---
 
-<aside class="ad-slot" role="complementary" aria-label={t(lang, 'ad.label')} data-ad-slot={slot}>
-  <div class="ad-inner">
-    <p class="ad-label">{t(lang, 'ad.label')}</p>
-    <p class="ad-note">
-      {t(lang, 'ad.pending')} · Google AdSense
-    </p>
-  </div>
-</aside>
-
-<style>
-  .ad-inner {
-    display: grid;
-    place-items: center;
-    gap: 6px;
-  }
-</style>
+<AdSlotUnit lang={lang} variant="banner" id="banner-mid" />

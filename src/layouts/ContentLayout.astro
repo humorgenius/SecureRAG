@@ -48,7 +48,9 @@ const toc = blocks
         <ContentBlocks blocks={blocks} lang={lang} />
       </div>
 
-      {ads > 0 && <AdSlot lang={lang} />}
+      {/* Every page carries the middle banner — the top and bottom ones, the two
+          rails and the anchor are added by BaseLayout. */}
+      <AdSlot lang={lang} />
 
       {
         related.length > 0 && (
