@@ -46,12 +46,19 @@ if (existsSync(pdfjsWorker)) {
 
 const ortDist = findOrtDist();
 if (ortDist) {
-  // Only the wasm binaries are fetched at runtime (via wasmPaths). The .mjs
-  // bundles in that folder are for the standalone onnxruntime-web API, which
-  // transformers.js does not use, and shipping them would add ~8 MB for nothing.
+  // Copy EVERY ort-wasm-* file: the .mjs loaders (tiny) and all wasm variants
+  // (asyncify / jsep / jspi / plain simd-threaded).
+  //
+  // Do NOT "optimise" this list. The runtime picks a variant by feature
+  // detection, and it changes with the environment: inside a Worker with no
+  // cross-origin isolation (which is what GitHub Pages gives us) it falls back
+  // to `asyncify`, while a WebGPU-capable browser asks for `jsep`. Shipping a
+  // subset produced a 404 on ort-wasm-simd-threaded.asyncify.mjs and the load
+  // failed with the opaque "No available adapters" — with the network working
+  // perfectly. The browser only downloads the variant it selects, so the extra
+  // variants cost repository size, never visitor bandwidth.
   for (const entry of readdirSync(ortDist)) {
-    if (!entry.endsWith('.wasm')) continue;
-    if (/\.(jspi|asyncify)\./.test(entry)) continue;
+    if (!/^ort-wasm-.*\.(mjs|wasm)$/.test(entry)) continue;
     copy(join(ortDist, entry), join(OUT, entry));
     copied++;
   }

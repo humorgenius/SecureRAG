@@ -14,6 +14,8 @@ export default defineConfig({
    * dev server reachable on both spellings; the built output is unaffected.
    */
   server: { host: '127.0.0.1', port: 4321 },
+  /** Same host pinning for the preview server, which serves the built output. */
+  preview: { host: '127.0.0.1', port: 4321 },
   output: 'static',
   trailingSlash: 'always',
   i18n: {

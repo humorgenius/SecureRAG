@@ -147,6 +147,20 @@ export type Embedder = (texts: string[], batch?: number) => Promise<Float32Array
  * Create an embedding function. Each call returns L2-normalised Float32Array
  * vectors, so similarity later reduces to a dot product.
  */
+/**
+ * Distinguish "the runtime never started" from "the download failed".
+ *
+ * Conflating them is what produced a message telling the user to check their
+ * network while the network was fine and a static wasm asset was missing. The
+ * runtime failure surfaces as onnxruntime's opaque "No available adapters",
+ * usually preceded by a 404 on /ort/ort-wasm-*.mjs.
+ */
+function classifyModelError(error: unknown): RagError {
+  const text = String((error as { message?: string })?.message ?? error);
+  const runtimeFailure = /no available adapters|ort-wasm|\/ort\//i.test(text);
+  return new RagError(runtimeFailure ? 'RUNTIME_INIT_FAILED' : 'MODEL_LOAD_FAILED', text);
+}
+
 export async function createEmbedder(modelId: string, onProgress?: ProgressFn): Promise<Embedder> {
   await configureRuntime();
   const { pipeline } = await import('@huggingface/transformers');
@@ -172,13 +186,13 @@ export async function createEmbedder(modelId: string, onProgress?: ProgressFn): 
   try {
     pipe = await load(device);
   } catch (error) {
-    if (device === 'wasm') throw new RagError('MODEL_LOAD_FAILED', String(error));
+    if (device === 'wasm') throw classifyModelError(error);
     // WebGPU can exist but fail on a given driver — fall back rather than break.
     lastActivity = Date.now();
     try {
       pipe = await load('wasm');
     } catch (fallbackError) {
-      throw new RagError('MODEL_LOAD_FAILED', String(fallbackError));
+      throw classifyModelError(fallbackError);
     }
   }
 

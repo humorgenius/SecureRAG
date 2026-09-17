@@ -9,14 +9,19 @@ interface Props {
 }
 
 const { lang, path } = Astro.props;
-const other: Lang = lang === 'en' ? 'zh' : 'en';
-/** Map the *current page* onto the other locale — never fall back to the homepage. */
-const otherHref = altLangPath(path, other);
+/**
+ * Each button must point at ITS OWN locale, not at "the current one" / "the other one".
+ * Pairing a hardcoded label with a relative target crosses the two links on one side:
+ * with `href={path}` the EN button pointed at the current page, so on a Chinese page
+ * "EN" reloaded Chinese while "中文" was the one that switched to English.
+ * Both directions are computed explicitly and independently.
+ */
+const hrefs: Record<Lang, string> = { en: altLangPath(path, 'en'), zh: altLangPath(path, 'zh') };
 ---
 
 <div class="langsw" role="group" aria-label="Language">
-  <a href={path} class={lang === 'en' ? 'on' : ''} aria-current={lang === 'en' ? 'true' : undefined}>EN</a>
-  <a href={otherHref} class={lang === 'zh' ? 'on' : ''} aria-current={lang === 'zh' ? 'true' : undefined}>中文</a>
+  <a href={hrefs.en} class={lang === 'en' ? 'on' : ''} aria-current={lang === 'en' ? 'true' : undefined}>EN</a>
+  <a href={hrefs.zh} class={lang === 'zh' ? 'on' : ''} aria-current={lang === 'zh' ? 'true' : undefined}>中文</a>
 </div>
 
 <style>

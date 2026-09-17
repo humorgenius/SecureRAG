@@ -41,6 +41,7 @@ export type RagErrorCode =
   | 'EMPTY_DOCUMENT'
   | 'TOO_MANY_CHUNKS'
   | 'MODEL_LOAD_FAILED'
+  | 'RUNTIME_INIT_FAILED'
   | 'OUT_OF_MEMORY'
   | 'NO_RESULTS'
   | 'INDEX_CORRUPT';
@@ -81,6 +82,10 @@ const HINTS: Record<RagErrorCode, { en: string; zh: string }> = {
   TOO_MANY_CHUNKS: {
     en: 'This library would exceed 20,000 text chunks. Remove some documents or split the collection.',
     zh: '该文档库将超过 20,000 个文本块上限。请删除部分文档，或拆成多个文档库。',
+  },
+  RUNTIME_INIT_FAILED: {
+    en: 'The local inference runtime could not start in this browser, so the model was never loaded. This is not a network problem. Reload the page; if it persists, try Chrome or Edge with WebAssembly enabled, or report it with your browser version.',
+    zh: '本地推理运行时在这个浏览器里启动失败，模型根本没有开始下载。这不是网络问题。请刷新页面；若持续出现，请换用 Chrome 或 Edge 并确认未禁用 WebAssembly，或把浏览器版本反馈给我们。',
   },
   MODEL_LOAD_FAILED: {
     en: 'The model could not be downloaded. Check the connection, then retry — or point the app at a mirror.',
