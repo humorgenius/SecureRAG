@@ -75,6 +75,14 @@ try {
     "actions:act?Array.prototype.map.call(act.querySelectorAll(\'button\'),function(b){return b.textContent.trim();}):[]};}" +
     "var ex=document.querySelector(\'.sr-export\');" +
     "o.exportGroup=ex?Array.prototype.map.call(ex.querySelectorAll(\'button\'),function(b){return b.textContent.trim();}):null;" +
+    "var h1el=document.querySelector(\'h1\');" +
+    "var par=h1el?h1el.parentElement:null;" +
+    "o.col=par?{tag:par.tagName,cls:(par.className||\'\').toString().slice(0,40)," +
+    "w:Math.round(par.getBoundingClientRect().width)," +
+    "gw:par.parentElement?Math.round(par.parentElement.getBoundingClientRect().width):0," +
+    "gtc:par.parentElement?getComputedStyle(par.parentElement).gridTemplateColumns:\'\'}:null;" +
+    "var pv=document.querySelector(\'.preview\');" +
+    "o.card=pv?Math.round(pv.getBoundingClientRect().width):0;" +
     "o.vp={inner:window.innerWidth,outer:window.outerWidth," +
     "scrollW:document.documentElement.scrollWidth,bodyW:document.body.scrollWidth," +
     "overflowX:document.documentElement.scrollWidth>window.innerWidth};" +
@@ -98,6 +106,7 @@ try {
   console.log('BUTTONS / LABELS：');
   for (const b of data.buttons ?? []) console.log(`  h=${String(b.h).padStart(3)}px  class="${b.cls}"  "${b.t}"`);
   console.log('ANSWER NOTE：', (data.notes ?? []).length ? data.notes.join(' | ') : '(none)');
+  if (data.col) console.log(`COLUMN：${data.col.tag}.${data.col.cls} w=${data.col.w}px  容器=${data.col.gw}px  卡片=${data.card}px\n  grid-template-columns: ${data.col.gtc}`);
   if (data.vp) console.log(`VIEWPORT：inner=${data.vp.inner} outer=${data.vp.outer} scrollW=${data.vp.scrollW} bodyW=${data.vp.bodyW} overflowX=${data.vp.overflowX}`, data.overflowing && data.overflowing.length ? `\n  溢出元素: ${data.overflowing.join(', ')}` : '');
   if (data.h1) console.log(`H1：lines=${data.h1.lines} width=${data.h1.w}px font=${data.h1.fs}\n     "${data.h1.text}"`);
   console.log('EXPORT GROUP：', data.exportGroup ? data.exportGroup.join(' ') : '(not on this page)');
