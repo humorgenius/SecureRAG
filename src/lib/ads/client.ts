@@ -12,7 +12,6 @@ import { CONSENT_EVENT, adMode, currentTimeZone, readConsent, type AdMode } from
  */
 
 const SCRIPT_SRC = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
-const ANCHOR_KEY = 'sr.ad.anchor';
 
 let booted = false;
 let scriptRequested = false;
@@ -99,36 +98,42 @@ function bootAnchor(): void {
     if (body) body.style.display = collapsed ? 'none' : '';
     if (label) label.style.display = collapsed ? 'none' : '';
 
-    anchor.style.left = collapsed ? 'auto' : '50%';
-    anchor.style.right = collapsed ? '14px' : '';
-    anchor.style.transform = collapsed ? 'none' : 'translateX(-50%)';
+    // Centered at the bottom edge, and the arrow itself is ~3x its old size: the
+    // white disc was right, the black glyph inside it was not.
+    anchor.style.left = collapsed ? '50%' : '';
+    anchor.style.right = collapsed ? 'auto' : '';
+    anchor.style.transform = collapsed ? 'translateX(-50%)' : '';
     anchor.style.width = collapsed ? '38px' : '';
     anchor.style.height = collapsed ? '38px' : '';
+    // A min-height somewhere up the cascade was holding the box at 104px, which
+    // is why a plain height did nothing: the arrow stayed inside a tall band.
+    anchor.style.minHeight = collapsed ? '0' : '';
+    anchor.style.minWidth = collapsed ? '0' : '';
     anchor.style.background = collapsed ? 'transparent' : '';
     anchor.style.border = collapsed ? '0' : '';
     anchor.style.boxShadow = collapsed ? 'none' : '';
 
     button.style.width = collapsed ? '38px' : '';
     button.style.height = collapsed ? '38px' : '';
+    button.style.padding = collapsed ? '0' : '';
     button.style.borderRadius = collapsed ? '50%' : '';
     button.style.border = collapsed ? '1px solid var(--line)' : '';
     button.style.background = collapsed ? '#fff' : '';
     button.style.boxShadow = collapsed ? '0 6px 18px rgba(10, 23, 48, .16)' : '';
+    button.style.fontSize = collapsed ? '26px' : '';
+    button.style.lineHeight = collapsed ? '1' : '';
+    button.style.color = collapsed ? 'var(--ink)' : '';
+    button.style.fontWeight = collapsed ? '700' : '';
 
     button.setAttribute('aria-expanded', String(!collapsed));
     button.textContent = collapsed ? (button.dataset.labelShow ?? '') : (button.dataset.labelHide ?? '');
   };
 
-  setCollapsed(storage()?.getItem(ANCHOR_KEY) === '1');
-  button.addEventListener('click', () => {
-    const next = anchor.dataset.collapsed !== '1';
-    setCollapsed(next);
-    try {
-      storage()?.setItem(ANCHOR_KEY, next ? '1' : '0');
-    } catch {
-      /* storage unavailable: the choice simply does not persist */
-    }
-  });
+  // Always starts expanded, on every page load: a collapse lasts for the visit and
+  // is not remembered. A remembered collapse left a small arrow in a corner that
+  // readers could not find, which reads as "the ad disappeared".
+  setCollapsed(false);
+  button.addEventListener('click', () => setCollapsed(anchor.dataset.collapsed !== '1'));
 }
 
 export function bootAds(): void {

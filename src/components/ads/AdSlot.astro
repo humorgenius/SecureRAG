@@ -48,10 +48,10 @@ const label = t(lang, 'ad.label');
           aria-expanded="true"
           aria-label={`${t(lang, 'ad.collapse')} / ${t(lang, 'ad.expand')}`}
           title={`${t(lang, 'ad.collapse')} / ${t(lang, 'ad.expand')}`}
-          data-label-hide="▾"
-          data-label-show="▴"
+          data-label-hide="▼"
+          data-label-show="▲"
         >
-          ▾
+          ▼
         </button>
       )
     }
@@ -197,14 +197,6 @@ const label = t(lang, 'ad.label');
   .ad-slot-anchor[data-collapsed='1'] .ad-collapse {
     display: grid;
     place-items: center;
-    width: 38px;
-    height: 38px;
-    border: 1px solid var(--line);
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 6px 18px rgba(10, 23, 48, .16);
-    font-size: 14px;
-    color: var(--ink-2);
   }
   .ad-anchor-spacer {
     height: 148px;

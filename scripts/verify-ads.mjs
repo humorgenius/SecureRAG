@@ -119,6 +119,36 @@ try {
   const anchorRow = (after.rows ?? []).find((r) => r.startsWith('anchor'));
   console.log('  折叠后尺寸:', anchorRow, '| 折叠后占地:', after.anchorBox);
 
+  // Ground truth for "it disappeared": what the box and its arrow really are.
+  const diag = await evalJs(`(function(){
+    var a = document.querySelector('[data-ad-variant="anchor"]');
+    var b = document.querySelector('[data-ad-collapse]');
+    if (!a) return 'no anchor';
+    var sa = getComputedStyle(a); var ra = a.getBoundingClientRect();
+    var sb = b ? getComputedStyle(b) : null; var rb = b ? b.getBoundingClientRect() : null;
+    return JSON.stringify({
+      anchor: { rect: Math.round(ra.left)+','+Math.round(ra.top)+' '+Math.round(ra.width)+'x'+Math.round(ra.height),
+        display: sa.display, visibility: sa.visibility, opacity: sa.opacity, position: sa.position,
+        left: sa.left, right: sa.right, bottom: sa.bottom, transform: sa.transform,
+        zIndex: sa.zIndex, overflow: sa.overflow, inlineHeight: a.style.height, inlineWidth: a.style.width },
+      button: b ? { text: JSON.stringify(b.textContent), rect: Math.round(rb.width)+'x'+Math.round(rb.height),
+        display: sb.display, color: sb.color, background: sb.backgroundColor, fontSize: sb.fontSize } : null,
+      inViewport: ra.top < window.innerHeight && ra.bottom > 0,
+      vh: window.innerHeight,
+    });
+  })()`);
+  console.log('  折叠后真实情况:', diag);
+
+  const corner = await send('Page.captureScreenshot', {
+    format: 'png',
+    clip: { x: 900, y: 700, width: 684, height: 205, scale: 1 },
+  });
+  if (corner.result?.data) {
+    const { writeFileSync } = await import('node:fs');
+    writeFileSync('E:/hermes-workspace/outputs/securerag/ad-collapsed.png', Buffer.from(corner.result.data, 'base64'));
+    console.log('  角落截图: E:/hermes-workspace/outputs/securerag/ad-collapsed.png');
+  }
+
   console.log('  --- 页面在作答前发出的站外请求 ---');
   console.log('  站外请求:', external.length === 0 ? '无（符合承诺）' : external.slice(0, 5));
 
