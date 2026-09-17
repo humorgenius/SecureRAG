@@ -630,7 +630,10 @@
 .sr-tool { display: flex; flex-direction: column; gap: 16px; }
 .sr-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .sr-hint { font-size: 13px; color: var(--muted); font-family: var(--font-mono); }
-.sr-textarea-lg { min-height: 170px; resize: vertical; }
+/* The tools are paste-a-document surfaces: the box is the main thing on the
+   page, so it gets real estate rather than a chat-sized input. */
+.sr-textarea-lg { min-height: 380px; resize: vertical; line-height: 1.7; }
+@media (max-width: 700px) { .sr-textarea-lg { min-height: 260px; } }
 .sr-scroll { overflow: auto; max-height: 380px; border: 1px solid var(--line); border-radius: var(--radius-m); }
 .sr-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .sr-table th, .sr-table td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
@@ -649,3 +652,15 @@
 .sr-chunk-head b { color: var(--blue-d); }
 .sr-chunks p { font-size: 13.5px; line-height: 1.65; color: var(--ink-2); white-space: pre-wrap; }
 .sr-path { color: var(--muted); }
+
+/* Explains, at the moment of confusion, that the answer is a quotation. */
+.sr-mode-note {
+  margin-top: 10px;
+  padding: 9px 12px;
+  border-left: 2px solid var(--blue);
+  background: var(--blue-soft);
+  border-radius: 0 8px 8px 0;
+  font-size: 12.8px;
+  line-height: 1.65;
+  color: var(--muted);
+}

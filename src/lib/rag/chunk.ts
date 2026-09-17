@@ -19,6 +19,18 @@ const MD_HEADING = /^(#{1,6})\s+(.*)$/;
 const NUM_HEADING = /^((?:第\s*[0-9一二三四五六七八九十百]+\s*[章节条款]|[0-9]+(?:\.[0-9]+){0,3}[.、)]?|Article\s+[0-9IVX]+|Section\s+[0-9.]+|附录\s*[A-Z0-9一二三四五六七八九十]+)\s*[:：]?\s*)(.*)$/i;
 const SENTENCE_SPLIT = /(?<=[。！？；])|(?<=[.!?;])\s+/;
 
+/**
+ * The minimal heading test, shared with the answer layer so a citation can work
+ * out which section a quoted sentence belongs to. Kept separate from
+ * looksLikeHeading() so that function's heuristics stay untouched.
+ */
+export function isHeadingLine(line: string): boolean {
+  const t = line.trim();
+  if (t.length === 0 || t.length > 70) return false;
+  if (/^\|.*\|$/.test(t) || /^```/.test(t)) return false;
+  return !/[。！？.!?；;，,、：:]$/.test(t);
+}
+
 /** Is this short line a heading, or just a short line? */
 function looksLikeHeading(line: string, next: string | undefined): boolean {
   const t = line.trim();

@@ -1,3 +1,7 @@
+// Imported here, not in each page: the styles must travel with the island that
+// depends on them. Forgetting this import on the tool pages left every .sr-*
+// element at browser-default size (a 51x162px paste box) with no error anywhere.
+import '../../styles/app.css';
 import { useState } from 'preact/hooks';
 import { ta } from '../../i18n/app';
 import type { Lang } from '../../i18n/utils';
@@ -70,7 +74,7 @@ function Picker({
         <p class="sr-drop-formats">
           {busy ? ta(lang, 'tools.working') : accept.replaceAll(',', ' · ')}
         </p>
-        <label class="btn btn-ghost">
+        <label class="btn btn-blue">
           {ta(lang, 'drop.choose')}
           <input
             type="file"

@@ -1,5 +1,6 @@
 import { LIMITS } from '../limits';
 import { tokenize } from '../bm25';
+import { isHeadingLine } from '../chunk';
 import type { AnswerResult, CitationRef, ScoredChunk, Strictness } from '../types';
 
 const SENTENCE_SPLIT = /(?<=[。！？；])|(?<=[.!?;])\s+/;
@@ -37,6 +38,38 @@ interface Candidate {
   score: number;
   hits: number;
   inferred: boolean;
+  /** the section this sentence sits under — may be narrower than the chunk's */
+  heading: string[];
+}
+
+/**
+ * Recover the heading that applies to each sentence inside a chunk.
+ *
+ * The chunker keeps headings as lines inside the chunk text, so the applicable
+ * section can be read back out of it. Without this a chunk that spans two
+ * sections reports only the chunk's final heading, and a quote taken from
+ * "8.2 解约" is displayed under "9.1 费用" — the citation then sends the reader
+ * to the wrong part of the document.
+ *
+ * Sentences that appear before any heading in the chunk fall back to the
+ * chunk's own heading path, which is the best information available there.
+ */
+export function sentencesWithHeading(text: string, base: string[]): { text: string; heading: string[] }[] {
+  const out: { text: string; heading: string[] }[] = [];
+  let local: string[] | null = null;
+  for (const rawLine of text.split('\n')) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    if (isHeadingLine(line)) {
+      // Keep the document's top-level heading so the path still reads as a path.
+      local = [...(base.length ? [base[0]] : []), line.replace(/^#{1,6}\s*/, '')];
+      continue;
+    }
+    for (const sentence of splitSentences(line)) {
+      out.push({ text: sentence, heading: local ? [...local] : [...base] });
+    }
+  }
+  return out;
 }
 
 const MAX_SENTENCES: Record<Strictness, number> = { strict: 4, balanced: 6 };
@@ -56,9 +89,9 @@ export function extractiveAnswer(chunks: ScoredChunk[], question: string, mode: 
   const candidates: Candidate[] = [];
 
   chunks.forEach((chunk, chunkIndex) => {
-    splitSentences(chunk.text).forEach((sentence, sentenceIndex) => {
+    sentencesWithHeading(chunk.text, chunk.headingPath).forEach(({ text: sentence, heading }, sentenceIndex) => {
       const { score, hits } = scoreSentence(sentence, queryTokens);
-      candidates.push({ chunkIndex, sentenceIndex, text: sentence, score, hits, inferred: hits === 0 });
+      candidates.push({ chunkIndex, sentenceIndex, text: sentence, score, hits, inferred: hits === 0, heading });
     });
   });
 
@@ -110,7 +143,9 @@ export function extractiveAnswer(chunks: ScoredChunk[], question: string, mode: 
         docId: chunk.docId,
         docName: chunk.docName,
         page: chunk.page,
-        headingPath: chunk.headingPath,
+        // picked is in document order, so the first quote from this chunk is the
+        // earliest one — its section is what the reader will land on.
+        headingPath: c.heading.length ? c.heading : chunk.headingPath,
         quote: c.text.length > 420 ? `${c.text.slice(0, 417)}…` : c.text,
       });
     }

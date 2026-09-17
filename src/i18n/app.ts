@@ -40,6 +40,8 @@ export const appStrings = {
     'chat.thinking': 'Searching your documents…',
     'chat.generating': 'Writing an answer locally…',
     'chat.answerLabel': 'Answer from your documents',
+    'chat.extractiveNote':
+      'These are sentences quoted verbatim from your documents — nothing was rewritten, and every number opens the source paragraph. For a written-out paragraph instead of quotes, turn on the local generation model in Settings.',
     'chat.answerGenerated': 'Answer · local model',
     'chat.inferredLabel': 'inferred',
     'chat.sources': 'Sources',
@@ -167,6 +169,8 @@ export const appStrings = {
     'chat.thinking': '正在检索你的文档…',
     'chat.generating': '正在本地生成回答…',
     'chat.answerLabel': '来自你的文档的回答',
+    'chat.extractiveNote':
+      '以下是文档里的原句，没有做任何改写；点编号可以跳到原文段落。如果想要连贯成段的回答而不是引文，可以在右侧设置里开启本地生成模型。',
     'chat.answerGenerated': '回答 · 本地模型',
     'chat.inferredLabel': '推断',
     'chat.sources': '来源',

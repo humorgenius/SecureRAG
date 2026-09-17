@@ -1,3 +1,5 @@
+// The island owns its stylesheet — see the note in Tools.tsx.
+import '../../styles/app.css';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { ta } from '../../i18n/app';
 import type { Lang } from '../../i18n/utils';

@@ -83,6 +83,41 @@ if (pages.length === 0) errors.push('no HTML pages found in dist — build first
 console.log(`checked ${pages.length} pages`);
 for (const w of warnings.slice(0, 25)) console.log('  warn:', w);
 if (warnings.length > 25) console.log(`  … ${warnings.length - 25} more warnings`);
+// ---------------------------------------------------------------------------
+// A page that ships an interactive island must also load the island stylesheet.
+// The tool pages once rendered every .sr-* element at browser-default size (a
+// 51x162px paste box) because app.css was imported by one page only — no error,
+// no warning, just an ugly page. Check it from the built output.
+// ---------------------------------------------------------------------------
+{
+  const cssCache = new Map();
+  const readCss = (href) => {
+    if (!cssCache.has(href)) {
+      let text = '';
+      try {
+        text = readFileSync(join(DIST, href.replace(/^\//, '')), 'utf8');
+      } catch {
+        text = '';
+      }
+      cssCache.set(href, text);
+    }
+    return cssCache.get(href);
+  };
+  let islands = 0;
+  for (const file of pages) {
+    const rel = '/' + relative(DIST, file).replace(/\\/g, '/');
+    const html = readFileSync(file, 'utf8');
+    if (!html.includes('<astro-island')) continue;
+    islands++;
+    const hrefs = [...html.matchAll(/<link[^>]+href="(\/[^"]+\.css)"/g)].map((m) => m[1]);
+    if (!hrefs.some((href) => readCss(href).includes('.sr-'))) {
+      errors.push(`${rel}: ships an interactive island but loads no island stylesheet (.sr-*)`);
+    }
+  }
+  if (islands === 0) errors.push('gate is inspecting nothing: no page in dist/ contains an astro-island');
+  console.log(`island pages checked: ${islands}`);
+}
+
 if (errors.length) {
   for (const e of errors.slice(0, 40)) console.error('  ERROR:', e);
   if (errors.length > 40) console.error(`  … ${errors.length - 40} more errors`);

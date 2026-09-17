@@ -306,6 +306,10 @@ export const ChatPanel: FunctionComponent<
                 </p>
               )}
 
+              {!msg.model && msg.citations && msg.citations.length > 0 && (
+                <p class="sr-mode-note">{ta(lang, 'chat.extractiveNote')}</p>
+              )}
+
               {msg.citations && msg.citations.length > 0 && (
                 <div class="sr-sources">
                   <span class="sr-sources-h">{ta(lang, 'chat.sources')}</span>

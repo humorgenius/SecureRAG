@@ -255,7 +255,7 @@ export const home: Record<Lang, HomeContent> = {
           bigNote: 'stated before download',
           items: [
             { text: 'Qwen2.5 0.5B–1.5B, 4-bit quantised' },
-            { text: 'WebLLM on WebGPU, Transformers.js fallback on CPU' },
+            { text: 'Transformers.js on WebGPU where available, WebAssembly on CPU otherwise' },
             { text: 'Streaming output with citation markers intact' },
             { text: 'No WebGPU means CPU speed: 3–8 tokens/second', warn: true },
           ],
@@ -463,7 +463,7 @@ export const home: Record<Lang, HomeContent> = {
           bigNote: '下载前明确告知',
           items: [
             { text: 'Qwen2.5 0.5B–1.5B，4 位量化' },
-            { text: 'WebGPU 走 WebLLM，CPU 回退 Transformers.js' },
+            { text: '有 WebGPU 时走 GPU，否则通过 WebAssembly 跑在 CPU 上' },
             { text: '流式输出，引用标记保持完好' },
             { text: '没有 WebGPU 就只能走 CPU：每秒 3–8 个 token', warn: true },
           ],
