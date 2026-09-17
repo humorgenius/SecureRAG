@@ -39,6 +39,11 @@ const PHRASE_STOPWORDS = new Set([
 
 /** Latin function words. */
 const LATIN_STOPWORDS = new Set([
+  // Two-letter function words are the dangerous ones: they appear in nearly every
+  // English sentence, so if one is treated as content the match list floods and
+  // the answer pool fills with sentences that share nothing but "is" or "in".
+  'a', 'an', 'as', 'at', 'be', 'by', 'do', 'he', 'if', 'in', 'is', 'it', 'me', 'my', 'no',
+  'of', 'on', 'or', 'so', 'to', 'up', 'us', 'we', 'am', 'out', 'off', 'per', 'via',
   'the', 'and', 'for', 'are', 'was', 'were', 'been', 'being', 'with', 'this', 'that', 'these',
   'those', 'from', 'into', 'onto', 'than', 'then', 'them', 'they', 'there', 'here', 'what',
   'when', 'where', 'which', 'while', 'who', 'whom', 'whose', 'why', 'how', 'much', 'many',
@@ -47,6 +52,8 @@ const LATIN_STOPWORDS = new Set([
   'would', 'will', 'shall', 'may', 'might', 'must', 'about', 'above', 'after', 'again',
   'against', 'all', 'any', 'because', 'before', 'below', 'between', 'both', 'each', 'few',
   'more', 'most', 'other', 'some', 'such', 'only', 'own', 'same', 'too', 'very', 'just',
+  'she', 'him', 'over', 'under', 'upon', 'within', 'without', 'whether', 'also', 'still',
+  'ever', 'never', 'always', 'often', 'once', 'hereby', 'thereof', 'therein', 'whereas',
 ]);
 
 const CJK_RUNS = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\u3040-\u30ff]+/g;

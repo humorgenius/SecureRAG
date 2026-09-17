@@ -3,6 +3,7 @@ import { LIMITS } from '../lib/rag/limits';
 import { buildPrompt } from '../lib/rag/answer/prompt';
 import { createEmbedder, createGenerator } from '../lib/rag/models';
 import { hybridRetrieve } from '../lib/rag/retrieve';
+import { matchAll, type MatchResult } from '../lib/rag/match-all';
 import type { Chunk, ScoredChunk, Strictness } from '../lib/rag/types';
 
 /**
@@ -31,7 +32,7 @@ export interface GenerateRequest {
 
 export type SearchEvent =
   | { type: 'model-progress'; loaded: number; total: number; file?: string }
-  | { type: 'results'; chunks: ScoredChunk[]; best: number }
+  | { type: 'results'; chunks: ScoredChunk[]; best: number; matches: MatchResult }
   | { type: 'token'; text: string }
   | { type: 'generated'; text: string }
   | { type: 'error'; code: string; detail?: string };
@@ -109,7 +110,15 @@ ctx.addEventListener('message', async (event: MessageEvent<SearchRequest | Gener
       queryText: msg.queryText,
       k: msg.k ?? LIMITS.topK,
     });
-    ctx.postMessage({ type: 'results', chunks: result.chunks, best: result.best } satisfies SearchEvent);
+    ctx.postMessage({
+      type: 'results',
+      chunks: result.chunks,
+      best: result.best,
+      // Exhaustive literal matches from the same scan. The chunks above are the
+      // ranked summary; these are every sentence in the whole library that
+      // contains a term from the question, in document order, uncapped by top-k.
+      matches: matchAll(msg.chunks, msg.queryText),
+    } satisfies SearchEvent);
   } catch (error) {
     ctx.postMessage({
       type: 'error',

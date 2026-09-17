@@ -1,4 +1,5 @@
 import { clear, createStore, del, get, keys, set } from 'idb-keyval';
+import type { MatchResult } from './match-all';
 import type { Chunk, Strictness } from './types';
 
 /**
@@ -107,6 +108,8 @@ export interface SessionMessage {
     quote: string;
   }[];
   inferred?: string[];
+  /** every sentence in the library that literally contains the question's terms */
+  matches?: MatchResult;
   notFound?: boolean;
   /** why an empty answer was returned — drives the help text */
   kind?: 'notFound' | 'noDocs' | 'error';

@@ -670,3 +670,45 @@
 .sr-export .sr-muted { font-size: 11.5px; }
 /* Document actions moved below the name, so the name gets the full column. */
 .sr-doc-actions { margin-top: 9px; }
+
+/* Exhaustive match list under an answer: every sentence containing the query's
+   words, in document order — the counterpart to the ranked summary above it. */
+.sr-matches {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.sr-matches summary {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  cursor: pointer;
+  list-style: none;
+}
+.sr-matches summary::-webkit-details-marker { display: none; }
+.sr-matches summary::before { content: '\25B8'; color: var(--muted); }
+.sr-matches[open] summary::before { content: '\25BE'; }
+.sr-matches-h { font-weight: 600; }
+.sr-matches-note { margin: 8px 0 10px; font-size: 12px; }
+.sr-matches-doc { margin-top: 9px; padding-top: 9px; border-top: 1px dashed var(--line); }
+.sr-matches-doc-h { display: flex; gap: 8px; align-items: baseline; margin-bottom: 4px; }
+.sr-matches-doc-h b { font-size: 13px; }
+.sr-matches ol { margin: 0; padding-left: 18px; }
+.sr-matches li { margin: 7px 0; }
+.sr-match-h { display: block; margin-bottom: 2px; font-size: 11.5px; color: var(--muted); }
+.sr-match-t {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.55;
+  text-align: left;
+  cursor: pointer;
+}
+.sr-match-t:hover { color: var(--blue); }
+.sr-matches mark { padding: 0 2px; border-radius: 3px; background: var(--amber-soft); color: inherit; }

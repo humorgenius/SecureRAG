@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { ta } from '../../i18n/app';
 import type { Lang } from '../../i18n/utils';
 import { extractiveAnswer } from '../../lib/rag/answer/extractive';
+import type { MatchResult } from '../../lib/rag/match-all';
 import { HINTS_BY_CODE, LIMITS, RagError, hintFor, type RagErrorCode } from '../../lib/rag/limits';
 import { GENERATION_MODELS, hasWebGPU } from '../../lib/rag/models';
 import {
@@ -340,7 +341,7 @@ export default function Workspace({ lang, sessionId }: Props) {
         return;
       }
 
-      const results = await request<{ chunks: ScoredChunk[]; best: number }>({
+      const results = await request<{ chunks: ScoredChunk[]; best: number; matches: MatchResult }>({
         type: 'search',
         queryText: question,
         chunks,
@@ -350,7 +351,12 @@ export default function Workspace({ lang, sessionId }: Props) {
       });
       setModelProgress(null);
 
-      if (!results.chunks.length || results.best < LIMITS.minConfidence) {
+      const matches = results.matches;
+      // A low confidence score only silences the *summary*. If the library still
+      // contains sentences with the words the reader typed, that is an answer of
+      // sorts and it must be shown — otherwise a word that appears 30 times looks
+      // like it appears twice.
+      if ((!results.chunks.length || results.best < LIMITS.minConfidence) && (matches?.total ?? 0) === 0) {
         push({ id: uid(), role: 'assistant', text: '', at: Date.now(), notFound: true, citations: [] });
         return;
       }
@@ -388,13 +394,15 @@ export default function Workspace({ lang, sessionId }: Props) {
           text: text || ta(lang, 'chat.notFound'),
           at: Date.now(),
           citations,
+          matches,
           model: settings.generationModel,
           strictness: settings.strictness,
         });
       } else {
         const answer = extractiveAnswer(results.chunks, question, settings.strictness);
         if (answer.notFound) {
-          push({ id: uid(), role: 'assistant', text: '', at: Date.now(), notFound: true, citations: [] });
+          // No quotable sentence, but the exhaustive list may still have hits.
+          push({ id: uid(), role: 'assistant', text: '', at: Date.now(), notFound: true, citations: [], matches });
         } else {
           push({
             id: uid(),
@@ -402,6 +410,7 @@ export default function Workspace({ lang, sessionId }: Props) {
             text: answer.text,
             at: Date.now(),
             citations: answer.citations,
+            matches,
             inferred: answer.inferred,
             strictness: settings.strictness,
           });

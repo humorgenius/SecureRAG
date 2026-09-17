@@ -4,6 +4,24 @@ import type { Lang } from '../../i18n/utils';
 import type { DocMeta, SessionMessage } from '../../lib/rag/store';
 import { EMBEDDING_MODELS, GENERATION_MODELS, type EmbeddingModel } from '../../lib/rag/models';
 
+/**
+ * Wrap the query terms inside a matched sentence so the reader can see at a
+ * glance *why* the line is in the list. Longest term first, so a phrase is not
+ * chopped up by one of its own words. Prefix rule on the right mirrors the
+ * matcher: "potato" highlights "potatoes".
+ */
+function highlightTerms(text: string, terms: string[]) {
+  if (terms.length === 0) return text;
+  const escaped = [...terms]
+    .sort((a, b) => b.length - a.length)
+    .map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const re = new RegExp(`(${escaped.join('|')})`, 'gi');
+  const wanted = terms.map((t) => t.toLowerCase());
+  return text
+    .split(re)
+    .map((part, i) => (wanted.some((t) => part.toLowerCase().startsWith(t)) ? <mark key={i}>{part}</mark> : part));
+}
+
 export interface ProgressState {
   file: string;
   stage: 'parse' | 'chunk' | 'embed' | 'model' | 'done';
@@ -342,6 +360,46 @@ export const ChatPanel: FunctionComponent<
                     </div>
                   ))}
                 </div>
+              )}
+
+              {msg.matches && msg.matches.total > 0 && (
+                <details class="sr-matches">
+                  <summary>
+                    <span class="sr-matches-h">{ta(lang, 'match.title', { n: msg.matches.total })}</span>
+                    <span class="sr-muted">{ta(lang, 'match.files', { n: msg.matches.docs.length })}</span>
+                  </summary>
+                  <p class="sr-muted sr-matches-note">{ta(lang, 'match.note')}</p>
+                  {msg.matches.capped && (
+                    <p class="sr-muted">
+                      {ta(lang, 'match.capped', {
+                        n: msg.matches.docs.reduce((sum, d) => sum + d.items.length, 0),
+                        total: msg.matches.total,
+                      })}
+                    </p>
+                  )}
+                  {msg.matches.docs.map((doc) => (
+                    <div class="sr-matches-doc">
+                      <div class="sr-matches-doc-h">
+                        <b class="sr-trunc">{doc.docName}</b>
+                        <span class="sr-muted">{doc.count}</span>
+                      </div>
+                      <ol>
+                        {doc.items.map((item) => (
+                          <li>
+                            {item.heading.length > 0 && (
+                              <span class="sr-match-h">
+                                {item.heading.filter((h, i, arr) => i === 0 || h !== arr[i - 1]).join(' › ')}
+                              </span>
+                            )}
+                            <button type="button" class="sr-match-t" onClick={() => onOpenSource(item.chunkId)}>
+                              {highlightTerms(item.text, item.terms)}
+                            </button>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  ))}
+                </details>
               )}
 
               {msg.inferred && msg.inferred.length > 0 && (
