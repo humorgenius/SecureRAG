@@ -120,7 +120,7 @@ export default {
             },
             {
               title: 'Then tell us what you found',
-              text: 'If a check above fails, that is a bug worth reporting rather than a wording problem. Write to hello@securerag.app with the browser you used and what you saw.',
+              text: 'If a check above fails, that is a bug worth reporting rather than a wording problem. Write to guweiicy@gmail.com with the browser you used and what you saw.',
             },
           ],
         },
@@ -138,7 +138,7 @@ export default {
         { t: 'h2', text: 'Contact' },
         {
           t: 'p',
-          text: 'Corrections, questions and reports go to hello@securerag.app. The contact page describes what to include so that a report can be acted on, and the changelog records what changed once it has been.',
+          text: 'Corrections, questions and reports go to guweiicy@gmail.com. The contact page describes what to include so that a report can be acted on, and the changelog records what changed once it has been.',
         },
       ],
     },
@@ -250,7 +250,7 @@ export default {
             },
             {
               title: '然后把结果告诉我们',
-              text: '如果上面任何一项验证失败，那是值得报告的缺陷，而不是措辞问题。写信到 hello@securerag.app，附上你用的浏览器和你看到的现象。',
+              text: '如果上面任何一项验证失败，那是值得报告的缺陷，而不是措辞问题。写信到 guweiicy@gmail.com，附上你用的浏览器和你看到的现象。',
             },
           ],
         },
@@ -268,7 +268,7 @@ export default {
         { t: 'h2', text: '联系方式' },
         {
           t: 'p',
-          text: '纠错、提问与问题报告都请发到 hello@securerag.app。联系页面说明了邮件里该写什么，才能让一份报告真正可处理；改动完成之后，会记进更新日志。',
+          text: '纠错、提问与问题报告都请发到 guweiicy@gmail.com。联系页面说明了邮件里该写什么，才能让一份报告真正可处理；改动完成之后，会记进更新日志。',
         },
       ],
     },

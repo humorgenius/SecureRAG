@@ -153,7 +153,7 @@ export default {
         { t: 'h2', text: 'If your question is not here' },
         {
           t: 'p',
-          text: 'Send it to hello@securerag.app with your browser name and version, the file type you were using and the exact wording of any message you saw. Questions that turn out to expose a real gap are answered and then added to this page, so the next person does not have to ask.',
+          text: 'Send it to guweiicy@gmail.com with your browser name and version, the file type you were using and the exact wording of any message you saw. Questions that turn out to expose a real gap are answered and then added to this page, so the next person does not have to ask.',
         },
         {
           t: 'callout',
@@ -304,7 +304,7 @@ export default {
         { t: 'h2', text: '这里没有你的问题' },
         {
           t: 'p',
-          text: '请写信到 hello@securerag.app，附上浏览器名称与版本、你当时使用的文件类型，以及你看到的提示原文。如果一个问题暴露出真实的缺口，我们会回答它，并把它补进这一页，让下一个人不必再问。',
+          text: '请写信到 guweiicy@gmail.com，附上浏览器名称与版本、你当时使用的文件类型，以及你看到的提示原文。如果一个问题暴露出真实的缺口，我们会回答它，并把它补进这一页，让下一个人不必再问。',
         },
         {
           t: 'callout',

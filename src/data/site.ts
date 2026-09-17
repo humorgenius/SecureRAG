@@ -10,7 +10,7 @@ export const SITE = {
   adsenseClient: 'pub-0000000000000000',
   modelsHost: 'https://huggingface.co',
   repo: 'https://github.com/securerag/securerag',
-  contactEmail: 'hello@securerag.app',
+  contactEmail: 'guweiicy@gmail.com',
   /** Cached, disclosed third-party request allow-list (used by CSP + the network shield UI). */
   allowedOrigins: ['huggingface.co', 'cdn-lfs.huggingface.co', 'cdn.jsdelivr.net'],
 } as const;

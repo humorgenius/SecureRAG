@@ -149,6 +149,20 @@ try {
     console.log('  角落截图: E:/hermes-workspace/outputs/securerag/ad-collapsed.png');
   }
 
+  console.log('  --- 回到顶部按钮 ---');
+  const topCheck = await evalJs(`(function(){
+    window.scrollTo(0, 1200);
+    return JSON.stringify({scrolled: window.scrollY, buttonHiddenInDom: document.querySelector('[data-to-top]') ? document.querySelector('[data-to-top]').hidden : 'missing'});
+  })()`);
+  console.log('  滚动 1200px 后:', topCheck);
+  await sleep(400);
+  const visible = await evalJs(`(function(){var b=document.querySelector('[data-to-top]');if(!b)return 'missing';var r=b.getBoundingClientRect();var s=getComputedStyle(b);return JSON.stringify({hidden:b.hidden,display:s.display,rect:Math.round(r.width)+'x'+Math.round(r.height),bottom:Math.round(window.innerHeight-r.bottom),right:Math.round(window.innerWidth-r.right)});})()`);
+  console.log('  按钮状态:', visible);
+  await evalJs(`(function(){var b=document.querySelector('[data-to-top]');if(b)b.click();return 'clicked';})()`);
+  await sleep(900);
+  const afterClick = await evalJs('String(Math.round(window.scrollY))');
+  console.log('  点击后 scrollY:', afterClick);
+
   console.log('  --- 页面在作答前发出的站外请求 ---');
   console.log('  站外请求:', external.length === 0 ? '无（符合承诺）' : external.slice(0, 5));
 

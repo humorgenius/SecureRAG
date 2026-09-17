@@ -197,7 +197,7 @@ export default {
         { t: 'h2', text: 'Reporting a security problem' },
         {
           t: 'p',
-          text: 'Write to hello@securerag.app. Include the browser and version, the steps that reproduce the problem, and what you observed in DevTools if you saw something unexpected. This is a small project with no bug bounty programme, and we would rather tell you that plainly than imply a reward that does not exist. Anything that turns out to be real gets fixed and described in the changelog.',
+          text: 'Write to guweiicy@gmail.com. Include the browser and version, the steps that reproduce the problem, and what you observed in DevTools if you saw something unexpected. This is a small project with no bug bounty programme, and we would rather tell you that plainly than imply a reward that does not exist. Anything that turns out to be real gets fixed and described in the changelog.',
         },
       ],
     },
@@ -334,7 +334,7 @@ export default {
         { t: 'h2', text: '报告安全问题' },
         {
           t: 'p',
-          text: '写信到 hello@securerag.app，附上浏览器和版本号、能复现问题的步骤，以及你在开发者工具里看到的异常。这是一个小项目，没有漏洞赏金计划，我们宁愿把这话说清楚，也不愿暗示一个并不存在的奖励。确认属实的问题会修掉，并写进更新日志。',
+          text: '写信到 guweiicy@gmail.com，附上浏览器和版本号、能复现问题的步骤，以及你在开发者工具里看到的异常。这是一个小项目，没有漏洞赏金计划，我们宁愿把这话说清楚，也不愿暗示一个并不存在的奖励。确认属实的问题会修掉，并写进更新日志。',
         },
       ],
     },

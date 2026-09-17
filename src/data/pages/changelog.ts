@@ -138,7 +138,7 @@ export default {
         { t: 'h2', text: 'Reporting something this page gets wrong' },
         {
           t: 'p',
-          text: 'If a feature listed above does not behave as described, that is a defect worth reporting rather than a changelog wording problem. Write to hello@securerag.app with your browser and version, the steps you took and what happened, and the entry gets corrected along with the fix.',
+          text: 'If a feature listed above does not behave as described, that is a defect worth reporting rather than a changelog wording problem. Write to guweiicy@gmail.com with your browser and version, the steps you took and what happened, and the entry gets corrected along with the fix.',
         },
       ],
     },
@@ -268,7 +268,7 @@ export default {
         { t: 'h2', text: '这一页写错了怎么办' },
         {
           t: 'p',
-          text: '如果上面列出的某项功能表现与描述不符，那是值得报告的缺陷，而不是更新日志的措辞问题。写信到 hello@securerag.app，附上浏览器与版本、你操作的步骤和实际结果，条目会随修复一起更正。',
+          text: '如果上面列出的某项功能表现与描述不符，那是值得报告的缺陷，而不是更新日志的措辞问题。写信到 guweiicy@gmail.com，附上浏览器与版本、你操作的步骤和实际结果，条目会随修复一起更正。',
         },
       ],
     },

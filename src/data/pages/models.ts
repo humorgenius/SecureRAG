@@ -204,7 +204,7 @@ export default {
         { t: 'h2', text: 'If something here turns out to be wrong' },
         {
           t: 'p',
-          text: 'Tell us at hello@securerag.app, with the model name and the figure you checked. A licence or parameter count that contradicts the upstream model page is a mistake on our side, and we correct it and note the change on the changelog.',
+          text: 'Tell us at guweiicy@gmail.com, with the model name and the figure you checked. A licence or parameter count that contradicts the upstream model page is a mistake on our side, and we correct it and note the change on the changelog.',
         },
       ],
     },
@@ -391,7 +391,7 @@ export default {
         { t: 'h2', text: '如果这里的哪个数字是错的' },
         {
           t: 'p',
-          text: '写信到 hello@securerag.app，说明模型名和你核对的那个数字。许可或参数量与上游模型页矛盾，就是我们写错了，我们会改正并在更新日志里记下来。',
+          text: '写信到 guweiicy@gmail.com，说明模型名和你核对的那个数字。许可或参数量与上游模型页矛盾，就是我们写错了，我们会改正并在更新日志里记下来。',
         },
       ],
     },

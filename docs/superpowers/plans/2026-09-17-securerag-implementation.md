@@ -410,7 +410,7 @@ Expected: `i18n check OK (34 keys)`
 export const SITE = {
   name: 'SecureRAG', url: 'https://securerag.app', localeOf: { en: 'en_US', zh: 'zh_CN' } as const,
   twitter: '@securerag', adsensePublisher: 'ca-pub-XXXXXXXXXXXXXXXX', // 上线前替换为真实 ID
-  modelsRepo: 'https://huggingface.co/Xenova', contactEmail: 'hello@securerag.app',
+  modelsRepo: 'https://huggingface.co/Xenova', contactEmail: 'guweiicy@gmail.com',
 } as const;
 ```
 

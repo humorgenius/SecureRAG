@@ -119,7 +119,7 @@ export default {
         { t: 'h2', text: '9. Contact' },
         {
           t: 'p',
-          text: 'Questions about these terms, correction requests and reports of misuse go to hello@securerag.app. The site is run by an individual and a few contributors, not a company: there is no legal entity, registered address or support desk behind it, just an address that reaches the people who build it.',
+          text: 'Questions about these terms, correction requests and reports of misuse go to guweiicy@gmail.com. The site is run by an individual and a few contributors, not a company: there is no legal entity, registered address or support desk behind it, just an address that reaches the people who build it.',
         },
       ],
     },
@@ -230,7 +230,7 @@ export default {
         { t: 'h2', text: '九、联系方式' },
         {
           t: 'p',
-          text: '关于条款的问题、纠正请求和滥用举报，请写信到 hello@securerag.app。本站由个人和几位贡献者维护，不是公司：背后没有法律实体、没有注册地址、没有客服台，只有一个能到达建设者手里的邮箱。',
+          text: '关于条款的问题、纠正请求和滥用举报，请写信到 guweiicy@gmail.com。本站由个人和几位贡献者维护，不是公司：背后没有法律实体、没有注册地址、没有客服台，只有一个能到达建设者手里的邮箱。',
         },
       ],
     },

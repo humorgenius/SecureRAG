@@ -13,18 +13,18 @@ export default {
   ],
   copy: {
     en: {
-      title: 'Contact: hello@securerag.app, no forms',
+      title: 'Contact: guweiicy@gmail.com, no forms',
       description:
         'One email address and no form, because no server could receive one. What to put in a bug, privacy or security report, and what is not promised.',
       h1: 'Contact',
       intro:
-        'There is exactly one way to reach this project: email hello@securerag.app. This page explains why there is no contact form, what to put in a message so that it can be acted on, how to report a security problem, and which parts of the tool we cannot help you recover.',
+        'There is exactly one way to reach this project: email guweiicy@gmail.com. This page explains why there is no contact form, what to put in a message so that it can be acted on, how to report a security problem, and which parts of the tool we cannot help you recover.',
       updated: '2026-09-17',
       blocks: [
         {
           t: 'p',
           lead: true,
-          text: 'Email hello@securerag.app is the only contact channel. There is no contact form, no chat widget, no ticket system and no phone number, because the site is a set of static files with no backend: a form would have nowhere to post to, unless we added a server, and adding one would undo the reason this tool exists.',
+          text: 'Email guweiicy@gmail.com is the only contact channel. There is no contact form, no chat widget, no ticket system and no phone number, because the site is a set of static files with no backend: a form would have nowhere to post to, unless we added a server, and adding one would undo the reason this tool exists.',
         },
         { t: 'h2', text: 'Why there is no form' },
         {
@@ -70,7 +70,7 @@ export default {
         { t: 'h2', text: 'Reporting a security problem' },
         {
           t: 'p',
-          text: 'If you find a way to make the tool send document content, questions or answers off the device, or a way to read another site’s or another user’s data through this site, that is the highest priority class of report and it should be sent to hello@securerag.app with “security” in the subject line. Include the browser and version, the steps that reproduce it, and what you observed in DevTools if you saw traffic that should not exist. Please do not test against other people’s data, and do not run automated scans against the hosting provider.',
+          text: 'If you find a way to make the tool send document content, questions or answers off the device, or a way to read another site’s or another user’s data through this site, that is the highest priority class of report and it should be sent to guweiicy@gmail.com with “security” in the subject line. Include the browser and version, the steps that reproduce it, and what you observed in DevTools if you saw traffic that should not exist. Please do not test against other people’s data, and do not run automated scans against the hosting provider.',
         },
         {
           t: 'p',
@@ -115,18 +115,18 @@ export default {
       ],
     },
     zh: {
-      title: '联系方式：hello@securerag.app，没有表单',
+      title: '联系方式：guweiicy@gmail.com，没有表单',
       description:
         '只有一个邮箱，没有联系表单，因为没有服务器接收它。缺陷、模型、隐私、安全与无障碍报告各该写什么，以及这里不承诺 SLA、无法帮你恢复什么。',
       h1: '联系方式',
       intro:
-        '联系这个项目只有一条路：写信到 hello@securerag.app。这一页说明为什么没有联系表单、邮件里写什么才能被处理、安全问题怎么报，以及哪些损失我们帮不上忙。',
+        '联系这个项目只有一条路：写信到 guweiicy@gmail.com。这一页说明为什么没有联系表单、邮件里写什么才能被处理、安全问题怎么报，以及哪些损失我们帮不上忙。',
       updated: '2026-09-17',
       blocks: [
         {
           t: 'p',
           lead: true,
-          text: '唯一的联系方式是 hello@securerag.app。这里没有联系表单、没有在线客服、没有工单系统，也没有电话，因为本站只是一组静态文件、没有后端：表单没有可以提交的地址，除非我们为此加一台服务器，而加服务器等于抵消这个工具存在的理由。',
+          text: '唯一的联系方式是 guweiicy@gmail.com。这里没有联系表单、没有在线客服、没有工单系统，也没有电话，因为本站只是一组静态文件、没有后端：表单没有可以提交的地址，除非我们为此加一台服务器，而加服务器等于抵消这个工具存在的理由。',
         },
         { t: 'h2', text: '为什么没有表单' },
         {
@@ -172,7 +172,7 @@ export default {
         { t: 'h2', text: '安全问题的报告方式' },
         {
           t: 'p',
-          text: '如果你找到让工具把文档内容、提问或回答发离设备的方法，或者通过本站读取到别的站点或别的用户数据的方法，这是优先级最高的一类报告，请发到 hello@securerag.app 并在主题里写上「security」。邮件里请附浏览器与版本、可复现的步骤，以及你在开发者工具里看到本不该存在的流量时的观察结果。请不要拿别人的数据做测试，也不要对托管服务商发起自动化扫描。',
+          text: '如果你找到让工具把文档内容、提问或回答发离设备的方法，或者通过本站读取到别的站点或别的用户数据的方法，这是优先级最高的一类报告，请发到 guweiicy@gmail.com 并在主题里写上「security」。邮件里请附浏览器与版本、可复现的步骤，以及你在开发者工具里看到本不该存在的流量时的观察结果。请不要拿别人的数据做测试，也不要对托管服务商发起自动化扫描。',
         },
         {
           t: 'p',

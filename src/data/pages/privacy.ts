@@ -79,7 +79,7 @@ export default {
               'Whoever serves these static files keeps the usual request logs any web host keeps — IP address, user agent, timestamp — for security and abuse prevention. Those logs cannot be linked to any document, because documents never reach the host.',
             ],
             [
-              'Email you send to hello@securerag.app',
+              'Email you send to guweiicy@gmail.com',
               'Yes, obviously',
               'It sits in our mailbox for as long as it takes to answer and keep a record of the fix. Ask us to delete it and we do.',
             ],
@@ -202,7 +202,7 @@ export default {
         { t: 'h2', text: 'Contact' },
         {
           t: 'p',
-          text: 'Privacy questions, deletion requests for an email you sent us, and corrections to anything this page gets wrong go to hello@securerag.app. The site is run by one person and a small set of contributors, not a company; there is no data protection officer, no registered office and no legal entity to route a request through, so write to the address and it reaches whoever can answer.',
+          text: 'Privacy questions, deletion requests for an email you sent us, and corrections to anything this page gets wrong go to guweiicy@gmail.com. The site is run by one person and a small set of contributors, not a company; there is no data protection officer, no registered office and no legal entity to route a request through, so write to the address and it reaches whoever can answer.',
         },
       ],
     },
@@ -244,7 +244,7 @@ export default {
             ['追踪像素、浏览器指纹、会话录制', '不收集', '这类脚本一个都没加载，页面里也不存在统计 SDK。'],
             ['你的 IP 地址', '我们不收', '我们不运行会收到它的应用服务器。下载模型文件时模型托管方能看到，加载广告时 Google 能看到，这和你访问任何网站时一样。'],
             ['静态托管商的常规服务器日志', '不在我们控制内', '托管这些静态文件的一方会保留任何网站主机都会保留的请求日志——IP、UA、时间戳——用于安全和防滥用。这些日志无法和任何文档关联，因为文档从来不会到达主机。'],
-            ['你发到 hello@securerag.app 的邮件', '会，这很自然', '它留在我们的邮箱里，直到回复完毕并留下一次处理记录。你要求删除，我们就删。'],
+            ['你发到 guweiicy@gmail.com 的邮件', '会，这很自然', '它留在我们的邮箱里，直到回复完毕并留下一次处理记录。你要求删除，我们就删。'],
           ],
         },
         { t: 'h2', text: '我们不做的事' },
@@ -334,7 +334,7 @@ export default {
         { t: 'h2', text: '联系方式' },
         {
           t: 'p',
-          text: '隐私相关的问题、删除你发来的邮件、以及纠正这一页写错的地方，都请写信到 hello@securerag.app。本站由一个人和少量贡献者维护，不是公司；没有数据保护官、没有注册地址、也没有一个法律实体需要你绕过它提申请，直接发邮件就能到能回答的人手里。',
+          text: '隐私相关的问题、删除你发来的邮件、以及纠正这一页写错的地方，都请写信到 guweiicy@gmail.com。本站由一个人和少量贡献者维护，不是公司；没有数据保护官、没有注册地址、也没有一个法律实体需要你绕过它提申请，直接发邮件就能到能回答的人手里。',
         },
       ],
     },

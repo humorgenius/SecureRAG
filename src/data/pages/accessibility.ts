@@ -109,7 +109,7 @@ export default {
         { t: 'h2', text: 'Reporting an accessibility problem' },
         {
           t: 'p',
-          text: 'Write to hello@securerag.app and describe the page or the panel, the assistive technology and version you are using, and what happened instead of what you expected. A keyboard trap that makes a control unreachable is treated as a bug rather than a suggestion, and it is fixed before any cosmetic work. If you use a screen reader and something is announced twice or not at all, the exact wording you heard is the most useful thing you can send.',
+          text: 'Write to guweiicy@gmail.com and describe the page or the panel, the assistive technology and version you are using, and what happened instead of what you expected. A keyboard trap that makes a control unreachable is treated as a bug rather than a suggestion, and it is fixed before any cosmetic work. If you use a screen reader and something is announced twice or not at all, the exact wording you heard is the most useful thing you can send.',
         },
         { t: 'h2', text: 'How this page changes' },
         {
@@ -215,7 +215,7 @@ export default {
         { t: 'h2', text: '报告无障碍问题' },
         {
           t: 'p',
-          text: '写信到 hello@securerag.app，说明页面或面板、你使用的辅助技术及其版本，以及发生了什么而不是你预期什么。让某个控件无法到达的键盘陷阱按缺陷处理，不按建议处理，会在任何外观类工作之前修掉。如果你用屏幕阅读器，遇到内容被念两遍或完全没念，把你实际听到的原话发给我们是最有用的信息。',
+          text: '写信到 guweiicy@gmail.com，说明页面或面板、你使用的辅助技术及其版本，以及发生了什么而不是你预期什么。让某个控件无法到达的键盘陷阱按缺陷处理，不按建议处理，会在任何外观类工作之前修掉。如果你用屏幕阅读器，遇到内容被念两遍或完全没念，把你实际听到的原话发给我们是最有用的信息。',
         },
         { t: 'h2', text: '这一页会怎么变' },
         {

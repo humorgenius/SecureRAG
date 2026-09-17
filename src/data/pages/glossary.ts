@@ -158,7 +158,7 @@ export default {
         { t: 'h2', text: 'Where the primary source sits elsewhere' },
         {
           t: 'p',
-          text: 'This page describes how these terms are used here, not how they are defined by their originators. For model parameters, quantisation and licences, the upstream model page listed on the models page governs. For browser APIs such as IndexedDB, Cache Storage, WebGPU and WebAssembly, the platform documentation is authoritative. Where a figure here disagrees with a primary source, the primary source is right and this page is wrong: tell us at hello@securerag.app and it gets corrected.',
+          text: 'This page describes how these terms are used here, not how they are defined by their originators. For model parameters, quantisation and licences, the upstream model page listed on the models page governs. For browser APIs such as IndexedDB, Cache Storage, WebGPU and WebAssembly, the platform documentation is authoritative. Where a figure here disagrees with a primary source, the primary source is right and this page is wrong: tell us at guweiicy@gmail.com and it gets corrected.',
         },
         {
           t: 'callout',
@@ -314,7 +314,7 @@ export default {
         { t: 'h2', text: '权威说明在别处' },
         {
           t: 'p',
-          text: '这一页写的是这些词在本站的用法，而不是提出者的定义。模型的参数量、量化方式与许可，以模型页面里列出的上游模型页为准；IndexedDB、Cache Storage、WebGPU、WebAssembly 这类浏览器接口，以平台文档为准。如果这里的某个数字与原始出处冲突，原始出处是对的、这一页是错的：写信到 hello@securerag.app，我们会改正。',
+          text: '这一页写的是这些词在本站的用法，而不是提出者的定义。模型的参数量、量化方式与许可，以模型页面里列出的上游模型页为准；IndexedDB、Cache Storage、WebGPU、WebAssembly 这类浏览器接口，以平台文档为准。如果这里的某个数字与原始出处冲突，原始出处是对的、这一页是错的：写信到 guweiicy@gmail.com，我们会改正。',
         },
         {
           t: 'callout',

@@ -50,6 +50,7 @@ export const ui = {
     'ad.pending': 'Ad slot · space reserved, nothing loaded yet',
     'ad.policy':
       'Ads are labeled, never placed inside the chat workspace, and no ad script loads until you answer the consent question.',
+    'a11y.top': 'Back to top',
     'ad.collapse': 'Hide',
     'ad.expand': 'Show',
     'consent.title': 'Advertising on this site',
@@ -65,7 +66,6 @@ export const ui = {
     'footer.colResources': 'Resources',
     'footer.colTrust': 'Trust',
     'footer.local': 'All processing is local to your device',
-    'footer.ads': 'Ads labeled · personalized only with consent · never inside the workspace',
     'footer.legal': '© 2026 SecureRAG · securerag.app',
 
     // shared
@@ -130,6 +130,7 @@ export const ui = {
     'ad.label': '广告',
     'ad.pending': '广告位 · 已预留空间，尚未加载',
     'ad.policy': '广告有明确标注，不会出现在聊天工作区内；在你回答同意问题之前，不会加载任何广告脚本。',
+    'a11y.top': '回到顶部',
     'ad.collapse': '收起',
     'ad.expand': '展开',
     'consent.title': '本站的广告',
@@ -145,7 +146,6 @@ export const ui = {
     'footer.colResources': '资源',
     'footer.colTrust': '信任',
     'footer.local': '全部处理都在你的设备本地完成',
-    'footer.ads': '广告有标注 · 需同意加载 · 不进工作区',
     'footer.legal': '© 2026 SecureRAG · securerag.app',
 
     // 通用
