@@ -47,9 +47,10 @@ export interface HomeContent {
   meta: { title: string; description: string };
   hero: {
     badge: string;
-    h1a: string;
-    h1accent: string;
-    h1b: string;
+    /** The headline, one entry per rendered line. */
+    h1Lines: string[];
+    /** Which entry of h1Lines carries the accent colour. */
+    h1AccentLine: number;
     lede: string;
     ctaPrimary: string;
     ctaSecondary: string;
@@ -95,10 +96,13 @@ export const home: Record<Lang, HomeContent> = {
     },
     hero: {
       badge: 'Built for documents you are not allowed to upload',
-      h1a: 'Document intelligence that runs ',
-      h1accent: 'on your machine',
-      h1b: ", not on someone else's.",
-      lede: 'SecureRAG is a static website with a full retrieval-augmented generation pipeline inside the browser: parsing, chunking, embedding, hybrid retrieval and cited answering. No backend, no accounts, no upload — and you can verify that claim in your own network tab in under a minute.',
+      h1Lines: [
+        'Cross-format file indexing.',
+        'Runs locally. Never uploaded.',
+        'AI retrieval, fast and simple.',
+      ],
+      h1AccentLine: 1,
+      lede: 'SecureRAG is a cross-format AI file search tool from AIrich. It accepts many file formats (PDF · DOCX · TXT · Markdown · CSV · HTML · JSON …) and uses AI to search their contents in one unified place. The whole process is fast and safe: your files always stay on your own machine, are never uploaded to the cloud, so your information stays completely private.',
       ctaPrimary: 'Start with a document',
       ctaSecondary: 'How to verify us',
       preview: {
@@ -303,10 +307,9 @@ export const home: Record<Lang, HomeContent> = {
     },
     hero: {
       badge: '为那些“不允许上传”的文档而建',
-      h1a: '文档智能跑在',
-      h1accent: '你的机器上',
-      h1b: '，而不是别人的服务器上。',
-      lede: 'SecureRAG 是一个静态网站，浏览器内包含完整的检索增强生成管线：解析、分块、向量化、混合检索与带引用的回答。没有后端、没有账号、没有上传——而且你可以在自己的网络面板里，一分钟内验证这句话。',
+      h1Lines: ['SecureRAG 跨格式文件索引工具。', '本地安全运行，文件不上传。', 'AI 智能检索，方便快捷。'],
+      h1AccentLine: 1,
+      lede: 'SecureRAG 是一款 AIrich 旗下的、可以跨格式快速检索信息的 AI 文件智能检索工具。它支持上传多种文件格式（PDF · DOCX · TXT · Markdown · CSV · HTML · JSON……）并借助 AI 对这些文件中的内容进行快速的统一检索。整个过程安全快捷，你的文件始终保存在你的本地，不会上传云端，保证你信息的绝对安全。',
       ctaPrimary: '从一份文档开始',
       ctaSecondary: '如何验证我们',
       preview: {

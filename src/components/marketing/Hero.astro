@@ -23,7 +23,12 @@ const p = c.preview;
     </span>
 
     <h1 class="h1 anim-in d2">
-      {c.h1a}<span class="accent">{c.h1accent}</span>{c.h1b}
+      {c.h1Lines.map((line, i) => (
+        <>
+          {i > 0 && <br />}
+          {i === c.h1AccentLine ? <span class="accent">{line}</span> : line}
+        </>
+      ))}
     </h1>
 
     <p class="lede anim-in d3">{c.lede}</p>
@@ -163,6 +168,12 @@ const p = c.preview;
   .h1 {
     color: #fff;
     margin: 22px 0 0;
+    /* Three deliberately short lines instead of one long sentence: the size and
+       width are tuned so each line stays on one visual line. */
+    font-size: clamp(23px, 2.7vw, 34px);
+    line-height: 1.32;
+    letter-spacing: -.02em;
+    max-width: 34ch;
   }
   .accent {
     color: #8ab4ff;

@@ -22,6 +22,7 @@ const chrome = spawn(
     '--disable-gpu',
     '--no-proxy-server',
     '--no-first-run',
+    '--window-size=1440,900',
     `--remote-debugging-port=${PORT}`,
     '--user-data-dir=E:/hermes-workspace/temp/cdp-diag2',
     'about:blank',
@@ -74,6 +75,10 @@ try {
     "actions:act?Array.prototype.map.call(act.querySelectorAll(\'button\'),function(b){return b.textContent.trim();}):[]};}" +
     "var ex=document.querySelector(\'.sr-export\');" +
     "o.exportGroup=ex?Array.prototype.map.call(ex.querySelectorAll(\'button\'),function(b){return b.textContent.trim();}):null;" +
+    "var h1=document.querySelector(\'h1\');" +
+    "o.h1=h1?{text:h1.innerText.replace(/\\n/g,\' | \').slice(0,100)," +
+    "lines:Math.round(h1.getBoundingClientRect().height/parseFloat(getComputedStyle(h1).lineHeight))," +
+    "w:Math.round(h1.getBoundingClientRect().width),fs:getComputedStyle(h1).fontSize}:null;" +
     "return JSON.stringify(o);})()";
 
   const r = await send('Runtime.evaluate', { expression: expr, returnByValue: true });
@@ -87,6 +92,7 @@ try {
   console.log('BUTTONS / LABELS：');
   for (const b of data.buttons ?? []) console.log(`  h=${String(b.h).padStart(3)}px  class="${b.cls}"  "${b.t}"`);
   console.log('ANSWER NOTE：', (data.notes ?? []).length ? data.notes.join(' | ') : '(none)');
+  if (data.h1) console.log(`H1：lines=${data.h1.lines} width=${data.h1.w}px font=${data.h1.fs}\n     "${data.h1.text}"`);
   console.log('EXPORT GROUP：', data.exportGroup ? data.exportGroup.join(' ') : '(not on this page)');
   if (data.docRow) {
     const r = data.docRow;
