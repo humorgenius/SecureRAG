@@ -1,0 +1,88 @@
+---
+title: "Limits of Running LLMs in the Browser"
+description: "Memory ceilings, the missing SharedArrayBuffer on static hosts, uneven WebGPU support, and what 3 to 8 tokens per second really means for a 0.5B model — plus what work belongs"
+lang: "en"
+slug: "limits-of-running-llms-in-the-browser"
+date: "2026-09-15"
+updated: "2026-09-15"
+minutes: 10
+author: "SecureRAG Team"
+faq:
+  - q: "Can a browser model replace a hosted API?"
+    a: "For drafting a paragraph from supplied text, sometimes. For multi-step tasks, tool use or long context, no — the memory ceiling and the token rate rule it out."
+  - q: "Why is WebGPU not always used?"
+    a: "Because it is not always available or reliable. The engine requests a WebGPU adapter when the browser exposes one, and falls back to CPU/WASM if the adapter is missing or the driver fails mid-load."
+related:
+  - "/models/"
+  - "/how-it-works/"
+  - "/app/"
+  - "/guides/"
+---
+
+A browser tab is a constrained runtime with a hard memory ceiling, no reliable threads, and an uneven GPU story; those three facts define exactly which language-model work is possible locally and which is not. Understanding them is more useful than any benchmark number, because the constraints are structural.
+
+## Memory is the first wall
+
+Everything the model needs — weights, KV cache, activations, the tokeniser, plus the page, the index and the vectors — lives in one tab's memory. Practical ceilings on a desktop browser sit in the low single-digit gigabytes before the tab is at risk; on a phone or tablet the budget is far smaller, and the operating system may kill the tab without asking.
+
+The arithmetic of a model's footprint is unforgiving. Full float32 weights cost roughly four bytes per parameter, so a 0.5B model would need about 2 GB. That is why the optional generative tier ships 4-bit quantised weights: 400 MB for Qwen2.5 0.5B (q4) and about 1.0 GB for 1.5B (q4). Those are download sizes and approximate resident sizes — and nothing above 30 MB is fetched without an explicit confirmation click, so the decision is always visible before the cost is paid.
+
+Context length competes for the same memory. Attention needs a key-value cache that grows with every token of context and every generated token. A 0.5B model with a few thousand tokens of context is comfortable; the same model asked to hold a whole 200-page report is not. This is why the pipeline retrieves six chunks rather than stuffing the library into the prompt: retrieval is a memory strategy as much as a quality strategy.
+
+## No threads without COOP and COEP
+
+Multi-threaded WebAssembly needs `SharedArrayBuffer`, and browsers expose `SharedArrayBuffer` only to pages that are cross-origin isolated — that is, pages served with the `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp` headers.
+
+Static hosting is the problem. GitHub Pages, a plain Netlify or Cloudflare Pages deployment, and most free tiers do not let you set those headers, so the page is not cross-origin isolated, so `SharedArrayBuffer` is unavailable, so the threaded build of the runtime fails to initialise with an error about no available adapters. Two ways out: move to a host that supports custom headers, or pin single-threaded execution. This site does the second, deliberately:
+
+```
+wasm.numThreads = 1;
+wasm.simd = true;
+```
+
+The trade is honest and asymmetric. Single-threaded WASM with SIMD is slower at everything, and the whole point of the site is to work anywhere a browser opens without a build step or a header policy you do not control. If you are deploying your own copy behind a host that sets COOP/COEP, raising the thread count is the single largest performance lever available.
+
+## WebGPU is a coin flip, and that is fine
+
+WebGPU is the difference between "a few tokens per second" and "pleasant," and its availability is uneven: current desktop Chrome and Edge ship it, Safari's support has arrived incrementally, Firefox is recent, and mobile support depends on both the browser version and the device. Even where the API exists, a specific driver can fail at load time.
+
+So the engine treats WebGPU as an optimisation and not a requirement: it asks for an adapter when the browser exposes one, and if the adapter is missing or the pipeline fails to initialise, it loads the same model on CPU/WASM. Same weights, same output, slower. Nothing in the product depends on the GPU path being present — which is also why the site does not say "requires WebGPU" anywhere.
+
+## What a 0.5B model can and cannot do
+
+A 4-bit 0.5B or 1.5B instruction-tuned model is genuinely capable at a narrow band of tasks, and hopeless outside it. Both halves matter:
+
+| Task | Local 0.5B–1.5B | Why |
+| --- | --- | --- |
+| Rewrite or summarise supplied passages | Yes, often well | The facts are already in the prompt; the task is text transformation |
+| Extract a list of obligations from a retrieved section | Yes, with checking | Pattern extraction over a short context |
+| Answer "which clause says X" with a citation | Yes, and citation checking is the key part | It is a selection task, not a reasoning task |
+| Multi-step planning, tool calling, code repair loops | No | Requires reliable instruction-following over long horizons |
+| Arithmetic on figures in a table | No | Small models fail at arithmetic; do it in code |
+| Anything depending on facts not in the prompt | No | There are no facts in the weights at this size |
+
+The failure mode to fear is not a wrong answer — it is a fluent wrong answer. A 0.5B model asked about something outside the retrieved context will produce grammatical, confident prose, because that is what it was trained to do. The mitigations are structural rather than clever: cite the chunks the answer was built from, and let a relevance gate refuse when the corpus is silent. This site's default answer step assembles the cited passages themselves, keeping the generated tier optional.
+
+## What 3 to 8 tokens per second feels like
+
+Token rate is the number that decides whether a feature is usable. On CPU/WASM, a quantised 0.5B model generates somewhere around 3 to 8 tokens per second on typical hardware. Convert it:
+
+- **180 to 480 tokens per minute.**
+- In Chinese, roughly 200 to 500 characters per minute — a short paragraph in about twenty seconds, a dense page in several minutes.
+- In English, roughly 130 to 360 words per minute, with the caveat that English packs fewer characters per token.
+
+Generation is also capped at about 320 new tokens for an answer, which is deliberate: past a paragraph or two, the model's grip on the retrieved evidence loosens and the output drifts. A capped, well-grounded paragraph beats a long, unmoored one that takes four minutes to appear.
+
+What this means for use: streamed token-by-token output makes the latency bearable for reading, painful for anything interactive. You cannot sit and iterate with a 1.5B model the way you iterate with a hosted one. You can ask a question, read a paragraph, and check the citations — which is what document lookup actually consists of.
+
+One more number worth internalising: on the same machine, WebGPU against WASM is often a factor of several, turning a twenty-second wait into a few seconds. It does not change what the model can be asked to do. Speed and capability are separate ceilings, and only the first one moves when a GPU path exists.
+
+## Splitting the work
+
+The useful discipline is to decide per task before you start:
+
+- **Give to the local model:** rewriting and summarising passages you supply, extraction over short retrieved context, turning a retrieved table into prose, consistent rewriting of a passage into another register.
+- **Do not give to the local model:** multi-step reasoning, anything requiring a tool call, arithmetic, translation of a whole document, long-form drafting, and any question where the answer is not in the retrieved chunks.
+- **Skip the generative tier entirely when:** your questions are lookup questions. Retrieval with citations answers "what does the contract say about notice periods" better than a 0.5B model paraphrasing it, and it does so instantly and offline.
+
+Browser inference is not a smaller version of a hosted model. It is a different tool with a narrow, genuinely useful band — and knowing where the band ends is what keeps you from concluding that local AI does not work when the real problem was asking it to do something the tab cannot hold in memory.

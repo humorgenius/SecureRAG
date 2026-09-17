@@ -1,7 +1,7 @@
-import type { ContentPage, PageSchemaFlags, PageCopy, Block, RelatedLink } from '../data/pages/types';
+import type { ContentPage, PageSchemaFlags, PageCopy, Block, RelatedLink } from '../../data/pages/types';
 import { articleSchema, breadcrumbSchema, faqSchema, howToSchema, orgSchema, websiteSchema } from './schema';
 import { faqItems, stepItems } from '../../data/pages/types';
-import type { Lang } from '../i18n/utils';
+import type { Lang } from '../../i18n/utils';
 
 interface Args {
   lang: Lang;

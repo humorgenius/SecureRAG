@@ -29,6 +29,16 @@ if (missingEn.length) {
   bad = 1;
 }
 
+// Nav entries reference dictionary keys by string, so a missing key silently
+// renders an empty link. Validate the references, not just en/zh parity.
+const navSrc = readFileSync('src/i18n/nav.ts', 'utf8');
+const navKeys = [...navSrc.matchAll(/key:\s*'([^']+)'/g)].map((m) => m[1]);
+const missingNav = [...new Set(navKeys.filter((k) => !en.includes(k)))];
+if (missingNav.length) {
+  console.error('✗ nav keys missing from ui.ts:', missingNav.join(', '));
+  bad = 1;
+}
+
 const slugs = (dir) =>
   existsSync(dir) ? readdirSync(dir).filter((f) => /\.mdx?$/.test(f)).map((f) => f.replace(/\.mdx?$/, '')).sort() : [];
 

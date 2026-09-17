@@ -48,7 +48,7 @@ function tableRows(paragraphXml: string): string | null {
 
 export async function parseDocx(buffer: ArrayBuffer, name: string, id: string): Promise<RawDoc> {
   const JSZip = (await import('jszip')).default;
-  let zip: JSZip;
+  let zip: Awaited<ReturnType<typeof JSZip.loadAsync>>;
   try {
     zip = await JSZip.loadAsync(buffer);
   } catch {

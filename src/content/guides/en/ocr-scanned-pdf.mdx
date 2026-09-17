@@ -1,0 +1,92 @@
+---
+title: "Scanned PDFs: detect the missing text layer, then fix it"
+description: "How to tell a scan from a text PDF, why the tool refuses it with PDF_NO_TEXT_LAYER, how to run OCR without shipping pages to a server, and why OCR errors become search errors."
+lang: "en"
+slug: "ocr-scanned-pdf"
+date: "2026-09-17"
+updated: "2026-09-17"
+minutes: 8
+author: "SecureRAG Team"
+faq:
+  - q: "Why does adding my PDF fail with PDF_NO_TEXT_LAYER?"
+    a: "The file contains page images with no embedded characters. A page that is a photograph of text has nothing for a text extractor to return, and this tool deliberately declines to guess rather than produce an empty index. Running OCR first, then importing the recognised text, is the fix."
+  - q: "Can OCR run locally instead of on a cloud service?"
+    a: "Yes. OCR engines that run in the browser or on your own machine exist, and one that you run locally keeps the page image on your device. That matters more for scans than for digital files, because a scan is often a form, an ID or a signed page."
+  - q: "Will imported OCR text be as good as a digital PDF?"
+    a: "No, and the difference is visible in the results. Recognition errors land in the index as wrong words, so a keyword search for the correct spelling can miss the passage entirely. Proofread names, numbers and codes before importing when the answer depends on them."
+  - q: "Should I import the OCR text or keep the original scan too?"
+    a: "Import the text. The scan adds no retrievable content and counts against your file and size limits. Keep the original outside the tool as the visual record you cite."
+related:
+  - "/app/"
+  - "/guides/"
+  - "/how-it-works/"
+  - "/security/"
+---
+
+A scanned PDF is a picture of a page, and a text extractor can only return the characters a page actually contains. That is the whole problem: the file looks like a document, opens like a document, and contains no words at all. This guide covers how to confirm that in ten seconds, how to run OCR without sending the pages anywhere, and what OCR mistakes do to search results afterwards.
+
+## Two ways to tell a scan from a text PDF
+
+The first method needs no tools beyond the reader you already have. Open the PDF, pick a normal paragraph in the middle of the page, and try to select it with the mouse. In a text PDF the selection highlights the words and you can copy them. In a scan nothing highlights, or the file drags a page-sized box as if you had grabbed an image.
+
+The second method is the tool's own answer. Drop the file in and watch the status: a scan is rejected with the error code `PDF_NO_TEXT_LAYER`, and the message says that no text layer was detected. That code is specific — it is not the same as an encrypted file, which is rejected with `PDF_ENCRYPTED`, and not the same as an oversized file, which is rejected with `FILE_TOO_LARGE`.
+
+| What you see | What it means | What to do next |
+| --- | --- | --- |
+| Text selects and copies in any PDF reader | The file has a real text layer | Import it directly; nothing below applies |
+| Nothing selects, but the pages look crisp and typed | A digital-born scan, probably rendered from a typesetter | Run OCR and import the recognised text |
+| Pages are photographs of paper, skewed, with shadows | A camera or flatbed capture | Run OCR, then proofread the result before importing |
+| Import fails with `PDF_NO_TEXT_LAYER` | The parser found zero characters across the pages | OCR, then import text |
+| Import fails with `PDF_ENCRYPTED` | A password or an owner restriction is set | Remove the protection in the tool that produced it, then import a protected-free copy |
+
+Mixed files exist too. A report can have a text cover page and scanned appendices, and the parser will extract what is there. The result is an index containing the cover page and nothing from the appendix, which is worth knowing before you conclude that a clause is absent from the library.
+
+## Why the tool declines rather than guesses
+
+It would be possible to accept a scan and index a placeholder, or to index the file name and a page count. Both would produce an index that answers nothing while looking healthy. The error is more useful than a silent empty document, which is why the parser raises it and names the reason.
+
+There is also a privacy argument for keeping the decision explicit. Scans are disproportionately the sensitive ones: a signed contract, a passport page, a medical form, a bank statement. That is exactly the material where an upload-first workflow costs the most, and where an error that stops the import is doing you a favour.
+
+## Running OCR without shipping the pages away
+
+The principle is simple: the recognition step should run where the image already is. Three arrangements satisfy that, and only one of them is remote.
+
+1. **Recognition inside the browser.** Some scanners and document tools ship an OCR engine that runs locally in a page or as part of an installed application. Nothing leaves the machine.
+2. **Recognition on your own computer.** A desktop OCR program, or a command-line recogniser installed on your machine, processes pages using your own processor. Output is a text file you then import.
+3. **Recognition on someone else's computer.** A cloud OCR service accepts the image and returns text. The page image leaves your device on the way in, and the provider's retention rules decide what happens to it afterwards.
+
+Only the first two keep the material local. If you use the third, the honest position is that the scan has been disclosed to another party, and the import that follows is local but no longer the whole story. For anything signed, anything with an account number, or anything covered by a confidentiality clause, work through the first two options instead and accept the extra few minutes.
+
+Where to find a local recogniser is beyond what this page can promise, because the landscape changes and we have not tested every tool. Prefer one that runs offline after installation, and verify that claim the same way you verify this site: watch what it does when the network is switched off.
+
+## Bringing the recognised text back into the library
+
+Once you have text, the import path is the same as any other plain file, and a few choices at this step pay off later.
+
+- **Keep page markers.** If your recogniser can insert a page break marker or a page number on each page, keep it. Chunk metadata that carries a page number lets a citation point back to the page you can verify by eye.
+- **Import text or Markdown, not a re-wrapped PDF.** A searchable PDF produced by OCR adds a container without adding retrievable content, and it counts against the per-file and total-size limits for no benefit.
+- **Recreate headings if the document has them.** A line of recognised text that was a heading becomes an ordinary sentence unless you mark it as a heading in Markdown. Restoring the heading level gives the splitter real boundaries, which is the difference between a clean chunk and a chunk that starts halfway through the previous section.
+- **Split by document, not by folder.** Import limits apply to single files and to the library as a whole, so a 60-page scan exported as one text file is easier to manage than forty page-sized files.
+- **Strip the repeated furniture.** Recognisers often turn a page footer into a line of text on every page. Removing repeated lines before import improves keyword search, the same way the cleaner removes repeated headers from digital PDFs.
+
+## OCR mistakes become search errors
+
+This is the part worth reading twice. In a digital PDF, a wrong character never enters the index. In a scanned one, recognition decides what the index contains, and a mistake is not a display problem — it is a permanent difference between what the document says and what the search can find.
+
+Concretely: if a recogniser reads `O` for `0` in a policy number, or `l` for `1` in a code, or merges two columns of a table into interleaved lines, then the correct spelling of that identifier will not match the passage. The keyword half of the hybrid search is what normally rescues exact identifiers, and OCR errors are precisely what defeats it. Vector search is no help either, since dense vectors blur rare tokens rather than resolving them.
+
+| Recognition failure | What it does to your results | Where to catch it |
+| --- | --- | --- |
+| Digits confused with letters in an identifier | The exact search misses, and only the fuzzy relevance ranking has a chance | Search for the identifier right after import |
+| Two-column layout read as interleaved lines | Sentences become word salad; the passage is in the index but unreadable | Read the first page of the imported text |
+| Table rows collapsed into one long line | Column values lose their association with their row labels | Open a table page and check the text |
+| Diacritics or a non-Latin script dropped | Words become different words, and keyword search fails | Search for one ordinary word you can see in the scan |
+| A whole region read as noise because of a shadow | Content simply absent from the index | Compare the page count of the recognised text with the scan |
+
+A two-minute self-test after import catches most of this: open the text file you fed in, read its first page against the scan, and run one keyword search in the tool for an exact code or name you can read in the original. If both pass, the rest of the document is usually in comparable shape.
+
+## Honest limits
+
+OCR does not recover what the scan does not contain. A blurred page, a stamp over a signature line, or handwriting in a margin will produce text that is confidently wrong or plausibly empty. If the answer to your question depends on a handwritten annotation, the scan cannot be searched and a person has to look at the image.
+
+It is also worth stating what this tool does and does not do. It does not perform OCR. It parses text that is already in your files, and a scan has none. The fix belongs upstream, in a step you choose and control, and the quality of that step sets a ceiling on everything the search can do afterwards.

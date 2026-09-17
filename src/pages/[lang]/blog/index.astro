@@ -1,0 +1,94 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
+import ArticleList from '../../../components/marketing/ArticleList.astro';
+import AdSlot from '../../../components/marketing/AdSlot.astro';
+import JsonLd from '../../../components/seo/JsonLd.astro';
+import { t, localizePath, type Lang } from '../../../i18n/utils';
+import { breadcrumbSchema, itemListSchema, orgSchema, websiteSchema } from '../../../lib/seo/schema';
+
+export function getStaticPaths() {
+  return [{ params: { lang: 'en' } }, { params: { lang: 'zh' } }];
+}
+
+const { lang: langParam } = Astro.params as { lang: string };
+const lang: Lang = langParam === 'zh' ? 'zh' : 'en';
+
+const copy =
+  lang === 'zh'
+    ? {
+        title: '本地 AI 与文档隐私 · SecureRAG 博客',
+        description:
+          '关于本地推理、向量检索、分块策略与文档合规的实测文章。写我们自己的取舍、真实的数字，以及我们做不到的地方。',
+        h1: '关于本地 AI 的实测记录',
+        intro:
+          '这里的文章不推销产品，只记录我们在浏览器里跑 RAG 时量到的数字、踩到的限制，以及那些"看起来能行其实不行"的做法。',
+      }
+    : {
+        title: 'Local AI and document privacy · SecureRAG blog',
+        description:
+          'Measured notes on local inference, vector retrieval, chunking strategy and document compliance — including the trade-offs we lose and the numbers we actually measured.',
+        h1: 'Measured notes on running AI locally',
+        intro:
+          'These posts are not product marketing. They record the numbers we measured while running RAG inside a browser tab, the limits we hit, and the approaches that look plausible but do not work.',
+      };
+
+const entries = (await getCollection('blog')).filter((entry) => entry.data.lang === lang);
+const items = entries
+  .sort((a, b) => (a.data.date < b.data.date ? 1 : -1))
+  .map((entry) => ({
+    href: localizePath(lang, `/blog/${entry.data.slug}/`),
+    title: entry.data.title,
+    description: entry.data.description,
+    minutes: entry.data.minutes,
+    date: entry.data.date,
+  }));
+
+const path = `/${lang}/blog/`;
+const crumbs = [
+  { name: t(lang, 'common.home'), path: localizePath(lang, '/') },
+  { name: t(lang, 'nav.blog'), path },
+];
+---
+
+<BaseLayout lang={lang} path={path} title={copy.title} description={copy.description} type="website">
+  <Breadcrumbs items={crumbs} />
+
+  <section class="wrap">
+    <header class="head">
+      <p class="eyebrow">{t(lang, 'nav.blog')}</p>
+      <h1>{copy.h1}</h1>
+      <p class="lede">{copy.intro}</p>
+    </header>
+
+    <ArticleList lang={lang} items={items} />
+    <AdSlot lang={lang} />
+  </section>
+
+  <JsonLd
+    data={[
+      orgSchema(lang),
+      websiteSchema(lang),
+      itemListSchema({ lang, name: copy.h1, items: items.map((item) => ({ name: item.title, path: item.href })) }),
+      breadcrumbSchema(crumbs),
+    ]}
+  />
+</BaseLayout>
+
+<style>
+  .head {
+    padding-top: 26px;
+  }
+  h1 {
+    font-size: clamp(28px, 3.6vw, 42px);
+    letter-spacing: -.03em;
+    max-width: 26ch;
+  }
+  .lede {
+    margin-top: 16px;
+  }
+  .eyebrow {
+    margin-bottom: 12px;
+  }
+</style>

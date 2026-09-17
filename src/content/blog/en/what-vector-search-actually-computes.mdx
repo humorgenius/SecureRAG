@@ -1,0 +1,110 @@
+---
+title: "What Vector Search Actually Computes"
+description: "Cosine similarity, L2 normalisation and the dot product in plain language — plus why contract numbers defeat vectors, how RRF merges two rankings, and why a relevance gate is"
+lang: "en"
+slug: "what-vector-search-actually-computes"
+date: "2026-09-11"
+updated: "2026-09-11"
+minutes: 10
+author: "SecureRAG Team"
+faq:
+  - q: "Does vector search understand my question?"
+    a: "No. It measures geometric closeness between two vectors. 'Understanding' is a useful shorthand for the fact that the model was trained so that paraphrases land near each other, and it stops being useful the moment you expect reasoning."
+  - q: "Why does the system refuse to answer sometimes?"
+    a: "Because the best dense score stayed under 0.25 and the best BM25 score stayed under 2.0. Without that gate, the retriever always returns its top six chunks, even when none of them is relevant."
+related:
+  - "/how-it-works/"
+  - "/models/"
+  - "/guides/"
+  - "/app/"
+---
+
+Vector search turns each chunk of text into a point in space and returns the chunks whose points sit closest to your question's point. That is the whole mechanism; every strength and every failure downstream follows from it, including the ones that have nothing to do with "understanding."
+
+## A sentence becomes a point
+
+An embedding model reads a piece of text and outputs a list of numbers — 384 of them in the smaller models used here, 512 in the Chinese-first one. Read that list as coordinates. A paragraph about termination clauses becomes a point somewhere in a 384-dimensional room; a paragraph about payment terms becomes a different point; two paraphrases of the same clause land close enough together to be neighbours.
+
+Distance in that room stands in for similarity of meaning. When you ask a question, the question is embedded with the same model, and the retriever sorts every chunk by how close its point is to the question's point. Nothing is looked up, nothing is matched word for word: it is one sort over a list of distances.
+
+The property that makes this useful is also the property that makes it dangerous. Paraphrase is free — "how long do I have to give notice" finds "the notice period is thirty days" even though they share no content words. Precision is not: a model that has never been trained to treat `CN-2024-0871` as a meaningful string will place that identifier in a region of the space governed by whatever generic tokens it was split into.
+
+## Why cosine similarity becomes a dot product
+
+The textbook measure between two vectors is cosine similarity: the cosine of the angle between them.
+
+```
+cos(a, b) = (a · b) / (|a| · |b|)
+```
+
+where `a · b` is the dot product and `|a|` is the vector's length. Dividing by both lengths costs two square roots and a multiplication per comparison, and there can be tens of thousands of comparisons per question. So the pipeline removes the divisor instead of computing it: every vector is L2-normalised the moment it is produced, meaning it is divided by its own length so that `|a| = 1`. What is stored is the unit vector.
+
+Once both vectors are unit length, the denominator becomes `1 × 1 = 1` and cosine similarity collapses into the dot product:
+
+```
+cos(a, b) = a · b     when |a| = |b| = 1
+```
+
+That is why the storage layer holds normalised vectors: similarity is one multiply-and-add loop over the dimensions, which is fast enough to run in a browser tab on a single thread. It also means the number you see as a "similarity score" is a plain dot product in the range −1 to 1, usually 0 to 1 for natural text, where higher is closer.
+
+## Where vectors fail: identifiers, numbers, clause references
+
+Ask a vector index for `第 3.2 条` or `CN-2024-0871` and it will usually return something plausible and wrong. Three reasons, all mechanical:
+
+1. **Subword splitting.** Identifiers are not words. A tokeniser breaks `CN-2024-0871` into fragments that also appear inside thousands of unrelated strings, so the resulting vector is dominated by the generic parts.
+2. **Training distribution.** Numbers, codes and version strings are rare in the paired text an embedding model learns from. Their vectors are unstable — small changes drift the point.
+3. **Entity blindness.** `Contract A` and `Contract B` may embed similarly if the surrounding sentences are similar, because the model encodes the pattern of the sentence more than the identity of the token.
+
+The practical consequence: vector search is strong on "what does this document say about notice periods" and weak on "find clause 7.4", where the answer needs the exact string.
+
+## BM25 catches what vectors miss
+
+BM25 is a ranking function from classical information retrieval. It scores by term frequency, inverse document frequency and document length normalisation: a term that appears in your question and in few chunks is worth a lot; a term that appears in every chunk is worth almost nothing. It has no notion of meaning at all.
+
+That blindness is exactly the point. BM25 sees `7.4` and `CN-2024-0871` as tokens and matches them exactly, which is the failure mode vectors cannot fix. The two retrievers disagree in a useful way:
+
+| Question | Vector search | BM25 |
+| --- | --- | --- |
+| "How much notice must I give before leaving?" | Strong — paraphrase matches | Weak — few shared terms |
+| "What does clause 7.4 say?" | Weak — the number is noise | Strong — exact token |
+| "公司因不可抗力免责" | Strong — dense paraphrase | Medium — needs the exact word |
+| "error code E_SQLITE_BUSY" | Weak — split into fragments | Strong — exact string |
+| "上面那个条款" (pronoun only) | Weak — no content | Weak — no content |
+
+Note the last row. Neither retriever rescues a query with no content of its own; that is a chunking problem as much as a retrieval problem.
+
+## Merging the two rankings with RRF
+
+You now have two ordered lists and no way to add their scores: cosine lives on roughly 0–1, BM25 is unbounded and typically 0–20. Reciprocal rank fusion sidesteps the scale mismatch by throwing away the scores and keeping only ranks:
+
+```
+score(d) = Σ_i  1 / (k + rank_i(d))
+```
+
+`rank_i(d)` is document `d`'s position in list `i` (counting from 1), `k` is a smoothing constant set to 60 — the conventional value, and the one used here. The implementation adds 1 because its arrays are zero-indexed, which is the same thing shifted by one.
+
+What does `k = 60` do? It flattens the head of each list. Without it, rank 1 would be worth `1/1 = 1.0` and ranks 2 and 3 would be worth 0.5 and 0.33 — one confident retriever would own the fused list. With the constant, the top ranks separate only slightly, and agreement between retrievers wins instead. A worked example:
+
+| Chunk | Dense rank | BM25 rank | Fused score |
+| --- | --- | --- | --- |
+| A | 1 | — | 1/61 = 0.0164 |
+| B | 3 | 3 | 1/63 + 1/63 = 0.0317 |
+| C | — | 1 | 1/61 = 0.0164 |
+
+Chunk B beats chunk A, because two independent retrievers placing it third is stronger evidence than one placing it first. That is the entire reason hybrid retrieval exists: dense catches paraphrase, BM25 catches strings, and RRF rewards the overlap.
+
+After fusion, the pipeline takes the top 20 candidates, applies MMR with `λ = 0.7` to trade relevance against diversity (with an explicit near-duplicate guard at cosine 0.92, needed because 15% chunk overlap produces paraphrased neighbours), and hands the best 6 chunks to the answer step.
+
+## Why a relevance gate is not optional
+
+Here is the failure that makes the gate necessary. Ask a question about share option vesting against a library of restaurant recipes. Every chunk is irrelevant. Vector search still returns six chunks, because "closest" is a total order and always has a first element — an unrelated chunk might score 0.18 and still come first. A generator with no way to say "I don't know" will write a fluent paragraph using the recipe text, and the failure is silent: a plausible answer, correct citations pointing at nothing relevant.
+
+The gate is a single rule: if the best dense cosine is below **0.25** *and* the best BM25 raw score is below **2.0**, the corpus counts as silent. Both conditions have to hold, because a real keyword hit OR a real semantic match is enough to proceed. In strict mode, a silent corpus gets a refusal with no generated text. In permissive mode it still tells you the confidence was low.
+
+Two honest notes. The thresholds are calibration constants, not physical laws: 0.25 on cosine is a reasonable floor for short question-versus-chunk pairs with these models, and it moved during testing. And a gate can only prevent confident nonsense; it cannot make a mediocre retrieval good.
+
+## What this means when you use it
+
+- **Word your question with content words.** A question containing the distinctive terms from your domain works well for both retrievers.
+- **Ask for exact strings in their exact form.** Clause numbers, error codes and identifiers are BM25's job, and it does that job well.
+- **Treat a refusal as information.** When the corpus is silent, the useful next step is changing the wording or importing the document you assumed was already there.

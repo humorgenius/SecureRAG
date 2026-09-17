@@ -17,7 +17,7 @@ export interface IngestRequest {
 }
 
 export type IngestEvent =
-  | { type: 'stage'; file: string; stage: 'parse' | 'chunk' | 'embed' | 'done'; done?: number; total?: number }
+  | { type: 'stage'; file: string; stage: 'parse' | 'chunk' | 'embed' | 'model' | 'done'; done?: number; total?: number }
   | { type: 'model-progress'; loaded: number; total: number; file?: string }
   | { type: 'doc'; id: string; name: string; kind: string; pages: number; size: number; chunks: Chunk[]; vectors: Float32Array[]; model: string }
   | { type: 'error'; file: string; code: string; detail?: string }
@@ -137,6 +137,6 @@ async function handleEmbed(msg: ChunkMessage) {
 
 ctx.addEventListener('message', (event: MessageEvent<IngestRequest | ChunkMessage>) => {
   const data = event.data;
-  if (data.type === 'ingest') void handleIngest(data);
+  if (data.type === 'ingest') void handleIngest(data as IngestRequest);
   else if (data.type === 'embed') void handleEmbed(data as ChunkMessage);
 });

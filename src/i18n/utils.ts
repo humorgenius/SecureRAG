@@ -1,5 +1,8 @@
 import { ui, type Lang, type UIKey } from './ui';
 
+// Re-exported so components can `import type { Lang } from '../i18n/utils'`.
+export type { Lang, UIKey };
+
 export const LOCALES: Lang[] = ['en', 'zh'];
 export const DEFAULT_LANG: Lang = 'en';
 export const HTML_LANG: Record<Lang, string> = { en: 'en', zh: 'zh-Hans' };

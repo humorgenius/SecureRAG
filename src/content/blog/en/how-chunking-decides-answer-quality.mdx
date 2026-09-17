@@ -1,0 +1,93 @@
+---
+title: "How Chunking Decides Answer Quality"
+description: "Why a fixed-length cut separates a rule from its exception, how structure-aware splitting works with 15% overlap, and the failure where retrieval finds the right page and the"
+lang: "en"
+slug: "how-chunking-decides-answer-quality"
+date: "2026-09-13"
+updated: "2026-09-13"
+minutes: 10
+author: "SecureRAG Team"
+faq:
+  - q: "What chunk size does this site use?"
+    a: "A 700-character target with 15% overlap (about 105 characters), and chunks shorter than 40 characters are not embedded at all. The size is a target, not a hard cut — a paragraph or a table is kept whole when possible."
+  - q: "Does more overlap mean better answers?"
+    a: "Up to a point. Overlap rescues sentences that straddle a boundary, but every overlapping chunk is a near-copy of its neighbour, so the index grows and the retriever starts returning the same passage twice."
+related:
+  - "/how-it-works/"
+  - "/guides/"
+  - "/app/"
+  - "/faq/"
+---
+
+Chunking decides which pieces of a document can ever be retrieved together, and a piece that never contains the answer cannot be retrieved no matter how good the embedding model is. Everything about answer quality starts here, before the model, before the ranking.
+
+## Why a fixed-length cut separates a rule from its exception
+
+The crude approach is to cut the document every N characters. It is fast, it is deterministic, and it produces failures that look like model failures but are not. Consider a real pattern from contracts:
+
+> 8.3 除非双方另有书面约定，任何一方均可提前三十日书面通知对方终止本协议。
+
+> 8.4 前款不适用于以下情形：…
+
+Cut at an arbitrary point and `8.3` lands at the end of one chunk while `8.4` — the exception that changes what `8.3` means — lands at the start of the next. Retrieve only the first chunk and you have a rule with its exception amputated. The generator will state the rule as absolute, and it will be citing your document correctly while doing so.
+
+The same happens with any structure that alternates between a general statement and its qualifications: a policy and its exemptions, a price list and its footnotes, a warranty and its exclusions. The information was never lost; it was separated.
+
+## Structure-aware splitting: headings, then paragraphs, then sentences
+
+The parser here first turns the document into blocks and remembers the heading it sits under. Then it splits with a preference order:
+
+1. **Keep the document's own structure.** Markdown headings and numbered headings (`第 3 章`, `7.4`, `Article 5`, `Section 2.1`, `附录 A`) start new groups. Each block carries its heading path, so a clause inherits the sections above it.
+2. **Split on paragraph boundaries** when a group exceeds the 700-character target.
+3. **Split on sentence boundaries** only when a single paragraph is still too long — the sentence splitter respects Chinese full stops and semicolons as well as `.`, `!`, `?` and `;`.
+4. **Keep short blocks together** and skip anything under 40 characters, because a three-word fragment embeds into noise.
+
+Heading detection is heuristic and worth knowing about, because it is where structure-aware splitting fails first. A line is treated as a heading when it is at most 70 characters, is not a table row or a code fence, and either ends in a colon, is followed by a blank line, or is a short line of nine words or fewer with no terminal punctuation. A one-line paragraph in the middle of dense prose can satisfy that and get promoted to a heading, which starts a new group in the wrong place. It is an acceptable trade: document formats vary too much for a rule that never misfires.
+
+## What the 15% overlap buys, and what it costs
+
+A 700-character chunk with 15% overlap means each chunk repeats roughly 105 characters of the previous one. That repetition exists for one reason: a sentence that straddles a boundary appears whole in at least one chunk. Without overlap, an answer like "the notice period is thirty days" can be sliced so that the number and its unit sit in different chunks, and neither chunk retrieves well for the question.
+
+The cost is real:
+
+- **Index size.** Overlapping chunks are near-copies. At 15%, the index carries roughly 15% more vectors than a clean cut, with the corresponding embedding time.
+- **Duplicate results.** A retrieval top-k will happily return the same passage twice, once from each side of a boundary. That is why the pipeline applies a diversity pass with MMR at `λ = 0.7` and drops any candidate whose cosine to an already-selected chunk exceeds 0.92 — with overlap, that threshold mainly catches neighbours produced by the overlap itself.
+- **Context waste.** Six chunks are handed to the answer step. Two of them being the same paragraph means four chunks of actual evidence.
+
+Overlap is a repair for a cutting decision you had to make, not a feature. Raising it to 30% mostly buys duplicate results.
+
+## Tables and code must stay whole
+
+Tables are the case where a whole-block rule matters most. Split a table row-wise and each chunk contains numbers with no header. A chunk reading `| Q3 | 12,400 | 8.1% |` embeds as a pattern of digits: the retriever may find it for "how did Q3 go" and will never find it for "what was the gross margin in Q3", because the words *gross margin* are in a header row sitting in a different chunk. The row is faithful and useless.
+
+The same applies to fenced code. Split a function in half and neither half contains the signature that a question is likely to name. The splitting code therefore marks fenced code and table rows as atomic blocks and avoids cutting inside them, letting a group run over the target size rather than break them.
+
+For tables there is one workaround worth doing at import time, outside the tool: repeat the header row every twenty rows, or export the table as CSV instead. A CSV file is parsed as structured records, and the column names come along with each value.
+
+## The failure you will actually see: recall succeeds, the answer is wrong
+
+This is the most confusing class of failure, because the citations look right. Three shapes of it:
+
+| Symptom | What happened | Fix |
+| --- | --- | --- |
+| Answer cites the right page, states a rule with no exceptions | The exception clause was in the next chunk and did not make the top 6 | Ask including the exception's wording; check whether the clause numbering was detected |
+| Answer says "it" or "the above" with no referent | A cross-chunk pronoun: the antecedent sat in the previous chunk | Prefer wording that repeats the noun; this is a genuine limit |
+| A number is quoted without its meaning | Table header separated from the row, or a unit dropped at a boundary | Import the table as CSV, or OCR/convert the source with headers preserved |
+
+The common thread is a chunk that is locally correct and globally incomplete. Retrieval did its job — the chunk it returned genuinely contains the phrase in your question. The answer is still wrong, which is why "the citation is present" is not the same as "the answer is supported."
+
+## Tuning: the dials and when to turn them
+
+| Situation | What to change | Why |
+| --- | --- | --- |
+| Answers state rules without exceptions | Ask a question that names the exception, or raise `top-k` in your head by checking the next results | The exception clause exists; the retriever needed the vocabulary to reach it |
+| One passage eats the whole context window | Nothing — the near-duplicate guard already handles it | Overlapping neighbours are dropped above cosine 0.92 |
+| Numbers appear without labels | Re-import the source as CSV or repeat table headers | Chunking cannot reconstruct a header that was never adjacent |
+| Short fragments dominate results | Nothing configurable; check the source document | Chunks under 40 characters are skipped, so what you see came from real text |
+| Answers quote the wrong section of a long policy | Confirm the heading detection found your sections | Heuristic heading rules can miss numbered clauses in dense layout |
+
+One recommendation that outperforms every parameter here: check the sources before you trust the answer. Every response shows the chunks it used. If the evidence looks thin, the answer is thin, and the fix is usually on the import side rather than in the retrieval settings.
+
+## What chunking cannot fix
+
+Chunking works on the text it is given. If a PDF has no text layer, there is nothing to split — OCR has to happen first, outside the tool, and OCR output arrives without reliable headings. If the extraction produced columns in the wrong reading order, structure-aware splitting will faithfully preserve a garbled structure. If the same clause appears in twelve documents with different values, retrieval will return a mix of all twelve and no amount of overlap will tell you which one governs your case. Splitting is a strong second-order lever; parsing is the first-order one.

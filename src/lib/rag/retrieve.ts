@@ -48,8 +48,8 @@ export function isSilent(bestDense: number, bestBm25: number): boolean {
 export function mmrSelect(
   candidates: { index: number; relevance: number; vector: Float32Array }[],
   k: number,
-  lambda = LIMITS.mmrLambda,
-  nearDuplicate = LIMITS.nearDuplicateCosine
+  lambda: number = LIMITS.mmrLambda,
+  nearDuplicate: number = LIMITS.nearDuplicateCosine
 ): number[] {
   if (candidates.length === 0) return [];
   const maxRel = Math.max(...candidates.map((c) => c.relevance), 1e-9);

@@ -49,8 +49,14 @@ for (const file of pages) {
   if (!desc) errors.push(`${rel}: no meta description`);
   else {
     const d = decode(desc[1]).trim();
-    if (d.length < 60) warnings.push(`${rel}: description is ${d.length} chars (target 120-158)`);
-    if (d.length > 175) warnings.push(`${rel}: description is ${d.length} chars (target 120-158)`);
+    // CJK packs far more meaning per character, so a 60-character Chinese
+    // description is already full length in a SERP. Both search engines and
+    // our own copy follow that; judge each script by its own range.
+    const cjk = (d.match(/[\u3400-\u9fff]/g) ?? []).length;
+    const isZh = cjk > 10;
+    const target = isZh ? '30-120' : '120-158';
+    if (d.length < (isZh ? 30 : 60)) warnings.push(`${rel}: description is ${d.length} chars (target ${target})`);
+    if (d.length > (isZh ? 120 : 175)) warnings.push(`${rel}: description is ${d.length} chars (target ${target})`);
   }
 
   if (!is404) {

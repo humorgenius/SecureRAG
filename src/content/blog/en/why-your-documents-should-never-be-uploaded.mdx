@@ -1,0 +1,102 @@
+---
+title: "Why Your Documents Should Never Be Uploaded"
+description: "What happens to a file after it reaches a cloud service — object storage, logs, backups, retention windows, training opt-ins — and how to verify local processing yourself."
+lang: "en"
+slug: "why-your-documents-should-never-be-uploaded"
+date: "2026-09-05"
+updated: "2026-09-05"
+minutes: 10
+author: "SecureRAG Team"
+faq:
+  - q: "If I delete a file from a cloud service, is it gone?"
+    a: "'Delete' in a web interface removes your copy from the active view and usually writes a delete marker. Backups, replicas and derived text commonly keep a version for a window the operator sets, not you."
+  - q: "Does local processing mean nothing ever touches the network?"
+    a: "No. The page fetches model weights once — a plain GET whose path is a file name such as bge-small-zh-v1.5, with no document content — then caches them, so it can keep working with the network switched off."
+  - q: "How do I check whether a tool is really local?"
+    a: "Open the network panel, load the tool, add a document while recording, then cut the connection and keep asking questions. No file-sized request body, and answers that survive going offline, is the evidence you want."
+related:
+  - "/privacy/"
+  - "/security/"
+  - "/how-it-works/"
+  - "/app/"
+---
+
+Uploading a document hands a copy to someone else's computer, where it stays under rules you did not write and cannot later revoke. That one sentence covers nearly every practical risk in this article; the rest is detail — what the copy becomes, why deletion is not recall, and how to check a tool's claim yourself.
+
+## What actually happens after a file is uploaded
+
+An upload feels like one action in a browser. On the receiving side it becomes a chain of separate stores, each with its own lifetime.
+
+1. **The request.** The bytes travel over TLS to an endpoint. Gateways, load balancers and CDNs in front of that endpoint keep access logs: timestamp, client IP, user agent, request path, account id, status code, byte count. Some pipelines are configured to sample request bodies for debugging or abuse detection.
+2. **The object store.** The file is written to blob storage — an object key, a bucket, a storage class, a version id. There are no directories; the "folder" you see in the interface is a row in a database.
+3. **Derived text.** If the product offers search, summaries or chat over your files, the text was parsed and stored separately from the original. Extracted text is easier to inspect in bulk than a PDF, and it is a second copy that your delete button does not necessarily address.
+4. **Backups and replicas.** Object storage is usually versioned, and snapshot cycles run on a schedule that has nothing to do with your account. Cross-region replication writes the object somewhere else again. Deleting often means a delete marker sits in front of older versions until the retention window expires.
+5. **Improvement and training settings.** Consumer tiers are frequently opted into "help us improve our services" by default, with a switch buried in settings; business plans more often exclude customer content by contract instead. Which one applies depends on your plan and on the terms in force on the day the data is used, which need not be the terms in force on the day you uploaded.
+6. **Moderation and support.** Most providers reserve the right to have staff or classifiers inspect content that automated systems flag. Support tickets are a second path: a file attached to a ticket usually lands in a separate system with its own retention policy.
+
+Nothing here requires anyone to be malicious. It is the ordinary shape of a hosted service, and it is why "we take privacy seriously" is not an answer to "can your staff read my file."
+
+## Upload is a copy, not a move
+
+The mental model most people carry is: *I moved my file there; if I delete it, it is only mine again.* The accurate model is: *a new copy now exists on someone else's disk, and my delete button removes one pointer to it.*
+
+Removing a document from a cloud account does not touch:
+
+- extracted text, thumbnails or previews generated earlier;
+- embeddings or search indexes built from it;
+- backup snapshots inside their retention window;
+- request log samples, if bodies are sampled;
+- attachments in support threads;
+- the copy your own browser cached while you were using the web app.
+
+The decision point is therefore not "should I delete this later," because that question cannot be reopened once the copy exists. It is "should this copy exist at all," which is answered at the moment of upload.
+
+There is a second consequence that gets less attention. Uploading is a legal act: you caused a copy of the content to be created on a third party's infrastructure. Inside a company that can be a data-processing event with its own obligations — a record, an assessment, a notification duty if something leaks. A tool that keeps files on the device never creates that event.
+
+## Reading a privacy claim
+
+Marketing language in this space converges on a few phrases. Four of them, translated:
+
+| Claim | What it usually means | What it does not mean |
+| --- | --- | --- |
+| Encrypted in transit and at rest | The pipe is TLS and the disk is encrypted | The operator cannot read your file — they hold the keys |
+| We do not train on your data | A policy, enforced by process | The architecture prevents it; policy can change with the next terms update |
+| Delete anytime | The pointer is removed from your view | Retained versions, replicas and derived text follow the provider's schedule |
+| Private by design | Usually access controls and least privilege | Anything about what leaves your machine on the wire |
+
+The only claim that survives scrutiny is one you can check. For a page that runs in your browser, checking is cheap.
+
+## Verifying it yourself in ten minutes
+
+Do this on the tool you already use. It requires no audit report and no source code.
+
+1. Open the tool in a fresh tab, press `F12`, open **Network**, and tick **Preserve log**.
+2. Reload and let the app initialise. A local tool shows a handful of first-party files (`html`, `js`, `wasm`, `css`) and, on first use, a model download — a `GET` whose path contains a model file name such as `bge-small-zh-v1.5`. Note the shape: file name, no document content.
+3. Add a document **while the panel is recording**. Sort by size and watch for a `POST` or `PUT` with a multi-megabyte body. That is what an upload looks like, and it cannot be hidden from this panel.
+4. Ask three or four questions. Retrieval here reads only the local index, so nothing new should appear. A remote generator would need one request per answer.
+5. Now cut the connection — set throttling to **Offline** in DevTools, or disable the adapter. Ask another question. Correct answers with citations while offline mean retrieval ran on your machine.
+6. Harden the check by wrapping the JavaScript APIs. In the console, before touching the app:
+
+   ```js
+   const _fetch = window.fetch;
+   window.fetch = (...a) => { console.log('fetch', a[0]); return _fetch(...a); };
+   const _open = XMLHttpRequest.prototype.open;
+   XMLHttpRequest.prototype.open = function (m, u, ...r) { console.log('xhr', m, u); return _open.call(this, m, u, ...r); };
+   const _beacon = navigator.sendBeacon?.bind(navigator);
+   navigator.sendBeacon = (u, d) => { console.log('beacon', u, d); return _beacon(u, d); };
+   ```
+
+   Every outbound call now prints a line. `sendBeacon` is worth watching because it survives page unload — it is the standard way to ship a payload quietly as a tab closes.
+7. For the whole picture rather than one tab, run the browser through a local proxy such as `mitmproxy` and read the session. Load a document and answer one question in a single pass; requests to analytics or font hosts appear as plainly as anything else.
+
+You are looking for a negative result: no request body containing your document, no `WebSocket` opened at question time, no beacon on unload. A genuinely local tool may still fetch an analytics script; the question that matters is whether your content leaves.
+
+## Where local processing is the wrong tool
+
+Escaping upload is not free, and pretending otherwise would be dishonest. The engine on this site runs in the tab, which imposes hard ceilings: one file up to 25 MB, up to 40 documents per library, 200 MB total, 20,000 text chunks per library, and 10 documents on a phone. Password-protected PDFs cannot be read, scans without a text layer have to be OCR'd first, and the legacy `.doc` format is rejected outright. If you need a shared index for a team, a versioned audit trail, or a library of several thousand scans, a hosted service does work a browser tab cannot.
+
+So the judgement is narrow. For a contract you are only reading, a medical note you are organising for yourself, interview material, or a salary spreadsheet, the copy is the risk and the local path costs you nothing but the setup. For a document forty colleagues must edit next week, the copy is a feature.
+
+## What to carry away
+
+The useful habit is not avoiding the cloud; it is noticing the moment a copy is created, because that is the only moment you have control over. After that, everything is somebody else's retention policy. Ask what leaves your machine before you hand over the file, and when the answer is "nothing but a model file name," the local option is not a compromise — it is simply the smaller risk.

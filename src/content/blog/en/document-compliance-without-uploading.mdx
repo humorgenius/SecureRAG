@@ -1,0 +1,96 @@
+---
+title: "Document Compliance Without Uploading"
+description: "What 'data never leaves the device' actually asserts, where that property fits and where it does not, the residual risks nobody mentions, and a question list for internal review."
+lang: "en"
+slug: "document-compliance-without-uploading"
+date: "2026-09-17"
+updated: "2026-09-17"
+minutes: 10
+author: "SecureRAG Team"
+faq:
+  - q: "Does local processing make me compliant?"
+    a: "No, and no tool can. It removes one specific event — content leaving the device to a third party — from the picture. Whether that changes your obligations depends on your rules, your jurisdiction and the data, which is a question for your own counsel."
+  - q: "What still leaves the machine?"
+    a: "Only the model weights request on first use: a GET whose path carries a file name, with no document content. Everything after that runs from the browser cache and works offline."
+related:
+  - "/security/"
+  - "/privacy/"
+  - "/use-cases/"
+  - "/compare/"
+---
+
+In a local-processing tool, "your documents never leave the device" is a statement about a mechanism, not a guarantee of compliance; conflating the two is how teams end up with a control they cannot describe. This page is about stating the fact precisely, deciding where it is useful, and knowing where it is not.
+
+## Say the mechanism, not the conclusion
+
+The verifiable claim is narrow and specific: during a session, the parsing, chunking, embedding, indexing, retrieval and answering all execute inside the browser tab; no document content is transmitted anywhere; the only outbound request is a first-use fetch of model weights, whose path contains a file name and no content, after which the app can run with the network switched off. Every part of that sentence can be checked on the wire with the network panel, and the check is repeatable by anyone.
+
+The unverifiable claim is "we are compliant." Compliance is a property of an organisation's obligations — a legal framework, a contract, an internal policy, an audit regime — and it depends on facts a browser tab cannot know: who the data subjects are, what consent exists, what retention rules apply, where the operator is established. A tool can make a compliance argument easier; it cannot make the argument for you, and any vendor who claims otherwise is selling a conclusion they cannot produce.
+
+So keep the two sentences apart in your own documents:
+
+| Statement | Type | Who can verify it |
+| --- | --- | --- |
+| "Document content is processed in the browser and never transmitted." | Technical fact | You, in the network panel, in ten minutes |
+| "This configuration satisfies [specific obligation]." | Assessment | Your compliance function, with your counsel's input |
+| "The tool is certified to [standard]." | Vendor claim | The certificate, scope and auditor — not the marketing page |
+
+## Where the property genuinely fits
+
+The property is worth having when the content is sensitive, the task is single-person lookup, and nobody else needs to see the document.
+
+| Situation | Does no-upload help? | Notes |
+| --- | --- | --- |
+| Reviewing a contract you received before signing | Yes | The counterparty's draft never lands on a third party's storage |
+| Organising your own medical records | Yes | Sensitive by category; the useful task is finding a value, not sharing it |
+| Reading interview or hiring materials as the interviewer | Yes | Candidate data stays on your device; no processor is introduced |
+| Checking a salary spreadsheet before a negotiation | Yes | Numbers, names, and no need for a shared index |
+| Personal study of a technical manual | Yes | Convenience, not obligation — the stakes are low either way |
+| Reviewing an incident report with sensitive logs | Yes, with care | Watch the OCR and extension caveats below |
+
+In these cases the local path removes a specific step from the process: no data-processing relationship is created for the content, no retention window starts, and no vendor becomes an additional party to consider. That is a defensible thing to write in an internal note, because it is checkable.
+
+## Where it is the wrong fit
+
+There are situations where the browser-only property is a defect rather than a feature, and it is better to say so plainly than to stretch the tool:
+
+- **Sharing.** A colleague cannot open your local library; there is no link to send. If the workflow is "circulate this to the team," a hosted service does it and a tab does not.
+- **Audit trails.** A local index produces no server-side read log. If an obligation requires demonstrating who accessed what and when, a client-side tool cannot produce that evidence.
+- **Collaboration and versioning.** No concurrent editing, no shared annotations, no central "latest version."
+- **Legal hold and e-discovery.** Preservation duties are about controlled, centrally-managed copies. A local cache is the opposite of what a hold requires.
+- **Scale.** One file up to 25 MB, up to 40 documents per library, 200 MB total, 20,000 chunks, and 10 documents on a phone. A corpus of thousands of scans is not a browser workload.
+- **Unattended processing.** Anything that must run on a schedule, on a server, without a person present.
+
+The honest summary: local processing is for reading, not for collaborating. If the workflow needs three of the bullets above, this is the wrong tool and no configuration changes that.
+
+## Residual risks that survive "no upload"
+
+The claim "the file never leaves your device" is true and also easy to over-read. These are the paths by which content can still spread:
+
+- **OCR.** If you scanned a contract and ran it through an OCR service before importing, the text left your machine at that step. The local tool never saw the scan; it saw the result. Do OCR locally, and check what the OCR tool itself sends.
+- **Browser extensions.** An extension with the "read and change all your data on all websites" permission can read the page, including rendered document text. Audit your extensions on the machine you use for sensitive material — or use a clean profile.
+- **Shared and public computers.** A local index lives in the browser's storage on that machine. On a shared machine, clear site data when you finish, or do not process the document there. On a library or hotel computer, assume nothing is private.
+- **Clipboard and screenshots.** Copying an answer into a chat app, a ticketing system or an email moves the content out — that is a manual exfiltration path no architecture can close.
+- **Operating-system and browser sync.** Some browsers sync storage or open tabs across devices on the same account. Session restore, screenshots in the OS's "recent files," or an OS-level file indexer can also turn up traces.
+- **The original file's location.** If the document itself sits in a synced folder, the whole question is moot: a copy already exists elsewhere before you open it.
+
+None of these argue against local processing. They argue for describing it accurately: it closes one channel, the largest one, and leaves the ones that depend on your own behaviour.
+
+## A question list for internal review
+
+These are the questions worth asking before anyone signs off on using a browser-based tool for real material. Answer them in writing; a blank answer is an answer.
+
+1. **What exactly leaves the machine, and when?** Get the specific request — the model weights GET on first use — and the statement that no document content is transmitted.
+2. **Can we reproduce that check ourselves?** Ask for the network-panel procedure and run it on our own network. Refusal to provide one is a finding.
+3. **Where is the data stored between sessions?** For this tool: the browser's local storage on the device, cleared by clearing site data. Confirm it is not a synced profile.
+4. **What is the retention period of anything retained?** If documents persist locally, they persist until deleted on that device. On a hosted alternative, get the number in writing.
+5. **Who can read the content?** Locally: anyone with access to the unlocked device. Remotely: your own access controls and physical security decide.
+6. **What happens on a shared or borrowed device?** Define a clearing procedure, or prohibit use there.
+7. **Which data categories are involved?** Special-category data has stricter rules in most frameworks; check whether that classification changes the answer.
+8. **What other tools touch the same document?** OCR, converters, screenshot tools, extensions, mail attachments. List them; that is where the real gaps usually are.
+9. **What does the hosted alternative we are replacing actually do with uploads?** Read the current terms, including the training and retention clauses, and date the answer.
+10. **Who owns the residual risk?** Name a role, not a team.
+
+## What this page is not
+
+This is a description of an architecture and a set of questions to ask. It is not legal advice, and nothing in it should be read as a determination that a particular use of a particular document is permitted or prohibited in your jurisdiction. That judgement needs your own counsel and your own facts. What this page can do is make one input to that judgement precise: with a local-processing tool, the document does not leave the device, and you can verify that statement yourself rather than taking it on trust.

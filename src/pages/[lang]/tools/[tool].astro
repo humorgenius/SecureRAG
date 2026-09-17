@@ -1,0 +1,228 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
+import AdSlot from '../../../components/marketing/AdSlot.astro';
+import JsonLd from '../../../components/seo/JsonLd.astro';
+import PrivacyBadge from '../../../components/marketing/PrivacyBadge.astro';
+import Tools, { type ToolId } from '../../../components/app/Tools';
+import { t, localizePath, type Lang } from '../../../i18n/utils';
+import { breadcrumbSchema, orgSchema, softwareAppSchema } from '../../../lib/seo/schema';
+
+export function getStaticPaths() {
+  // Declared inside the function on purpose: Astro hoists getStaticPaths into its own
+  // prerender chunk, where top-level frontmatter constants are not in scope.
+  const slugs: ToolId[] = ['pdf-text', 'token-counter', 'chunk-preview'];
+  return ['en', 'zh'].flatMap((lang) => slugs.map((tool) => ({ params: { lang, tool } })));
+}
+
+const { lang: langParam, tool } = Astro.params as { lang: string; tool: ToolId };
+const lang: Lang = langParam === 'zh' ? 'zh' : 'en';
+
+const COPY: Record<ToolId, Record<'en' | 'zh', { title: string; description: string; h1: string; intro: string; points: string[] }>> = {
+  'pdf-text': {
+    en: {
+      title: 'PDF text extractor — in your browser, no upload · SecureRAG',
+      description:
+        'Extract text from a PDF locally with PDF.js and see the character count per page. Copy it or download a .txt. Nothing is uploaded and no account is needed.',
+      h1: 'Pull the text out of a PDF, page by page',
+      intro:
+        'PDF.js runs inside this tab and reads the file you drop. You get the text per page with character counts, a copy button and a .txt download.',
+      points: [
+        'Password-protected PDFs stop with a clear message instead of an empty result.',
+        'A scan with no text layer is reported as such — that file needs OCR before any search can find it.',
+        'Reading stops after 300 pages to keep the tab responsive.',
+        'The file is read into memory only. Close the tab and it is gone.',
+      ],
+    },
+    zh: {
+      title: 'PDF 取文字——浏览器内完成，不上传 · SecureRAG',
+      description:
+        '用 PDF.js 在本机抽出 PDF 文字，逐页显示字符数，可复制或下载 .txt。不上传文件，不需要账号，也不用下载模型。',
+      h1: '把 PDF 的文字逐页取出来',
+      intro:
+        'PDF.js 在这个标签页内读取你拖进来的文件，并给出每页的文字与字符数、复制按钮和 .txt 下载。',
+      points: [
+        '加密 PDF 会明确报错，而不是给你一个空结果。',
+        '没有文字层的扫描件会被告知是扫描件——这种文件必须先做 OCR 才能被检索。',
+        '超过 300 页停止读取，避免标签页卡死。',
+        '文件只读进内存。关掉标签页就没了。',
+      ],
+    },
+  },
+  'token-counter': {
+    en: {
+      title: 'Token and length counter for prompts · SecureRAG',
+      description:
+        'Count characters, CJK characters, words and UTF-8 bytes, and estimate LLM token cost — entirely in your browser with nothing uploaded and no signup.',
+      h1: 'Count characters, CJK glyphs and tokens before you spend them',
+      intro:
+        'Paste text or drop a file. You get character, CJK, word and byte counts plus an estimated token cost and how many 700-character chunks it would become.',
+      points: [
+        'CJK glyphs and Latin words are counted separately, because their token ratios differ by roughly 2.7x.',
+        'The token figure is an estimate (about 4 characters per token for Latin, 1.5 for CJK) — real tokenizers differ per model.',
+        'The chunk count uses the same 700-character / 15% overlap setting as the search tool.',
+        'Everything runs in the page; no request leaves the tab.',
+      ],
+    },
+    zh: {
+      title: '提示词 token 与长度统计 · SecureRAG',
+      description:
+        '统计字符、汉字、单词与 UTF-8 字节数，并估算大模型 token 用量。全程在浏览器内完成，不上传、不注册。',
+      h1: '先算清楚字符和 token，再花出去',
+      intro:
+        '粘贴文本或拖入文件，得到字符数、汉字数、单词数、字节数，以及 token 估算值和按 700 字符会切成多少块。',
+      points: [
+        '汉字和拉丁单词分开计数，因为两者与 token 的换算比例差了大约 2.7 倍。',
+        'token 是估算值（拉丁文本约 4 字符一个、汉字约 1.5 字符一个），真实分词器因模型而异。',
+        '分块数用的是与检索工具相同的 700 字符 / 15% 重叠设置。',
+        '全部在页面内运行，没有任何请求离开这个标签页。',
+      ],
+    },
+  },
+  'chunk-preview': {
+    en: {
+      title: 'Chunking preview — see how your text gets split · SecureRAG',
+      description:
+        'Paste text and watch the exact chunker the search tool uses split it: chunk count, average length, heading paths and the characters carried between chunks.',
+      h1: 'See exactly how your text will be split',
+      intro:
+        'This page runs the same chunker as the document tool — structure-aware splitting on headings, paragraphs and sentence boundaries, with overlap. Move the sliders to see the trade-off.',
+      points: [
+        'Headings, tables and code fences are kept with their content instead of being cut in half.',
+        'Overlap carries the tail sentences of one chunk into the next, which is what keeps a definition and its exception clause retrievable together.',
+        'The chunk size and overlap here are the real engine defaults (700 characters, 15%), not a mock.',
+        'Nothing is uploaded, and no model is needed for this tool.',
+      ],
+    },
+    zh: {
+      title: '分块预览——看清文本会被怎么切 · SecureRAG',
+      description:
+        '粘贴文本，用与检索工具完全相同的分块引擎切分它：块数、平均长度、标题层级，以及相邻块之间重叠的字符。',
+      h1: '看清你的文本会被怎么切分',
+      intro:
+        '这个页面跑的就是文档工具用的那套分块引擎——按标题、段落、句子边界做结构感知切分，并保留重叠。拖动滑块能看到取舍。',
+      points: [
+        '标题、表格和代码块会跟着内容走，不会被从中间切断。',
+        '重叠会把上一块的末尾句子带进下一块，这样"定义"和它的"例外条款"才不至于被切散。',
+        '这里的块大小与重叠就是引擎的真实默认值（700 字符、15%），不是演示假数据。',
+        '不上传任何内容，这个工具也不需要模型。',
+      ],
+    },
+  },
+};
+
+const c = COPY[tool][lang];
+const path = `/${lang}/tools/${tool}/`;
+const crumbsList = [
+  { name: t(lang, 'common.home'), path: localizePath(lang, '/') },
+  { name: t(lang, 'nav.tools'), path: localizePath(lang, '/tools/') },
+  { name: c.h1, path },
+];
+---
+
+<BaseLayout lang={lang} path={path} title={c.title} description={c.description}>
+  <Breadcrumbs items={crumbsList} />
+
+  <section class="wrap">
+    <header class="head">
+      <p class="eyebrow">{t(lang, 'nav.tools')}</p>
+      <h1>{c.h1}</h1>
+      <p class="lede">{c.intro}</p>
+    </header>
+
+    <div class="promise">
+      <PrivacyBadge lang={lang} variant="light" />
+    </div>
+
+    <div class="island">
+      <Tools client:only="preact" tool={tool} lang={lang} />
+    </div>
+
+    <section class="notes">
+      <h2>{t(lang, 'common.readMore')}</h2>
+      <ul>
+        {c.points.map((point) => (
+          <li>{point}</li>
+        ))}
+      </ul>
+      <p class="fine">
+        <a href={localizePath(lang, '/app/')}>{t(lang, 'cta.open')} →</a>
+      </p>
+    </section>
+
+    <AdSlot lang={lang} />
+  </section>
+
+  <JsonLd
+    data={[
+      orgSchema(lang),
+      softwareAppSchema(lang),
+      softwareAppSchema(lang, { name: c.h1, description: c.description, path }),
+      breadcrumbSchema(crumbsList),
+    ]}
+  />
+</BaseLayout>
+
+<style>
+  .head {
+    padding-top: 26px;
+  }
+  h1 {
+    font-size: clamp(26px, 3.4vw, 38px);
+    letter-spacing: -.03em;
+    max-width: 26ch;
+  }
+  .lede {
+    margin-top: 16px;
+  }
+  .eyebrow {
+    margin-bottom: 12px;
+  }
+  .promise {
+    margin-top: 20px;
+  }
+  .island {
+    margin-top: 24px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-l);
+    box-shadow: var(--sh-1);
+    padding: 22px;
+  }
+  .notes {
+    margin-top: 34px;
+  }
+  .notes h2 {
+    font-size: 15px;
+    margin-bottom: 14px;
+  }
+  .notes ul {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 74ch;
+  }
+  .notes li {
+    position: relative;
+    padding-left: 22px;
+    font-size: 14.8px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+  .notes li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--blue);
+  }
+  .fine {
+    margin-top: 18px;
+    font-size: 14px;
+    font-weight: 650;
+    color: var(--blue-d);
+  }
+</style>

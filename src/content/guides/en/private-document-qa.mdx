@@ -1,0 +1,116 @@
+---
+title: "Prove your documents never leave your browser"
+description: "A five-minute DevTools check that shows your files stay on your device, the setups that look private but are not, and the cases that still need a human reader."
+lang: "en"
+slug: "private-document-qa"
+date: "2026-09-17"
+updated: "2026-09-17"
+minutes: 9
+author: "SecureRAG Team"
+faq:
+  - q: "Does my file name or its content appear in the model download request?"
+    a: "No. The request is an ordinary HTTPS GET for a file such as model.onnx or tokenizer.json. There is no request body, no query string carrying your text, and your document name is never part of the URL."
+  - q: "Why do I see requests to Google domains after I accept ads?"
+    a: "The ad script is the only third-party code, and it is injected after you press Accept. Decline the banner and no ad domain appears at all. The ad frame receives no document text, no chunks and no questions."
+  - q: "Is the check still meaningful if I have browser extensions installed?"
+    a: "It is weaker. An extension with host permissions can read and send page content on its own. For a clean audit, repeat the check in a browser profile with no extensions enabled."
+  - q: "Can the people running this site read my documents?"
+    a: "There is no server that receives them and no account attached to you. The only party who can read the library on your machine is whoever can sign in to that browser profile."
+steps:
+  - title: "Open the app and the developer tools"
+    text: "Go to the app page, then press F12 in Chrome, Edge or Firefox, or Option+Command+I in Safari."
+  - title: "Clear the Network log"
+    text: "Switch to the Network tab and press the clear button so the list starts empty. Leave the panel open for the rest of the check."
+  - title: "Add one document"
+    text: "Drag a single PDF, DOCX, TXT or Markdown file into the drop area and wait until its status badge shows that indexing has finished."
+  - title: "Ask a question"
+    text: "Type a question whose answer is inside that file, and wait for the answer and its numbered citations."
+  - title: "Read the request list"
+    text: "On a first-ever visit you should see model weight downloads from one public model host. Every other entry should be a file served from this site."
+  - title: "Go offline and ask again"
+    text: "Set the throttling dropdown to Offline and repeat the question. The answer still appears, because retrieval and answering run locally."
+  - title: "Inspect the storage, then erase it"
+    text: "Open the Application tab, look at IndexedDB and Cache Storage, then press Clear site data. Reload and the library is gone, with no copy left behind."
+related:
+  - "/security/"
+  - "/privacy/"
+  - "/how-it-works/"
+  - "/models/"
+---
+
+Documents stay on your device when the browser never places them in a request body. The honest test is your own network log, not a badge printed on the page. What follows is the five-minute check, the shape of the single outbound request you should expect, three setups that feel private while shipping files elsewhere, and the cases where a person still has to read the answer.
+
+## Why a browser-only design makes the check worth running
+
+This site is a static bundle. The HTML, the CSS, the JavaScript and the ONNX runtime that executes the embedding model are ordinary files you fetch once and then keep. No API endpoint accepts a document, there is no queue, no server-side worker, and no database row holding your text. The parsers for PDF, Word, Markdown, CSV and HTML are compiled into the page, so opening a file is a local function call rather than a round trip.
+
+An upload path, if one existed, would be unmistakable in a network log: a POST carrying megabytes of body, a filename sitting in the URL, a streaming progress request that keeps talking while the file travels. Removing the path is a stronger position than promising not to use it, and it is the reason a two-minute look at the log settles the question.
+
+If you want the mechanics instead of the audit, the pipeline is documented on the how-it-works page: format detection by magic bytes, text extraction that keeps page numbers for PDFs and heading levels for Word files, cleaning that drops repeated headers and footers, chunking at roughly 700 characters with 15 percent overlap, local vectorisation, then hybrid retrieval. Every one of those steps runs in the tab you are looking at.
+
+## Step by step: reading the log while you work
+
+Use a desktop browser. Chrome, Edge, Firefox and Safari released in the last two years all behave the same way here.
+
+1. Open the app page and press F12 (Chrome, Edge, Firefox) or Option+Command+I (Safari).
+2. Go to the **Network** tab and press the clear button, so the list starts empty. Leave the panel open.
+3. Drag one PDF, DOCX, Markdown or plain-text file onto the drop area and wait for its status badge to confirm that indexing finished.
+4. Ask a question whose answer sits inside that file. Wait for the answer and its numbered citations.
+5. Read the list now. On a first-ever visit you will see the model download. On any later visit there is nothing to see.
+6. Set the throttling dropdown to **Offline** and ask a second question.
+7. Open the **Application** tab, look at IndexedDB and Cache Storage, then press **Clear site data** and reload.
+
+The table below is what each phase should look like, so you can compare against your own screen rather than take our word for it.
+
+| Stage of the check | What the Network tab shows | What it means |
+| --- | --- | --- |
+| Page load | HTML, CSS, JavaScript and the ONNX runtime files under `/ort/`, all from this site's own domain | The application shell. No document is in play yet. |
+| You drop a 3 MB PDF | Nothing new | The file is read into memory through the browser's own file picker. |
+| Very first question on a first visit | One or more GETs to a public model host such as HuggingFace or a mirror, for files like `model.onnx` and `tokenizer.json`, together around 25 MB | Model weights requested by name. No part of your PDF appears in the request or its URL. |
+| Any later question | Nothing | The weights are served from Cache Storage inside your browser profile. |
+| Offline mode, question repeated | Nothing, and an answer still appears | Embedding, retrieval and the extractive answer need no network. |
+| Clear site data, then reload | The model download appears again, around 25 MB | You deleted it. Nothing was retained on our side to restore it from. |
+
+## What the one outbound request actually contains
+
+The request is a plain HTTPS GET. Its path names a file inside a public model repository, such as the weights and the tokenizer for a small embedding model. There is no request body. The response is a binary blob of numbers. The list of files is fixed before you ever pick a document, which is why nothing about your library can leak into it — the request is assembled from a constant, not from your content.
+
+Sizes are small because the default tier is deliberately small. Chinese document libraries use a model of roughly 25 MB; English ones use roughly 23 MB; a mixed Chinese and English library can switch to a multilingual model of about 120 MB. Switching is manual, and the download panel states the figure before anything starts.
+
+The optional generative tier is a separate and much larger purchase of bandwidth: 400 MB for the small model that runs on the processor, or about 1.0 GB for the larger one used when WebGPU is available. It begins only after you confirm a dialog that names the model and the size. If you never open that panel, that request never happens, and the extractive answer mode still works.
+
+## Three setups that feel private but move your files
+
+Private-feeling is not the same as private. These four arrangements are common in real document work, and each one has a place where the bytes travel.
+
+| What it looks like | Why it feels safe | Where the document actually goes |
+| --- | --- | --- |
+| A PDF or document reader browser extension | It runs inside the browser, next to your files | Extensions hold host permissions and can issue their own requests. A marketplace review is a policy, not a technical limit. If it can send, your file can leave. |
+| A web viewer, or an online convert-to-text page | The preview renders in a tab, so the file appears to have stayed put | Rendering needs the bytes on a server. The upload happens before the preview appears on your screen. |
+| Cloud OCR for a scanned page | Recognising text sounds mechanical and local | Recognition runs on someone else's hardware. The page image leaves your device, and the provider's retention policy decides what happens next. |
+| A desktop app with an account and a sync folder | It is installed, so it feels self-contained | An account and a sync folder imply a server copy under your login. Deleting the local folder does not delete that copy. |
+
+None of these is automatically wrong. A shared team workspace has reasons to exist, and a cloud OCR service can be the right tool when a vendor contract and a data processing agreement cover it. The failure mode is using one of them while believing you are using something else. If the document matters, either pick a tool whose architecture has no upload path, or accept the trade with your eyes open.
+
+## Honest limits of this particular check
+
+The audit proves something about one page at one moment.
+
+- It says nothing about other tools, other sites, or a different browser build.
+- Advertising pays for this site. The ad script is injected only after you press Accept, and from that point you will see requests to Google ad domains in the log. Decline the banner and the log stays free of them. The ad frame receives no document text, no chunks and no questions, but the requests are genuinely there — which is exactly why you should run the check before accepting, or with your choice set to essential only.
+- Extensions and injected scripts share the page with the tool. For a strict audit, use a fresh browser profile with no extensions enabled and no other tabs open.
+- We cannot audit anyone else's software for you. Where we describe another category of tool, we describe the general shape of how it works, and you should confirm the specifics in that vendor's own documentation and your own network log.
+- The storage itself is not encrypted by the application. Chunks and vectors sit in IndexedDB, model weights sit in Cache Storage, and what protects them is your operating system's disk encryption and your browser profile, or the absence of both.
+
+## When a person still has to read the answer
+
+The default answer mode is extractive: it picks sentences out of your chunks and tags them with `[1]`, `[2]` markers. That makes the answer traceable. It does not make it correct, and it does not make it yours to act on without reading.
+
+Four situations deserve that extra pass.
+
+1. **Numbers with consequences.** Dosages, tax rates, tolerance values, contractual dates. Click the citation and read the paragraph in the source, not the summary line.
+2. **Answers that depend on something you did not import.** A missing annex produces a confident-looking answer built from an incomplete library. The tool cannot tell you what is absent from a folder you never gave it.
+3. **Contradictions between documents.** When two files disagree, retrieval returns both and the answer may present them side by side. Deciding which one applies to your case is a judgement call about your situation, not a retrieval problem.
+4. **Questions at the edge of the material.** The relevance gate treats a question as out of scope when the best dense score falls below 0.25 and the best keyword score falls below 2.0. In strict mode the answer is then a straight refusal. That refusal is the designed behaviour, and it is often a prompt to rephrase using the vocabulary of the document rather than proof that the answer is missing.
+
+Treat the tool as a fast, private index that always shows its sources. The reading, and the decision, stay with you.

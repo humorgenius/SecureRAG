@@ -1,0 +1,119 @@
+---
+title: "Browser and hardware requirements, with real numbers"
+description: "Which browsers work, what WebGPU changes, a memory estimate you can apply to your own library before importing, the reduced mobile limits, and generation speed without a GPU."
+lang: "en"
+slug: "browser-hardware-requirements"
+date: "2026-09-17"
+updated: "2026-09-17"
+minutes: 9
+author: "SecureRAG Team"
+faq:
+  - q: "Which browsers are supported?"
+    a: "Chrome, Edge, Firefox and Safari releases from the last two years. Recent versions are the ones tested, because the tool depends on features such as WebAssembly with threads, workers and IndexedDB behaviour that older engines implement differently or not at all."
+  - q: "What actually breaks without WebGPU?"
+    a: "Only the optional generative tier slows down. Vectorisation, retrieval and the extractive answer run on the processor through WebAssembly, so a machine with no WebGPU still answers questions at normal speed."
+  - q: "How much memory do I need for a large library?"
+    a: "A library at the full 20,000-chunk limit costs roughly 30 MB of vector storage and tens of megabytes of text, which is small. The larger costs are the runtime working set and, if you enable it, a generative model of 400 MB or 1.0 GB. A machine with 8 GB of RAM is comfortable."
+  - q: "Why can I only add 10 files on my phone?"
+    a: "Mobile browsers enforce much tighter memory limits per tab, and a batch of 40 files pushes the tab into a state where the browser discards it. The reduced limit is a guard rail against losing work, not a performance tweak."
+related:
+  - "/models/"
+  - "/app/"
+  - "/compare/"
+  - "/use-cases/"
+---
+
+Everything runs in one browser tab, so the practical requirements are three: a browser from roughly the last two years, enough memory for the runtime plus your index, and a few tens of megabytes of cache for the embedding model. WebGPU is a speed feature for the optional generative model, and it changes nothing about retrieval.
+
+## What the browser has to support
+
+Four engines, each needing a handful of capabilities: WebAssembly with threads, Web Workers, IndexedDB, the Cache API, and a service worker.
+
+| Browser | Recent releases | Notes |
+| --- | --- | --- |
+| Chrome | Yes | The default test environment. WebGPU support on desktop and on newer Android hardware |
+| Edge | Yes | Chromium engine, behaves as Chrome does |
+| Firefox | Yes | Full support for the light tier. WebGPU availability arrived later than in Chromium and varies by platform |
+| Safari | Yes, on macOS and iOS | Runs the light tier. Memory limits on iOS are the binding constraint, more so than the API surface |
+
+Specific version numbers are deliberately absent. Engine capabilities land at different times across platforms and the safe statement is the tested one: releases from the last two years, on a desktop operating system, handle the light tier without caveats. If your browser is older than that, the failure is usually obvious and immediate — the model fails to initialise, or the worker never starts — rather than silent.
+
+Nothing here needs a plugin, a native installer or administrator rights. The site is a set of static files, and the only code it runs is the code you received from it.
+
+## WebGPU, and what changes without it
+
+WebGPU is an API that lets a page submit computation to the graphics processor. When it is available, the embedding step and the optional generative model use it. When it is not, both fall back to WebAssembly running on the processor with SIMD and multiple threads.
+
+The difference shows up in exactly one place that users notice.
+
+| Task | With WebGPU | Without it |
+| --- | --- | --- |
+| Adding a document and building the index | Faster, but a few hundred chunks of difference is measured in seconds either way | Fully functional, just slower |
+| Asking a question (vectorise the question, search, extract the answer) | Milliseconds | Milliseconds |
+| Generating an answer with the optional model | Interactive, tens of tokens per second on desktop hardware | A few tokens per second, usable for short answers |
+
+Notice that the middle row is the one people care about. A normal question does not run a language model; it embeds a short question, runs a hybrid search and selects sentences. That path is fast enough on the processor that WebGPU is irrelevant to it. Our own test machine pairs Chrome with a Radeon RX 580, a card without WebGPU support, and the light tier is the mode actually used day to day.
+
+You can check what your browser reports by opening the console and evaluating `navigator.gpu`. A value rather than undefined means the API exists; whether it is suitable is a separate question that the tool answers by trying and falling back.
+
+## Estimating memory before you import
+
+The numbers here are small, and it helps to see them laid out, because the honest surprise is that the index is not what fills memory.
+
+| Item | Rough cost | Notes |
+| --- | --- | --- |
+| Embedding model weights plus runtime working set | Plan a few hundred megabytes of headroom | The download is about 23 MB or 25 MB, but the runtime keeps working buffers alongside the weights |
+| Chunk text | 1,000 chunks is roughly 0.7 MB of English text, or about 2 MB of Chinese text at three bytes per character | Default chunking is around 700 characters with 15 percent overlap |
+| Vectors | about 1.5 MB per 1,000 chunks | Fixed-size floats, stored alongside the index |
+| Keyword index | A fraction of the text size | Word and bigram statistics for the keyword half of the search |
+| Optional generative model | 400 MB for the processor-friendly model, about 1.0 GB for the WebGPU one | Disk for the weights, plus working memory while running |
+
+A worked example makes the scale concrete. A library at the full limit of 20,000 chunks, which is roughly twenty documents of a thousand chunks each:
+
+| Component | At 20,000 chunks |
+| --- | --- |
+| Vector storage | about 30 MB |
+| Chunk text, English | about 14 MB |
+| Chunk text, Chinese | about 42 MB |
+| Keyword index | a few megabytes |
+| Model and runtime | a few hundred megabytes of headroom |
+| Total, light tier | comfortably under 1 GB |
+
+The practical ceiling is not disk and it is not the index. It is the browser tab, and the failure mode when you exceed it is that the tab is discarded and you lose the session. A machine with 4 GB of RAM handles the light tier; 8 GB is comfortable; a library much larger than the documented cap is refused up front for the same reason, with the specific file named.
+
+## Phones and tablets run with tighter limits
+
+| Limit | Desktop | Mobile |
+| --- | --- | --- |
+| Files per library | 40 | 10 |
+| Single file | 25 MB | 25 MB |
+| Total size | 200 MB | 200 MB |
+| Chunks per library | 20,000 | 20,000 |
+
+The reduced file count is the number to plan around. Mobile browsers give a tab far less memory than a desktop browser does, and the penalty for exceeding it is not a slow page — it is a page that vanishes, taking an in-progress import with it. Ten files keeps a session inside the budget that phones actually grant.
+
+Two more things change on a phone. Holding the tab open matters: switching apps for long enough can cause the browser to discard the page, and a re-import is the cost. And the generative tier is impractical on a phone even when the browser reports WebGPU, because the weights are a large fraction of the device's free storage and the memory available to a tab is smaller than the model's working set.
+
+## What generation looks like without a GPU
+
+The optional generative tier has one honest limitation, and it is speed rather than capability.
+
+| Engine | Model | Download | Typical speed | Realistic use |
+| --- | --- | --- | --- | --- |
+| WebGPU | Qwen2.5 1.5B, 4-bit | about 1.0 GB | Tens of tokens per second on desktop graphics | Conversational follow-ups, short summaries |
+| Processor fallback | Qwen2.5 0.5B, 4-bit | about 400 MB | Roughly 3 to 8 tokens per second | Short answers, patience required |
+
+At 3 to 8 tokens per second, a two-hundred-token answer takes between twenty-five seconds and a little over a minute. That is slow enough that you should want it before you enable it, and the interface says so rather than pretending otherwise. The download also has to complete before the first generated answer, and it starts only after a confirmation that names the model and its size.
+
+The tier is optional for a reason. The default answer mode is extractive — it selects sentences from the retrieved chunks and attaches numbered citations — and it runs at interactive speed on any supported browser, with or without a GPU. Generation changes the shape of the prose, not the evidence underneath it.
+
+## Reading these numbers against your own machine
+
+A short decision path:
+
+1. **Just want answers with citations.** Any supported browser, light tier, no WebGPU. This is the tested default.
+2. **Documents mix Chinese and English in one library.** Same as above, with the multilingual model at about 120 MB, and a re-index when you switch.
+3. **Want paraphrased answers rather than quoted sentences.** Enable the generative tier. Expect about 400 MB on a processor-only machine, or about 1.0 GB with WebGPU, and expect the processor path to be slow rather than broken.
+4. **Working on a phone.** Keep to ten files, stay on the light tier, and expect to re-import if the browser discards the tab.
+
+Where the answer is "it depends", the dependency is almost always the optional model rather than the core engine. Retrieval was designed to run on modest hardware, and it is the part you can count on everywhere.

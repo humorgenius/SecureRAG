@@ -1,0 +1,178 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
+import AdSlot from '../../../components/marketing/AdSlot.astro';
+import JsonLd from '../../../components/seo/JsonLd.astro';
+import { t, localizePath, type Lang } from '../../../i18n/utils';
+import { articleSchema, breadcrumbSchema, faqSchema, orgSchema } from '../../../lib/seo/schema';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('blog');
+  return entries.map((entry) => ({
+    params: { lang: entry.data.lang, slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { lang: langParam } = Astro.params as { lang: string; slug: string };
+const lang: Lang = langParam === 'zh' ? 'zh' : 'en';
+const { Content } = await render(entry);
+
+const path = `/${lang}/blog/${entry.data.slug}/`;
+const crumbs = [
+  { name: t(lang, 'common.home'), path: localizePath(lang, '/') },
+  { name: t(lang, 'nav.blog'), path: localizePath(lang, '/blog/') },
+  { name: entry.data.title, path },
+];
+
+const toc = [...entry.body.matchAll(/^##\s+(.+)$/gm)].map((m, i) => ({ id: `h-${i + 1}`, text: m[1].trim() }));
+
+const siblings = (await getCollection('blog'))
+  .filter((e) => e.data.lang === lang)
+  .sort((a, b) => (a.data.date < b.data.date ? 1 : -1));
+const index = siblings.findIndex((e) => e.data.slug === entry.data.slug);
+const next = siblings[index + 1];
+const prev = siblings[index - 1];
+
+const schema: Record<string, unknown>[] = [
+  orgSchema(lang),
+  articleSchema({
+    lang,
+    title: entry.data.title,
+    description: entry.data.description,
+    path,
+    datePublished: entry.data.date,
+    dateModified: entry.data.updated,
+    author: entry.data.author,
+  }),
+];
+if (entry.data.faq?.length) schema.push(faqSchema(entry.data.faq));
+schema.push(breadcrumbSchema(crumbs));
+---
+
+<BaseLayout lang={lang} path={path} title={`${entry.data.title} · SecureRAG`} description={entry.data.description} type="article">
+  <Breadcrumbs items={crumbs} />
+
+  <article class="wrap layout">
+    <div class="main">
+      <header class="head">
+        <h1>{entry.data.title}</h1>
+        <p class="lede">{entry.data.description}</p>
+        <p class="stamp">
+          {t(lang, 'common.by')} {entry.data.author} · <time datetime={entry.data.date}>{entry.data.date}</time> ·{' '}
+          {entry.data.minutes} {t(lang, 'common.minutes')}
+        </p>
+      </header>
+
+      <div class="prose">
+        <Content />
+      </div>
+
+      <AdSlot lang={lang} />
+
+      <nav class="pager" aria-label="Blog">
+        {prev && <a href={localizePath(lang, `/blog/${prev.data.slug}/`)}>← {prev.data.title}</a>}
+        {next && <a class="right" href={localizePath(lang, `/blog/${next.data.slug}/`)}>{next.data.title} →</a>}
+      </nav>
+    </div>
+
+    {
+      toc.length > 2 && (
+        <nav class="toc" aria-label={t(lang, 'common.onThisPage')}>
+          <p>{t(lang, 'common.onThisPage')}</p>
+          <ol>
+            {toc.map((item) => (
+              <li>
+                <a href={`#${item.id}`}>{item.text}</a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+  </article>
+
+  <JsonLd data={schema} />
+</BaseLayout>
+
+<style>
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 56px;
+    align-items: start;
+    padding-top: 22px;
+  }
+  .main {
+    min-width: 0;
+  }
+  h1 {
+    font-size: clamp(28px, 3.6vw, 42px);
+    letter-spacing: -.03em;
+    max-width: 24ch;
+  }
+  .lede {
+    margin-top: 16px;
+    font-size: 17px;
+    line-height: 1.72;
+    color: var(--muted);
+    max-width: 66ch;
+  }
+  .stamp {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--muted-2);
+  }
+  .prose {
+    margin-top: 8px;
+  }
+  .pager {
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    margin-top: 40px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--blue-d);
+  }
+  .pager .right {
+    margin-left: auto;
+    text-align: right;
+  }
+  .toc {
+    position: sticky;
+    top: 88px;
+    font-size: 13.5px;
+  }
+  .toc p {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+    margin-bottom: 12px;
+  }
+  .toc ol {
+    border-left: 1px solid var(--line);
+    padding-left: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .toc a {
+    color: var(--muted);
+  }
+  @media (max-width: 1020px) {
+    .layout {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .toc {
+      display: none;
+    }
+  }
+</style>

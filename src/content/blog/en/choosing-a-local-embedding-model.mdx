@@ -1,0 +1,105 @@
+---
+title: "Choosing a Local Embedding Model"
+description: "Three embedding models, three different trade-offs: 25 MB Chinese-first, 23 MB English-first, 120 MB bilingual — plus what q8 quantisation costs and when an index must be rebuilt."
+lang: "en"
+slug: "choosing-a-local-embedding-model"
+date: "2026-09-08"
+updated: "2026-09-08"
+minutes: 9
+author: "SecureRAG Team"
+faq:
+  - q: "Do I have to pick a model before adding documents?"
+    a: "Yes in practice. Vectors from two different models are not comparable, so switching after a library is indexed forces a re-embed of every chunk."
+  - q: "Why is the bilingual model five times larger?"
+    a: "It carries a much bigger vocabulary and a multilingual text encoder. 120 MB against 23–25 MB buys cross-language matching, which the small monolingual models simply do not have."
+  - q: "Does a bigger embedding model mean better answers?"
+    a: "Not by itself. Retrieval quality depends more on how the document was split than on the last few points of embedding quality."
+related:
+  - "/models/"
+  - "/how-it-works/"
+  - "/app/"
+  - "/guides/"
+---
+
+A local embedding model turns each text chunk into a fixed-length list of numbers, and the choice of model decides which questions will find which passages. The three tiers here are 25 MB Chinese-first, 23 MB English-first, and 120 MB bilingual; picking between them is mostly a question of language mix, not raw quality.
+
+## Why the model matters more than it looks
+
+Embedding is the step that makes search work on meaning rather than on exact words. Every chunk of your document is passed through a small neural network that outputs a vector — 384 or 512 floating-point numbers in the models used here — and the vectors are stored in the browser's IndexedDB alongside the chunk text. Because the vectors are L2-normalised on the way out, comparing two of them is a dot product and nothing more.
+
+Two consequences follow from that design:
+
+- **The model is a permanent decision, per library.** A vector produced by one model is meaningless to another: the coordinates encode a specific model's notion of similarity. Change the model and every stored vector has to be recomputed.
+- **The model is downloaded once, then cached.** The first visit fetches the weights with a plain `GET`. After that the browser cache serves them, so the app works offline.
+
+## The three tiers
+
+| Model | Download | Dimensions | Language | Best for | Watch out for |
+| --- | --- | --- | --- | --- | --- |
+| `bge-small-zh-v1.5` | ~25 MB | 512 | Chinese | Chinese-only corpora; the default when documents are 中文 | Weaker on English-only passages and on code identifiers |
+| `all-MiniLM-L6-v2` | ~23 MB | 384 | English | English corpora; the smallest and fastest of the three | Almost no Chinese capability — mixed libraries degrade badly |
+| `multilingual-e5-small` | ~120 MB | 384 | 100+ languages | One library that genuinely mixes Chinese and English | Five times the first download; slower per-chunk embedding |
+
+The numbers are the actual download sizes, and nothing above 30 MB is fetched without an explicit confirmation click, so you always see the cost before it happens.
+
+## What gets downloaded, and what it costs afterwards
+
+Two different budgets matter, and they are not the same one.
+
+**The one-off download.** The first visit fetches the model weights with a plain `GET` — no third-party CDN in the loop, the files come from the same origin as the page. The weights land in the browser's HTTP cache. On subsequent visits nothing is downloaded again; the network panel stays quiet.
+
+**The resident cost per library.** Vectors do not compress much. In 32-bit floats, one chunk in a 384-dimension model costs about 1.5 KB, and one chunk in the 512-dimension model about 2 KB. Run that forward:
+
+| Library size | Chunks (typical) | Vector storage at 384 dim | Vector storage at 512 dim |
+| --- | --- | --- | --- |
+| 1 contract, 30 pages | ~120 | ~0.2 MB | ~0.25 MB |
+| 10 documents, mixed | ~1,200 | ~1.8 MB | ~2.5 MB |
+| 40 documents, 200 MB total | ~6,000–12,000 | ~9–18 MB | ~12–25 MB |
+| The 20,000-chunk ceiling | 20,000 | ~31 MB | ~41 MB |
+
+So the vectors are cheaper than people expect; the weights, not the index, are usually the largest thing a library holds. That is an argument for the bilingual model when your content demands it, and an argument against downloading it "just in case" on a metered mobile connection.
+
+## Dimensions and size are not the same thing
+
+It is tempting to read 512 dimensions as "better than 384." Dimension count sets how much detail a vector can carry, but two other things usually matter more in practice:
+
+- **Vocabulary coverage.** A model trained mainly on Chinese produces poor vectors for English identifiers, error codes or product names. More dimensions do not repair a tokeniser that splits your terms into meaningless fragments.
+- **Training data.** `bge-small-zh-v1.5` at 512 dimensions beats a generic 768-dimension model on Chinese retrieval, because it was trained on Chinese pairs.
+
+The bilingual model makes the point neatly: 384 dimensions, larger file, and the extra bytes go into vocabulary and multilingual training rather than into more dimensions. Size buys coverage, not resolution.
+
+## Quantisation: what q8 changes
+
+The weights downloaded here are 8-bit quantised (q8), which is roughly a quarter the size of full float32 weights. Two honest caveats:
+
+- **Retrieval quality drops, slightly.** For embedding models the loss is small enough that you will rarely see it in top-6 results, but it is not zero. If you were comparing two retrieval systems for a benchmark, this is not the setting to do it on.
+- **Memory behaviour improves, and that is the real reason.** A 120 MB download that expands to half a gigabyte resident in the tab is a different product. Quantisation is what makes the browser tier viable at all — the same reason the optional generation tier uses 4-bit weights.
+
+## Choosing in one minute
+
+1. **Documents entirely Chinese?** `bge-small-zh-v1.5`. 25 MB, 512 dimensions, no compromise to make.
+2. **Documents entirely English?** `all-MiniLM-L6-v2`. 23 MB is the smallest download and the fastest embedding pass, which matters when you import a 300-page PDF.
+3. **Mixed, or you search in one language and read in another?** `multilingual-e5-small`. Pay the 120 MB once. For a library that is 30% English and 70% Chinese, the small monolingual models fail noticeably on the minority language, and a mixed index is exactly where that failure costs you an answer.
+4. **Not sure yet?** Import three or four documents, ask the questions you actually plan to ask, and look at the citations. If the right passage keeps appearing in the top results, the model is doing its job. If it keeps missing passages you know are in the file, try the bilingual model before you blame the chunking.
+
+## Switching models rebuilds the index
+
+If you do change your mind, understand what happens. The chunk text stays; the vectors do not. Every chunk gets embedded again through the new model — for a 200-page document that is a few hundred chunks and, on a single-threaded WASM runtime, a wait measured in tens of seconds rather than an instant. Re-downloading a 120 MB model on a slow connection adds to it.
+
+A few practical notes:
+
+- **Decide before you scale up.** Choosing the model on a two-document library costs seconds. Choosing it after importing forty documents costs minutes.
+- **Nothing is re-uploaded.** Rebuilding happens from the parsed text already in the browser, with the network off if you like.
+- **Originals are never modified.** If an index is damaged, the fix is to rebuild it; the file you imported is untouched.
+
+## Deciding in the app, not in the abstract
+
+Reading a comparison table is a poor substitute for trying it, and the workflow that settles the question takes twenty minutes. Pick a model, import three documents you know well, and ask six questions whose answers you can verify by hand. Count how often the correct passage lands in the top three citations.
+
+If it lands five or six times out of six, stop tuning — you have found the ceiling for this corpus and it is high enough. If it lands two or three times, the limitation is usually a language mix or a chunking boundary rather than the dimension count. If a passage you know exists never appears at all, suspect the parser first: text that was never extracted cannot be embedded or retrieved by any of the three models.
+
+One asymmetry is worth knowing before you begin. `all-MiniLM-L6-v2` at 23 MB embeds a few hundred chunks fast enough that re-importing is painless, while the 120 MB bilingual model roughly reverses that. So the cheap test order is to start small, note which questions fail, and only then pay for multilingual coverage.
+
+## Where this choice does not help
+
+No embedding model fixes a document that was parsed badly. If your PDF had no text layer, no model will embed it — you need OCR first, outside the tool. If a table lost its header row during extraction, the embedding will faithfully represent a column of numbers with no meaning attached, and retrieval will confidently return it for the wrong question. Model choice is the second-order decision; splitting and parsing are first-order. For the rest of the pipeline, see [/how-it-works/], and the model list itself lives on [/models/].

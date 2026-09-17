@@ -1,0 +1,121 @@
+---
+title: "Fix weak retrieval: chunking, phrasing and model tiers"
+description: "How to diagnose a bad answer, what chunk size and overlap do to recall, which question shapes favour vector search and which favour keyword search, and when a bigger embedding"
+lang: "en"
+slug: "improve-retrieval-quality"
+date: "2026-09-17"
+updated: "2026-09-17"
+minutes: 11
+author: "SecureRAG Team"
+faq:
+  - q: "Is a bigger embedding model always better?"
+    a: "No. A model trained mostly on English is a poor fit for Chinese documents, and the multilingual model at about 120 MB mainly buys cross-language matching. If your library is one language, the small default model at roughly 23 to 25 MB usually wins on speed with no loss in recall."
+  - q: "Why does a question about an exact part number return nothing useful?"
+    a: "Part numbers, product codes and abbreviations sit at the weak end of dense vector search. The keyword half of the hybrid search is what finds them, and the useful fix is usually to re-index after changing the model tier rather than to ask the question differently."
+  - q: "Do I need to re-index after changing chunking settings?"
+    a: "Yes. Chunk boundaries and vectors are produced together during import, so changing the chunk size means rebuilding the index. The original files stay where they are, so this is a local rebuild and takes a fraction of the original import time."
+  - q: "Should I always use strict mode?"
+    a: "Strict mode is the right default for documents you will cite. Switch to the looser setting when the question needs several passages combined and you are willing to read every cited sentence yourself."
+related:
+  - "/models/"
+  - "/how-it-works/"
+  - "/guides/"
+  - "/app/"
+---
+
+Retrieval quality is mostly decided before you type a question: by how the document was cut into chunks, whether headings and tables survived import, and whether the embedding model matches the document language. When the answer is wrong, check those three things in that order before you touch anything else.
+
+## Diagnose before you tune
+
+A bad answer has three possible causes, and they need different fixes. Sorting out which one you have takes a minute.
+
+1. **The passage was never retrieved.** The answer says the documents do not contain it, or it cites passages that are clearly about something else. This is a retrieval problem, and the rest of this guide is about it.
+2. **The passage was retrieved but the answer sentence is wrong.** Open citation `[1]` and compare. If the chunk contains the answer and the summary line does not, the problem is in answer selection rather than retrieval. Asking a narrower question usually fixes it.
+3. **The passage was retrieved and is genuinely the best match, and the document does not answer the question.** No amount of tuning helps here. The library simply lacks the material.
+
+Before tuning, confirm the document finished indexing. A status badge that still reads as parsing means the chunks are not in the index yet, and no search will find them.
+
+## Chunking and overlap: the two numbers that decide recall
+
+Imports here cut text at roughly 700 characters with about 15 percent overlap between neighbours. The cut falls on a heading boundary first, then a paragraph, then a sentence, so a chunk rarely ends mid-clause. Overlap exists so that an answer sitting exactly on a boundary still appears whole in one of the two chunks that share it.
+
+Those numbers are defaults, not laws, and two failure modes point in opposite directions.
+
+| Symptom | Likely cause | The adjustment |
+| --- | --- | --- |
+| Answers quote half a definition, or a step that starts with "then" | Chunks are too small for the material | Raise the chunk size so a full definition or procedure fits inside one chunk |
+| Answers blend two unrelated topics from the same document | Chunks are too large, so one chunk covers two subjects | Lower the chunk size, or use subheadings in the source to give the splitter better boundaries |
+| A key sentence vanishes from the top results, yet is clearly present | The sentence falls exactly on a boundary | Raise the overlap percentage |
+| Nearly identical passages fill all six returned results | Duplicate content in the source, such as the same clause repeated per chapter | Raise the near-duplicate threshold, which currently sits at 0.92 similarity, so more of the repeated passages are collapsed |
+
+A practical method for finding your own numbers: take one document, ask the same five questions after each change, and count how often the cited chunk is the right one. Change one variable at a time. Document length matters more than any rule of thumb — a contract with numbered clauses tolerates smaller chunks than a narrative report, because the clauses are already clean units.
+
+## Use the structure that already exists in the file
+
+Text extraction and cleaning preserve more structure than people expect. Keeping it is free recall.
+
+- **PDF** imports keep the page number with each chunk, so every citation can point back to a page.
+- **Word** imports keep heading levels from the document's own styles, which gives the splitter real boundaries instead of guessed ones.
+- **Markdown and HTML** keep their heading hierarchy for the same reason.
+- **Tables** are treated as units. An oversized table is kept whole rather than cut across a row boundary, because a table split down the middle is worse than a long chunk.
+- **Repeated headers and footers** are detected and dropped. Page numbers that repeat on every page add noise to keyword search without adding meaning, and removing them measurably improves results on long PDFs.
+
+You can help all of this at the source. A document with real heading styles imports far better than the same content formatted with bold text and blank lines, because bold text carries no hierarchy a parser can rely on.
+
+## Write questions with the vocabulary of the document
+
+Retrieval matches words and meanings that exist in the index. A question using synonyms the document never uses is asking the model to bridge a gap that a small embedding model may not bridge.
+
+Four habits that measurably help:
+
+1. **Borrow the document's nouns.** If the file says "termination notice period", ask about the termination notice period rather than "how do I quit".
+2. **Ask for the definition first, then the exception.** Start with "what is the standard retention period". Follow with "which categories are exempt from the standard retention period". The first question establishes the vocabulary; the second works because that vocabulary is now in the conversation context, and the recent turns are used to expand the search terms.
+3. **One question per retrieval.** A sentence containing three questions retrieves passages for the average of three topics. Ask them separately and the citations stay clean.
+4. **Name the document when you know it.** "In the 2026 supplier agreement, what is the payment window" narrows the candidate set before scoring even begins.
+
+The session keeps a handful of recent turns — six by default — and uses the last turn to expand keywords. That is why a follow-up like "and what about the exceptions" finds the right passage instead of searching for the word "exceptions" alone.
+
+## Vector search and keyword search fail differently
+
+Every query runs through both halves of a hybrid search, and the two result sets are merged with reciprocal rank fusion at k equals 60, then thinned by a redundancy filter at a lambda of 0.7 before the best six chunks are kept. Knowing which half is carrying your query tells you what to change when it goes wrong.
+
+| Query type | Vector search | Keyword search | Which half finds it |
+| --- | --- | --- | --- |
+| Conceptual question: "how does the approval process work" | Strong. It matches meaning across different wording | Weak, unless the exact words appear | Vector |
+| Paraphrased question using different vocabulary from the document | Strong, within the limits of the model's language coverage | Weak | Vector |
+| Exact identifier: a part number, an error code, a case reference | Weak. Dense vectors blur rare tokens | Strong. This is what it was built for | Keyword |
+| Proper noun or product name that appears in one clause | Mediocre | Strong | Keyword |
+| Abbreviation used without its expansion | Weak if the document always spells it out | Strong only if the abbreviation itself appears | Neither, until you expand it |
+| Negation: "which items are not covered" | Unreliable. Vector similarity ignores polarity | Depends on whether the document uses "not" | Rewrite as the positive form the document uses |
+| Numeric threshold: "at least 30 days" | Weak on the number itself | Strong on the number and unit | Keyword |
+
+The practical reading of that table: identifier-style questions succeed because of keyword search, conceptual questions succeed because of vector search, and a question that combines both — "the 2026 agreement, what does it say about renewals" — is exactly what the fusion step exists for.
+
+## Choosing the strictness level
+
+Two settings, and the choice changes how the tool behaves when nothing relevant is found.
+
+| Setting | What it does | Use it when |
+| --- | --- | --- |
+| Document-only (default) | If the best dense score is below 0.25 and the best keyword score is below 2.0, the answer states that the documents do not contain the material | You are going to cite the answer, or act on it |
+| Allow moderate inference | Merges several passages into a summary, still tagging every sentence with a citation, and marking unsupported conclusions as inference | You are exploring a large library and will read the cited sentences yourself |
+
+The gate thresholds matter more than they look. A question can fail both gates for a good reason: the library genuinely lacks the material. In that case the useful move is not to loosen the setting but to confirm the document was indexed, then rephrase using the document's vocabulary.
+
+Loosening the setting does not create sources. It changes how willing the answer is to combine the passages it has, and it adds visible inference markers when it goes beyond them.
+
+## When a larger embedding model earns its megabytes
+
+Three tiers exist, and bigger is not the same as better.
+
+| Tier | First download | Trained mainly on | Best for | The cost you pay |
+| --- | --- | --- | --- | --- |
+| all-MiniLM-L6-v2 | about 23 MB | English | An English-only library | Weaker on Chinese text |
+| bge-small-zh-v1.5 | about 25 MB | Chinese | A Chinese-only library | Weaker on English text |
+| multilingual-e5-small | about 120 MB | More than one hundred languages | A library that mixes Chinese and English documents | Roughly five times the download, and slower embedding per chunk |
+
+Move up a tier when the symptom is specifically cross-language matching: Chinese questions over English documents, or a library where the same topic is discussed in both languages and you want one result set covering both. Move up when a document's domain vocabulary is dense and specialised and the small model keeps returning topically adjacent passages rather than the exact one.
+
+Stay on the small tier when your library is one language, when import speed matters, or when you are on a phone. The multilingual model is roughly five times the download and its embedding step takes proportionally longer per chunk.
+
+Changing the tier is a re-index, not a migration. Chunks and vectors are produced together at import time, so a new model means rebuilding the index for the documents you keep. That is a local operation and the original files never move — but on a large library it is the moment you will notice the difference in cost.

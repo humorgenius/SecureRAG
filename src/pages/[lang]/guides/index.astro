@@ -1,0 +1,98 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
+import ArticleList from '../../../components/marketing/ArticleList.astro';
+import AdSlot from '../../../components/marketing/AdSlot.astro';
+import JsonLd from '../../../components/seo/JsonLd.astro';
+import { t, localizePath, type Lang } from '../../../i18n/utils';
+import { breadcrumbSchema, itemListSchema, orgSchema, websiteSchema } from '../../../lib/seo/schema';
+
+export function getStaticPaths() {
+  return [{ params: { lang: 'en' } }, { params: { lang: 'zh' } }];
+}
+
+const { lang: langParam } = Astro.params as { lang: string };
+const lang: Lang = langParam === 'zh' ? 'zh' : 'en';
+
+const copy =
+  lang === 'zh'
+    ? {
+        title: '本地 RAG 使用指南 · SecureRAG',
+        description:
+          '五篇操作指南：怎么做到文档不上传、离线怎么配、检索不准怎么调、扫描件怎么办、以及对浏览器和硬件到底有什么要求。',
+        h1: '把本地文档问答真正用起来的指南',
+        intro:
+          '每篇都写给具体场景：要做的动作、会看到的数字、以及做不到的时候该怎么退。不写原理教科书，只写能立刻照着做的步骤。',
+      }
+    : {
+        title: 'Guides for running local document Q&A · SecureRAG',
+        description:
+          'Five practical guides: keeping documents off the network, setting up offline use, fixing weak retrieval, handling scans, and what your browser and hardware actually need.',
+        h1: 'Guides for actually running local document Q&A',
+        intro:
+          'Every guide is written for a specific situation: the steps to take, the numbers you should see, and what to do when it does not work out. No theory textbooks — just things you can follow today.',
+      };
+
+const entries = (await getCollection('guides')).filter((entry) => entry.data.lang === lang);
+const items = entries
+  .sort((a, b) => a.data.slug.localeCompare(b.data.slug))
+  .map((entry) => ({
+    href: localizePath(lang, `/guides/${entry.data.slug}/`),
+    title: entry.data.title,
+    description: entry.data.description,
+    minutes: entry.data.minutes,
+    date: entry.data.date,
+  }));
+
+const path = `/${lang}/guides/`;
+const crumbs = [
+  { name: t(lang, 'common.home'), path: localizePath(lang, '/') },
+  { name: t(lang, 'nav.guides'), path },
+];
+---
+
+<BaseLayout lang={lang} path={path} title={copy.title} description={copy.description} type="website">
+  <Breadcrumbs items={crumbs} />
+
+  <section class="wrap">
+    <header class="head">
+      <p class="eyebrow">{t(lang, 'nav.guides')}</p>
+      <h1>{copy.h1}</h1>
+      <p class="lede">{copy.intro}</p>
+    </header>
+
+    <ArticleList lang={lang} items={items} />
+    <AdSlot lang={lang} />
+  </section>
+
+  <JsonLd
+    data={[
+      orgSchema(lang),
+      websiteSchema(lang),
+      itemListSchema({
+        lang,
+        name: copy.h1,
+        items: items.map((item) => ({ name: item.title, path: item.href })),
+      }),
+      breadcrumbSchema(crumbs),
+    ]}
+  />
+</BaseLayout>
+
+<style>
+  .head {
+    padding-top: 26px;
+  }
+  h1 {
+    font-size: clamp(28px, 3.6vw, 42px);
+    letter-spacing: -.03em;
+    max-width: 26ch;
+  }
+  .lede {
+    margin-top: 16px;
+  }
+  .eyebrow {
+    margin-bottom: 12px;
+  }
+</style>

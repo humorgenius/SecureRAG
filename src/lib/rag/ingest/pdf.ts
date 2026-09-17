@@ -15,7 +15,6 @@ export async function parsePdf(buffer: ArrayBuffer, name: string, id: string): P
   try {
     doc = await pdfjs.getDocument({
       data: new Uint8Array(buffer),
-      isEvalSupported: false,
       useSystemFonts: false,
       disableAutoFetch: true,
     }).promise;
@@ -44,7 +43,8 @@ export async function parsePdf(buffer: ArrayBuffer, name: string, id: string): P
   }
 
   if (totalChars < 40) throw new RagError('PDF_NO_TEXT_LAYER', name);
-  await doc.destroy();
+  // destroy() exists at runtime but is absent from the v5 typings
+  await (doc as unknown as { destroy?: () => Promise<void> }).destroy?.();
 
   return { id, name, kind: 'pdf', size: buffer.byteLength, pages };
 }

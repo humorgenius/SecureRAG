@@ -28,13 +28,17 @@ export const websiteSchema = (lang: Lang) => ({
   publisher: { '@id': abs('/#org') },
 });
 
-export const softwareAppSchema = (lang: Lang) => ({
+export const softwareAppSchema = (
+  lang: Lang,
+  override?: { name: string; description: string; path: string }
+) => ({
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: SITE.name,
+  name: override?.name ?? SITE.name,
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'Any modern web browser',
-  url: abs(`/${lang}/app/`),
+  url: abs(override?.path ?? `/${lang}/app/`),
+  ...(override?.description ? { description: override.description } : {}),
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   isAccessibleForFree: true,
   featureList:

@@ -97,7 +97,15 @@ export interface SessionMessage {
   id: string;
   role: 'user' | 'assistant';
   text: string;
-  citations?: { index: number; docName: string; page?: number; headingPath: string[]; quote: string }[];
+  citations?: {
+    index: number;
+    /** needed so a citation click can jump back to the exact chunk */
+    chunkId: string;
+    docName: string;
+    page?: number;
+    headingPath: string[];
+    quote: string;
+  }[];
   inferred?: string[];
   notFound?: boolean;
   /** why an empty answer was returned — drives the help text */

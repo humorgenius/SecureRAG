@@ -1,0 +1,121 @@
+---
+title: "Set up offline document Q&A, once, in fifteen minutes"
+description: "What gets downloaded on the first visit, what the service worker caches, how to confirm it, and how to test the whole thing in airplane mode."
+lang: "en"
+slug: "offline-rag-setup"
+date: "2026-09-17"
+updated: "2026-09-17"
+minutes: 8
+author: "SecureRAG Team"
+faq:
+  - q: "Can I run this with no internet connection at all, ever?"
+    a: "Not on a cold start. The model weights must be fetched once from a public model host. After that first visit, everything needed to answer questions is in your browser profile and the tool runs with the network switched off."
+  - q: "The model downloaded again after a few weeks. Why?"
+    a: "Your browser evicted the cached weights to reclaim disk space. Pressing the persist request reduces the chance of that, but a browser working under real storage pressure can still clear site data. The download panel reappears with the same figures."
+  - q: "Does clearing my browser history delete my library?"
+    a: "History and cookies are separate from site data. Removing only history leaves the library intact. Choosing clear site data, or clearing cached images and files for this site, removes both the index and the model."
+  - q: "Does offline mode change the quality of the answers?"
+    a: "No. Embedding, retrieval and the extractive answer all run locally, online or offline. Only the optional generative tier behaves differently, since its weights also have to be cached before it can run without a connection."
+steps:
+  - title: "Do the first visit while you have a connection"
+    text: "Open the app, add one or two documents, and ask a question. This is the visit that fetches the model weights, roughly 25 MB for Chinese documents or 23 MB for English ones."
+  - title: "Confirm the cache, not the promise"
+    text: "Open the Application tab, expand Cache Storage, and check that model files are present. Check IndexedDB in the same panel for chunk and vector entries."
+  - title: "Request persistent storage"
+    text: "Press the persist control in the interface, or run navigator.storage.persist() in the console. The browser then treats this origin as less likely to be evicted."
+  - title: "Switch to airplane mode and reload"
+    text: "Enable airplane mode or set DevTools throttling to Offline, then reload the page. The interface should load from the service worker cache instead of the network."
+  - title: "Ask a question with the network off"
+    text: "Retrieval and the extractive answer need no connection, so the answer and its citations should appear exactly as before."
+  - title: "Note what breaks without a connection"
+    text: "A model you have never downloaded cannot be fetched offline, and the first load of a brand new device has nothing cached. Both are expected."
+related:
+  - "/models/"
+  - "/app/"
+  - "/how-it-works/"
+  - "/privacy/"
+---
+
+Offline use means this: after one visit with a connection, the application shell lives in the service worker cache and the model weights live in Cache Storage, so parsing, chunking, embedding, retrieval and the extractive answer all run with the network switched off. Two things cannot be conjured from nothing — a model you never downloaded, and a cold start on a device that has never visited.
+
+## What actually downloads, and how big it is
+
+The first visit pulls two categories of file, and they are worth separating.
+
+The application itself: the HTML for the pages you load, the CSS, the JavaScript, the PDF and Word parsers compiled into the bundle, and the ONNX runtime that executes the model. The runtime is served from this site under `/ort/`, not from a third-party CDN, so the file list stays short and auditable.
+
+The embedding model weights: one file group, chosen by the language of your documents.
+
+| Tier | Model | First download | Choose it when |
+| --- | --- | --- | --- |
+| Chinese default | bge-small-zh-v1.5 | about 25 MB | Your library is mostly Chinese |
+| English default | all-MiniLM-L6-v2 | about 23 MB | Your library is mostly English |
+| Mixed Chinese and English | multilingual-e5-small | about 120 MB | Documents mix both languages in one library |
+
+A short document, a few hundred kilobytes, does not change any of these numbers. The weights are a fixed cost paid once, independent of how many files you add.
+
+The optional generative tier is larger and separate. The processor-friendly model is about 400 MB, and the model used when WebGPU is available is about 1.0 GB. Neither starts without an explicit confirmation that names the model and the size, and neither is required for offline use — the extractive answer mode already works offline.
+
+## What the service worker caches, and what it does not
+
+The service worker is a small script that sits between the page and the network. Its job here is narrow: serve the application shell from cache so a reload works without a connection, and leave user data alone.
+
+| Asset | Where it lives | Cleared by |
+| --- | --- | --- |
+| HTML, CSS, JavaScript, parsers, `/ort/` runtime | The service worker cache | Clearing site data |
+| Model weights | Cache Storage, under this site's origin | Clearing site data, or browser eviction under storage pressure |
+| Chunks, vectors, document metadata, settings | IndexedDB, under this site's origin | Clearing site data |
+| Your original files | Nowhere. They are read from disk when you add them and are never copied into storage | Nothing removes them, because nothing wrote them |
+
+That last row deserves emphasis. What the tool stores are the things it derived from your documents — the chunk text, and the vectors built from that text — so reloading the page does not force a re-import. It does not keep a second copy of the PDF or the DOCX. Keep your originals where they are: the index holds extracted text rather than page layout, so checking a stamped signature, a chart axis or a handwriting margin happens in the file, not in the tool. When a document has to be re-imported after a model switch or a storage eviction, having the original where you left it is the difference between one drag and a search through your mail archive.
+
+A second consequence is worth knowing before it surprises you. Because the index is derived rather than copied, adding the same file twice produces two sets of chunks rather than one. If you are not sure whether a document is already in the library, search for a distinctive phrase from its first page instead of importing it a second time.
+
+## Confirming the cache yourself
+
+Two panels, about thirty seconds.
+
+1. Open developer tools and switch to the **Application** tab.
+2. Expand **Cache Storage**. You should see entries for the model files. Their combined size should roughly match the tier you selected — around 25 MB, 23 MB, or 120 MB.
+3. Expand **IndexedDB** and look for this site's database. Inside you will find the documents, chunks and vector stores. Chunks and vectors grow with your library; the vectors are the larger of the two.
+4. If you want the raw numbers, run `navigator.storage.estimate()` in the console. It returns `usage` and `quota` in bytes for the whole origin.
+
+A useful rule of thumb for reading those numbers: every 1,000 chunks costs roughly 1.5 MB of vector storage before any overhead. A 200-page report might produce 1,500 to 2,500 chunks, so a few megabytes rather than a few hundred.
+
+## The airplane mode test
+
+This is the only test that answers the question directly.
+
+1. Load the page with a connection and let it settle, so the shell and the weights are cached.
+2. Turn on airplane mode, or set the Network tab's throttling dropdown to **Offline**. Airplane mode is the stricter test, because it also removes the mobile data path.
+3. Reload the page. The interface should appear. If it does not, reload once more while still online so the service worker can complete its first install, then repeat the test with the network off again.
+4. Ask a question. The answer and its citations should appear as normal.
+5. If you enabled the generative tier, ask a question that needs generation. It also runs offline, provided its weights finished downloading.
+
+Two failures are expected rather than bugs. A model you never downloaded cannot be fetched while you are offline; the download panel will simply fail and offer a retry. And a browser that has never visited this site has nothing cached, so the very first visit has to be online.
+
+A useful habit once the test passes: keep the tab pinned for the sessions where you might lose connectivity. Reopening a tab that was closed rather than kept can mean a fresh HTML fetch for pages whose shell was not part of the precache, which is the one gap in an otherwise offline setup.
+
+## When the browser takes the cache back
+
+Browsers treat site data as theirs to manage. Under disk pressure, a browser may evict the cache, including the several megabytes of model weights it thinks you can download again. From the user's side this looks like a surprise re-download.
+
+Pressing the persist request is the mitigation. The interface exposes a control for it, and the underlying call is:
+
+`navigator.storage.persist()`
+
+Calling it asks the browser to mark this origin as persistent, which means it will be evicted only as a last resort rather than as routine housekeeping. Two honest caveats: the browser grants or denies the request on its own terms, and no grant makes storage permanent. Clearing site data always wins, by design — that is the feature that guarantees deletion.
+
+If a re-download happens, the cost is the same one-time figure as before. Nothing was lost from your library; chunks and vectors in IndexedDB were not part of the eviction, and re-downloading weights does not invalidate them.
+
+## What offline mode does not change
+
+Quality of retrieval is identical with the network off, because retrieval never used the network. Hybrid search over vectors and keywords, the fusion step, the redundancy filter and the relevance gate all execute locally against your IndexedDB index.
+
+Three things still require a connection, and it is worth knowing them in advance:
+
+1. The first visit after clearing site data, or on a new device.
+2. Switching to a model tier whose weights you have not downloaded yet.
+3. Loading the site's other pages for the first time, if their HTML was not part of the cached shell.
+
+Everything else — adding a document you already have on disk, re-indexing, asking questions, exporting an answer — works with the network off.

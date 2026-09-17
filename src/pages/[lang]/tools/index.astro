@@ -1,0 +1,150 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
+import AdSlot from '../../../components/marketing/AdSlot.astro';
+import JsonLd from '../../../components/seo/JsonLd.astro';
+import { t, localizePath, type Lang } from '../../../i18n/utils';
+import { breadcrumbSchema, itemListSchema, orgSchema, websiteSchema } from '../../../lib/seo/schema';
+
+export function getStaticPaths() {
+  return [{ params: { lang: 'en' } }, { params: { lang: 'zh' } }];
+}
+
+const { lang: langParam } = Astro.params as { lang: string };
+const lang: Lang = langParam === 'zh' ? 'zh' : 'en';
+
+const TOOLS = [
+  { slug: 'pdf-text', en: 'PDF text extractor', zh: 'PDF 取文字' },
+  { slug: 'token-counter', en: 'Token & length counter', zh: 'Token 与长度统计' },
+  { slug: 'chunk-preview', en: 'Chunking preview', zh: '分块预览' },
+];
+
+const copy =
+  lang === 'zh'
+    ? {
+        title: '免费本地小工具 · SecureRAG',
+        description:
+          '三个不需要上传的浏览器小工具：PDF 抽文字、token 与字符统计、分块预览。都在本机运行，打开就能用，不用注册。',
+        h1: '三个不用上传文件的小工具',
+        intro:
+          '它们不依赖账号、不调用服务器，也不需要先下载模型。打开页面就能用，关掉页面什么都没留下。第三个工具跑的正是工具页用的那套分块引擎。',
+        blurb: {
+          'pdf-text': '把 PDF 里的文字抽出来，逐页统计字符数，可复制或下载为 .txt。无文字层的扫描件会明确告诉你去 OCR。',
+          'token-counter': '统计字符、汉字、单词、UTF-8 字节数，并估算大模型 token 用量——写提示词或估预算时用得上。',
+          'chunk-preview': '粘贴一段文本，看它会被切成几块、每块多长、标题层级如何归属。与工具页用的是同一个分块引擎。',
+        },
+      }
+    : {
+        title: 'Free local browser tools · SecureRAG',
+        description:
+          'Three browser tools that never upload your file: PDF text extraction, token and length counting, and a chunking preview. All local, no account, no model download.',
+        h1: 'Three tools that never upload your file',
+        intro:
+          'No account, no server call, and no model download required. Open the page and use it; close it and nothing is left behind. The third tool runs the exact chunker the main app uses.',
+        blurb: {
+          'pdf-text': 'Pull text out of a PDF, see the character count per page, then copy it or download a .txt. A scan with no text layer tells you to run OCR instead.',
+          'token-counter': 'Count characters, CJK characters, words, UTF-8 bytes and an estimated LLM token cost — useful for prompt budgeting.',
+          'chunk-preview': 'Paste text and see how many chunks it becomes, how long each one is, and which heading each belongs to. Same chunker as the app.',
+        },
+      };
+
+const path = `/${lang}/tools/`;
+const crumbs = [
+  { name: t(lang, 'common.home'), path: localizePath(lang, '/') },
+  { name: t(lang, 'nav.tools'), path },
+];
+---
+
+<BaseLayout lang={lang} path={path} title={copy.title} description={copy.description}>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="wrap">
+    <header class="head">
+      <p class="eyebrow">{t(lang, 'nav.tools')}</p>
+      <h1>{copy.h1}</h1>
+      <p class="lede">{copy.intro}</p>
+    </header>
+
+    <div class="cards">
+      {
+        TOOLS.map((tool) => (
+          <a class="card" href={localizePath(lang, `/tools/${tool.slug}/`)}>
+            <h2>{lang === 'zh' ? tool.zh : tool.en}</h2>
+            <p>{copy.blurb[tool.slug as keyof typeof copy.blurb]}</p>
+            <span class="go">{t(lang, 'common.readMore')} →</span>
+          </a>
+        ))
+      }
+    </div>
+
+    <AdSlot lang={lang} />
+  </section>
+
+  <JsonLd
+    data={[
+      orgSchema(lang),
+      websiteSchema(lang),
+      itemListSchema({
+        lang,
+        name: copy.h1,
+        items: TOOLS.map((tool) => ({
+          name: lang === 'zh' ? tool.zh : tool.en,
+          path: localizePath(lang, `/tools/${tool.slug}/`),
+        })),
+      }),
+      breadcrumbSchema(crumbs),
+    ]}
+  />
+</BaseLayout>
+
+<style>
+  .head {
+    padding-top: 26px;
+  }
+  h1 {
+    font-size: clamp(28px, 3.6vw, 42px);
+    letter-spacing: -.03em;
+    max-width: 24ch;
+  }
+  .lede {
+    margin-top: 16px;
+  }
+  .eyebrow {
+    margin-bottom: 12px;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+    margin-top: 34px;
+  }
+  .card {
+    position: relative;
+    display: block;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-l);
+    padding: 24px;
+    transition: box-shadow .18s, transform .18s;
+  }
+  .card:hover {
+    box-shadow: var(--sh-2);
+    transform: translateY(-2px);
+  }
+  .card h2 {
+    font-size: 17px;
+    margin-bottom: 10px;
+  }
+  .card p {
+    font-size: 14.5px;
+    line-height: 1.68;
+    color: var(--muted);
+  }
+  .go {
+    display: inline-block;
+    margin-top: 14px;
+    font-size: 13.5px;
+    font-weight: 650;
+    color: var(--blue-d);
+  }
+</style>

@@ -625,3 +625,27 @@
     animation: none;
   }
 }
+
+/* ---- standalone tool pages (Tools.tsx island) ---- */
+.sr-tool { display: flex; flex-direction: column; gap: 16px; }
+.sr-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.sr-hint { font-size: 13px; color: var(--muted); font-family: var(--font-mono); }
+.sr-textarea-lg { min-height: 170px; resize: vertical; }
+.sr-scroll { overflow: auto; max-height: 380px; border: 1px solid var(--line); border-radius: var(--radius-m); }
+.sr-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.sr-table th, .sr-table td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.sr-table th { position: sticky; top: 0; background: var(--bg); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-2); }
+.sr-table td:first-child { font-family: var(--font-mono); color: var(--muted); width: 56px; }
+.sr-cut { color: var(--muted); }
+.sr-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 10px; }
+.sr-stat { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-m); padding: 12px 14px; }
+.sr-stat b { display: block; font-size: 19px; letter-spacing: -.02em; color: var(--ink); }
+.sr-stat span { font-size: 12px; color: var(--muted); }
+.sr-sliders label { flex: 1 1 220px; display: block; font-size: 13px; color: var(--muted); }
+.sr-sliders input[type='range'] { width: 100%; margin-top: 8px; }
+.sr-chunks { display: flex; flex-direction: column; gap: 10px; max-height: 520px; overflow: auto; padding-right: 4px; }
+.sr-chunks > li { list-style: none; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-m); padding: 12px 14px; }
+.sr-chunk-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; margin-bottom: 8px; font-size: 12px; font-family: var(--font-mono); color: var(--muted-2); }
+.sr-chunk-head b { color: var(--blue-d); }
+.sr-chunks p { font-size: 13.5px; line-height: 1.65; color: var(--ink-2); white-space: pre-wrap; }
+.sr-path { color: var(--muted); }

@@ -20,6 +20,10 @@ export const ui = {
     'nav.about': 'About',
     'nav.contact': 'Contact',
     'nav.changelog': 'Changelog',
+    'nav.privacy': 'Privacy policy',
+    'nav.terms': 'Terms of use',
+    'nav.security': 'Security notes',
+    'nav.accessibility': 'Accessibility',
     'nav.menu': 'Menu',
     'nav.home': 'SecureRAG home',
 
@@ -88,6 +92,10 @@ export const ui = {
     'nav.about': '关于',
     'nav.contact': '联系我们',
     'nav.changelog': '更新日志',
+    'nav.privacy': '隐私政策',
+    'nav.terms': '使用条款',
+    'nav.security': '安全说明',
+    'nav.accessibility': '无障碍声明',
     'nav.menu': '菜单',
     'nav.home': 'SecureRAG 首页',
 
