@@ -27,17 +27,6 @@ export interface CompareRow {
   edge: 'us' | 'them';
 }
 
-export interface Tier {
-  rec: string;
-  title: string;
-  who: string;
-  big: string;
-  bigNote: string;
-  items: { text: string; warn?: boolean }[];
-  cta: string;
-  primary: boolean;
-}
-
 export interface QA {
   q: string;
   a: string;
@@ -92,10 +81,7 @@ export interface HomeContent {
     caption: string;
     head: { criterion: string; us: string; them: string };
     rows: CompareRow[];
-    noteTitle: string;
-    note: string;
   };
-  tiers: { eyebrow: string; heading: string; items: Tier[]; note: string };
   faq: { eyebrow: string; heading: string; items: QA[] };
 }
 
@@ -246,45 +232,6 @@ export const home: Record<Lang, HomeContent> = {
         { criterion: 'Cost', us: 'Your electricity', them: 'Free tier cap, then paid', edge: 'us' },
         { criterion: 'Natural-language fluency', us: 'Bounded by a 0.5–1.5B local model', them: 'Frontier-scale', edge: 'them' },
       ],
-      noteTitle: 'Where we lose, stated up front:',
-      note: 'if your document is public and you want the best possible prose, a frontier cloud model will beat anything that fits in a browser tab. Choose this tool when the document is the part you cannot hand over.',
-    },
-    tiers: {
-      eyebrow: 'Deployment tiers',
-      heading: 'Both tiers run locally. You choose what to download.',
-      items: [
-        {
-          rec: 'Enabled by default',
-          title: 'Lightweight retrieval tier',
-          who: 'Embedding plus extractive answering with citations. Instant start, works on phones.',
-          big: '≈ 25 MB',
-          bigNote: 'first visit, then cached',
-          items: [
-            { text: 'bge-small-zh-v1.5 or all-MiniLM-L6-v2, quantised ONNX' },
-            { text: 'Hybrid vector + BM25 retrieval, RRF fusion' },
-            { text: 'Answers built from source sentences — never invented' },
-            { text: 'Offline-capable after the first load' },
-          ],
-          cta: 'Start here',
-          primary: true,
-        },
-        {
-          rec: 'Opt-in',
-          title: 'Local generation tier',
-          who: 'Adds a small instruct model that writes fluent answers from the retrieved passages.',
-          big: '400 MB – 1.0 GB',
-          bigNote: 'stated before download',
-          items: [
-            { text: 'Qwen2.5 0.5B–1.5B, 4-bit quantised' },
-            { text: 'Transformers.js on WebGPU where available, WebAssembly on CPU otherwise' },
-            { text: 'Streaming output with citation markers intact' },
-            { text: 'No WebGPU means CPU speed: 3–8 tokens/second', warn: true },
-          ],
-          cta: 'See the trade-off',
-          primary: false,
-        },
-      ],
-      note: 'Model weights are the only thing this site ever downloads. They contain no information about you, your files or your questions — and once cached, the tool keeps working with the network switched off.',
     },
     faq: {
       eyebrow: 'FAQ',
@@ -452,45 +399,6 @@ export const home: Record<Lang, HomeContent> = {
         { criterion: '成本', us: '你的电费', them: '免费额度上限，之后付费', edge: 'us' },
         { criterion: '自然语言流畅度', us: '受 0.5–1.5B 本地模型限制', them: '前沿规模模型', edge: 'them' },
       ],
-      noteTitle: '我们输在哪，先说清楚：',
-      note: '如果你的文档是公开的、你要的是最好的文笔，云端前沿模型会赢过任何能塞进浏览器标签页的模型。当文档本身就是你交不出去的那部分时，才该选这个工具。',
-    },
-    tiers: {
-      eyebrow: '模型档位',
-      heading: '两档都在本地运行，下载什么由你决定',
-      items: [
-        {
-          rec: '默认开启',
-          title: '轻量检索档',
-          who: '嵌入 + 抽取式回答，附带引用。秒级开始，手机也能用。',
-          big: '约 25 MB',
-          bigNote: '首次访问，之后缓存',
-          items: [
-            { text: 'bge-small-zh-v1.5 或 all-MiniLM-L6-v2，量化 ONNX' },
-            { text: '向量 + BM25 混合检索，RRF 融合排序' },
-            { text: '回答由源句构成，绝不编造' },
-            { text: '首次加载后可离线使用' },
-          ],
-          cta: '从这里开始',
-          primary: true,
-        },
-        {
-          rec: '需手动开启',
-          title: '本地生成档',
-          who: '追加一个小型指令模型，把检索到的段落写成通顺回答。',
-          big: '400 MB – 1.0 GB',
-          bigNote: '下载前明确告知',
-          items: [
-            { text: 'Qwen2.5 0.5B–1.5B，4 位量化' },
-            { text: '有 WebGPU 时走 GPU，否则通过 WebAssembly 跑在 CPU 上' },
-            { text: '流式输出，引用标记保持完好' },
-            { text: '没有 WebGPU 就只能走 CPU：每秒 3–8 个 token', warn: true },
-          ],
-          cta: '查看取舍细节',
-          primary: false,
-        },
-      ],
-      note: '模型权重是本网站唯一会下载的东西。它不包含关于你、你的文件或你的问题的任何信息——而且缓存之后，关掉网络工具照常可用。',
     },
     faq: {
       eyebrow: '常见问题',
