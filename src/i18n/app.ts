@@ -54,7 +54,7 @@ export const appStrings = {
     'chat.copied': 'Copied',
     'chat.strictHint': 'Documents only — refuses rather than guesses.',
     'chat.balancedHint': 'Allow inference — marked sentences may go beyond the source.',
-    'chat.empty': 'Add a document, then ask something you would not type into a cloud box.',
+    'chat.empty': 'Type the words you want to find in these files.',
     'chat.noDocs': 'There is nothing to search yet — add a document first.',
     'chat.noDocsHelp': 'The library is empty or every document is excluded from search.',
 
@@ -182,7 +182,7 @@ export const appStrings = {
     'chat.copied': '已复制',
     'chat.strictHint': '仅依据文档——找不到就拒答，不猜。',
     'chat.balancedHint': '允许推理——标注过的句子可能超出原文。',
-    'chat.empty': '先加一份文档，然后问一个你绝不会打进云端输入框的问题。',
+    'chat.empty': '请输入你想要在这些文件中检索的词。',
     'chat.noDocs': '还没有可检索的内容——请先添加一份文档。',
     'chat.noDocsHelp': '文档库是空的，或所有文档都被排除了。',
 

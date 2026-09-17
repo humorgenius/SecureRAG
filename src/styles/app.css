@@ -664,3 +664,9 @@
   line-height: 1.65;
   color: var(--muted);
 }
+
+/* Export format group in the chat header. */
+.sr-export { display: inline-flex; align-items: center; gap: 7px; }
+.sr-export .sr-muted { font-size: 11.5px; }
+/* Document actions moved below the name, so the name gets the full column. */
+.sr-doc-actions { margin-top: 9px; }

@@ -160,6 +160,8 @@ export const DocList: FunctionComponent<
           {docs.map((doc) => (
             <li class={`sr-doc ${doc.enabled ? '' : 'is-off'}`}>
               <span class={`sr-ft sr-ft-${doc.kind}`}>{doc.kind.slice(0, 3).toUpperCase()}</span>
+              {/* The actions sit under the name on purpose: with them beside it the
+                  file name had barely half the column and was truncated early. */}
               <div class="sr-doc-main">
                 {editing === doc.id ? (
                   <form
@@ -188,26 +190,26 @@ export const DocList: FunctionComponent<
                     </span>
                   </>
                 )}
-              </div>
-              <div class="sr-doc-actions">
-                <button class="sr-link" type="button" onClick={() => onEdit(doc.id)} disabled={busy}>
-                  {ta(lang, 'docs.rename')}
-                </button>
-                <button class="sr-link" type="button" onClick={() => onToggle(doc.id)} disabled={busy}>
-                  {ta(lang, doc.enabled ? 'docs.disable' : 'docs.enable')}
-                </button>
-                <button
-                  class="sr-link"
-                  type="button"
-                  onClick={() => onReindex(doc.id)}
-                  disabled={busy || !canReindex(doc.id)}
-                  title={canReindex(doc.id) ? '' : ta(lang, 'drop.hint')}
-                >
-                  {ta(lang, 'docs.reindex')}
-                </button>
-                <button class="sr-link sr-danger" type="button" onClick={() => onDelete(doc.id)} disabled={busy}>
-                  {ta(lang, 'docs.delete')}
-                </button>
+                <div class="sr-doc-actions">
+                  <button class="sr-link" type="button" onClick={() => onEdit(doc.id)} disabled={busy}>
+                    {ta(lang, 'docs.rename')}
+                  </button>
+                  <button class="sr-link" type="button" onClick={() => onToggle(doc.id)} disabled={busy}>
+                    {ta(lang, doc.enabled ? 'docs.disable' : 'docs.enable')}
+                  </button>
+                  <button
+                    class="sr-link"
+                    type="button"
+                    onClick={() => onReindex(doc.id)}
+                    disabled={busy || !canReindex(doc.id)}
+                    title={canReindex(doc.id) ? '' : ta(lang, 'drop.hint')}
+                  >
+                    {ta(lang, 'docs.reindex')}
+                  </button>
+                  <button class="sr-link sr-danger" type="button" onClick={() => onDelete(doc.id)} disabled={busy}>
+                    {ta(lang, 'docs.delete')}
+                  </button>
+                </div>
               </div>
             </li>
           ))}
@@ -249,9 +251,22 @@ export const ChatPanel: FunctionComponent<
           {ta(lang, strictness === 'strict' ? 'settings.strict' : 'settings.balanced')}
         </span>
         <div class="sr-head-actions">
-          <button class="sr-link" type="button" onClick={() => onExport('md')} disabled={messages.length === 0}>
-            {ta(lang, 'chat.export')}
-          </button>
+          {/* Plain text first: that is the format people actually open. */}
+          <span class="sr-export">
+            <span class="sr-muted">{ta(lang, 'chat.export')}</span>
+            {(['txt', 'md', 'json'] as const).map((format) => (
+              <button
+                class="sr-link"
+                type="button"
+                key={format}
+                onClick={() => onExport(format)}
+                disabled={messages.length === 0}
+                title={ta(lang, format === 'txt' ? 'export.text' : format === 'md' ? 'export.markdown' : 'export.json')}
+              >
+                .{format}
+              </button>
+            ))}
+          </span>
           <button class="sr-link" type="button" onClick={onClear} disabled={messages.length === 0}>
             {ta(lang, 'chat.clear')}
           </button>

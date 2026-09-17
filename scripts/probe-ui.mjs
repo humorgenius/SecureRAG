@@ -23,7 +23,7 @@ const chrome = spawn(
     '--no-proxy-server',
     '--no-first-run',
     `--remote-debugging-port=${PORT}`,
-    '--user-data-dir=E:/hermes-workspace/temp/cdp-probe',
+    '--user-data-dir=E:/hermes-workspace/temp/cdp-diag2',
     'about:blank',
   ],
   { stdio: 'ignore' }
@@ -65,6 +65,15 @@ try {
     "document.querySelectorAll('button,.btn,label.btn').forEach(function(b){var r=b.getBoundingClientRect();" +
     "if(r.height>0)o.buttons.push({t:(b.textContent||'').trim().slice(0,18),cls:b.className.slice(0,32),h:Math.round(r.height)});});" +
     "document.querySelectorAll('.sr-mode-note').forEach(function(n){o.notes.push((n.textContent||'').slice(0,60));});" +
+    "var row=document.querySelector(\'.sr-doc\');" +
+    "if(row){var nm=row.querySelector(\'.sr-doc-main b\');var act=row.querySelector(\'.sr-doc-actions\');" +
+    "o.docRow={name:nm?nm.textContent.slice(0,30):null," +
+    "nameW:nm?Math.round(nm.getBoundingClientRect().width):0," +
+    "actionsInsideMain:!!(act&&act.closest(\'.sr-doc-main\'))," +
+    "actionsBelowName:!!(act&&nm&&act.getBoundingClientRect().top>=nm.getBoundingClientRect().bottom-1)," +
+    "actions:act?Array.prototype.map.call(act.querySelectorAll(\'button\'),function(b){return b.textContent.trim();}):[]};}" +
+    "var ex=document.querySelector(\'.sr-export\');" +
+    "o.exportGroup=ex?Array.prototype.map.call(ex.querySelectorAll(\'button\'),function(b){return b.textContent.trim();}):null;" +
     "return JSON.stringify(o);})()";
 
   const r = await send('Runtime.evaluate', { expression: expr, returnByValue: true });
@@ -78,6 +87,17 @@ try {
   console.log('BUTTONS / LABELS：');
   for (const b of data.buttons ?? []) console.log(`  h=${String(b.h).padStart(3)}px  class="${b.cls}"  "${b.t}"`);
   console.log('ANSWER NOTE：', (data.notes ?? []).length ? data.notes.join(' | ') : '(none)');
+  console.log('EXPORT GROUP：', data.exportGroup ? data.exportGroup.join(' ') : '(not on this page)');
+  if (data.docRow) {
+    const r = data.docRow;
+    console.log('DOC ROW：');
+    console.log(`  name="${r.name}"  rendered width=${r.nameW}px`);
+    console.log(`  actions inside .sr-doc-main: ${r.actionsInsideMain}`);
+    console.log(`  actions below the name:      ${r.actionsBelowName}`);
+    console.log(`  action labels: ${r.actions.join(' / ')}`);
+  } else {
+    console.log('DOC ROW：(no documents in this profile)');
+  }
 
   exitCode = 0;
   ws.close();
