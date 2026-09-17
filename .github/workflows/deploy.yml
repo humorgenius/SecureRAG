@@ -31,6 +31,15 @@ jobs:
       - name: Prepare self-hosted runtime assets
         run: npm run prepare:runtime
 
+      - name: Type check
+        run: npx tsc --noEmit -p tsconfig.json
+
+      - name: i18n gate (source)
+        run: npm run check:i18n
+
+      - name: Content gate (frontmatter, pairing, block renderers)
+        run: npm run check:content
+
       - name: Unit tests (RAG engine)
         run: npm test
 
@@ -39,10 +48,7 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 
-      - name: i18n gate
-        run: npm run check:i18n
-
-      - name: SEO gate
+      - name: SEO gate (over the built output)
         run: npm run check:seo
 
       - uses: actions/configure-pages@v5
