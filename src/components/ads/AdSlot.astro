@@ -40,6 +40,19 @@ const label = t(lang, 'ad.label');
   <div class="ad-head">
     <p class="ad-label">{label}</p>
     {
+      variant === 'rail' && (
+        <button
+          class="ad-close"
+          type="button"
+          data-ad-close
+          aria-label={t(lang, 'ad.closeAd')}
+          title={t(lang, 'ad.closeAd')}
+        >
+          ×
+        </button>
+      )
+    }
+    {
       variant === 'anchor' && (
         <button
           class="ad-collapse"
@@ -144,6 +157,29 @@ const label = t(lang, 'ad.label');
     .ad-slot-rail {
       display: block;
     }
+  }
+  /* Closed for this page view only. `[hidden]` would lose to the media query
+     above, so the state is carried by an attribute with its own rule. */
+  .ad-slot-rail[data-closed='1'] {
+    display: none;
+  }
+  .ad-close {
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--muted-2);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .ad-close:hover {
+    background: #eef2f8;
+    color: var(--ink);
   }
 
   /* ---- collapsible anchor above the bottom edge ---- */

@@ -149,6 +149,24 @@ try {
     console.log('  角落截图: E:/hermes-workspace/outputs/securerag/ad-collapsed.png');
   }
 
+  console.log('  --- 两侧竖幅的关闭 × ---');
+  const railState = `(function(){
+    var rails = Array.prototype.slice.call(document.querySelectorAll('[data-ad-variant="rail"]'));
+    return JSON.stringify(rails.map(function (r) {
+      var s = getComputedStyle(r);
+      var box = r.querySelector('[data-ad-close]');
+      var rb = box ? box.getBoundingClientRect() : null;
+      return r.dataset.adId + ' ' + (s.display === 'none' ? 'HIDDEN' : 'shown') + ' ×' + (rb ? Math.round(rb.width) + 'x' + Math.round(rb.height) : 'none');
+    }));
+  })()`;
+  console.log('  初始:', await evalJs(railState));
+  await evalJs(`(function(){var b=document.querySelector('[data-ad-variant="rail"] [data-ad-close]');if(b){b.click();return 'clicked';}return 'no button';})()`);
+  await sleep(300);
+  console.log('  点左侧 × 之后:', await evalJs(railState));
+  await evalJs('location.reload()');
+  await sleep(3500);
+  console.log('  跳转/刷新之后:', await evalJs(railState));
+
   console.log('  --- 回到顶部按钮 ---');
   const topCheck = await evalJs(`(function(){
     window.scrollTo(0, 1200);

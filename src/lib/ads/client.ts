@@ -74,7 +74,24 @@ function applyConsent(): void {
   fillSlots(mode);
 }
 
-/** The bottom slot can be collapsed, and the choice sticks across pages. */
+/**
+ * The two side rails can be closed with the small × in their corner.
+ *
+ * Deliberately not remembered: the close lasts for the page view, so navigating
+ * anywhere brings the rail back. That is what was asked for, and it also keeps a
+ * single accidental click from hiding the slot for the rest of the session.
+ */
+function bootRails(): void {
+  document.querySelectorAll<HTMLElement>('[data-ad-variant="rail"]').forEach((rail) => {
+    const close = rail.querySelector<HTMLButtonElement>('[data-ad-close]');
+    if (!close) return;
+    close.addEventListener('click', () => {
+      rail.dataset.closed = '1';
+    });
+  });
+}
+
+/** The bottom slot can be collapsed for the current page view. */
 function bootAnchor(): void {
   const anchor = document.querySelector<HTMLElement>('[data-ad-variant="anchor"]');
   const button = anchor?.querySelector<HTMLButtonElement>('[data-ad-collapse]');
@@ -143,6 +160,7 @@ export function bootAds(): void {
     applyConsent();
     document.addEventListener(CONSENT_EVENT, applyConsent);
     bootAnchor();
+    bootRails();
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();

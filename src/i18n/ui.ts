@@ -51,6 +51,7 @@ export const ui = {
     'ad.policy':
       'Ads are labeled, never placed inside the chat workspace, and no ad script loads until you answer the consent question.',
     'a11y.top': 'Back to top',
+    'ad.closeAd': 'Close this ad',
     'ad.collapse': 'Hide',
     'ad.expand': 'Show',
     'consent.title': 'Advertising on this site',
@@ -131,6 +132,7 @@ export const ui = {
     'ad.pending': '广告位 · 已预留空间，尚未加载',
     'ad.policy': '广告有明确标注，不会出现在聊天工作区内；在你回答同意问题之前，不会加载任何广告脚本。',
     'a11y.top': '回到顶部',
+    'ad.closeAd': '关闭这个广告',
     'ad.collapse': '收起',
     'ad.expand': '展开',
     'consent.title': '本站的广告',
