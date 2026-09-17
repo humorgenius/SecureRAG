@@ -143,7 +143,7 @@ export const home: Record<Lang, HomeContent> = {
       },
     },
     metrics: [
-      { n: '0', label: 'documents uploaded, ever' },
+      { n: '0', label: 'documents leaked, ever' },
       { n: '1', unit: 'request', label: 'model weights, cached after first load' },
       { n: '25', unit: 'MB', label: 'default first download — nothing above 30 MB without your consent' },
       { n: '100', unit: '%', label: 'of parsing, embedding and retrieval happens in your tab' },
@@ -310,7 +310,7 @@ export const home: Record<Lang, HomeContent> = {
       },
     },
     metrics: [
-      { n: '0', label: '至今上传过的文档数量' },
+      { n: '0', label: '至今泄露过的文档数量' },
       { n: '1', unit: '个请求', label: '模型权重，首次加载后即缓存' },
       { n: '25', unit: 'MB', label: '默认首次下载体积，超过 30MB 必须经你同意' },
       { n: '100', unit: '%', label: '的解析、向量化与检索发生在你的标签页里' },
