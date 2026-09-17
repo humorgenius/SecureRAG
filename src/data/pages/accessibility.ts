@@ -75,16 +75,16 @@ export default {
         {
           t: 'ul',
           items: [
-            'Animations and transitions are shortened or removed when the operating system requests reduced motion. Both stylesheets carry a prefers-reduced-motion block, which is what turns off the fade-in effects on the home page and the hover transitions on cards.',
-            'Body text is aimed at a contrast ratio of 4.5:1 or better against its background, and no information is conveyed by colour alone: the strictness setting is a labelled control with a text value, and the progress bar during indexing is announced in words as a stage and a count, not only as a filled bar.',
-            'The document list states each file status in text — indexed, queued, failed — instead of relying on a coloured dot.',
-            'Text can be zoomed to 200% and the layout reflows without horizontal scrolling on the article pages; wide tables scroll inside their own container rather than pushing the page sideways.',
+            'Animations and transitions are turned off when the operating system requests reduced motion: one rule in the global stylesheet disables all animations and transitions and stops smooth scrolling, and the workspace stylesheet stops the typing indicator in the chat panel.',
+            'Body text is aimed at a contrast ratio of 4.5:1 or better against its background, and no information is conveyed by colour alone: the strictness control is a group of two named options, “Documents only” and “Allow inference”, each with its consequence spelled out in words, and indexing progress is announced as a stage name and a count rather than only as a filled bar.',
+            'In the document list each file carries a three-letter type label (PDF, DOC, TXT) plus its page count and its chunk count as text, and a document that is switched off is marked “excluded” in words rather than by a colour change alone.',
+            'The article layout is fluid down to phone widths, and a wide table scrolls inside its own container, an element with horizontal overflow, rather than widening the page.',
           ],
         },
         { t: 'h2', text: 'Progress and status announcements' },
         {
           t: 'p',
-          text: 'Indexing and model download report progress to assistive technology through live regions marked polite, so the announcement waits for a pause instead of interrupting. The progress text names the stage — parsing, chunking, embedding, indexing, model load — and, where a count exists, the number of items completed out of the total. Model downloads report megabytes loaded against the total in the same way. Errors appear in a region announced as an alert, with a labelled dismiss control. The confirmation shown before the optional generation model is downloaded is a dialog marked as modal, containing the size and two buttons, one to confirm and one to cancel.',
+          text: 'Indexing and model download report progress to assistive technology through live regions marked polite, so the announcement waits for a pause instead of interrupting. The progress text names the stage as it happens: reading the file, splitting it into chunks, embedding, indexed. Where a count exists it reports items done out of the total, and a model download reports megabytes loaded against the total. Errors appear in a region announced as an alert, with a labelled dismiss control. The confirmation shown before the optional generation model is downloaded is a dialog marked as modal, containing the size and two buttons, one to confirm and one to cancel.',
         },
         { t: 'h2', text: 'What is not good enough yet' },
         {
@@ -181,7 +181,7 @@ export default {
         {
           t: 'ul',
           items: [
-            '系统请求减少动效时，动画与过渡会被缩短或取消。两份样式表里都有 prefers-reduced-motion 规则，首页的淡入效果和卡片的悬停过渡就是由它关掉的。',
+            '系统请求减少动效时，动画与过渡会被关掉：全局样式表里的一条规则会停用全部动画与过渡、并停用平滑滚动；工作区样式表另外停掉对话面板里的输入指示动画。',
             '正文对比度目标为 4.5:1 以上，并且不靠颜色单独传达信息：严格度是有文字取值的带标签控件，索引时的进度条同时以阶段名和计数播报，而不只是一条填充条。',
             '文档列表用文字写出每一份文件的状态——已索引、排队中、失败——而不是靠一个彩色圆点。',
             '文字放大到 200% 时，文章类页面会重排而不出现横向滚动；宽表格在自己的容器内滚动，不会把整页撑开。',

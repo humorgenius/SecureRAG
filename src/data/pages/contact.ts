@@ -7,7 +7,7 @@ export default {
   schema: { article: true },
   related: [
     { path: '/security/', labelEn: 'Security and data flow', labelZh: '安全与数据流' },
-    { path: '/accessibility/', labelEn: 'Accessibility statement', labelZh: '无障碍声明' },
+    { path: '/about/', labelEn: 'About this project', labelZh: '关于这个项目' },
     { path: '/faq/', labelEn: 'Frequently asked questions', labelZh: '常见问题' },
     { path: '/privacy/', labelEn: 'Privacy policy', labelZh: '隐私政策' },
   ],
@@ -15,7 +15,7 @@ export default {
     en: {
       title: 'Contact: hello@securerag.app, no forms',
       description:
-        'One email address and no form, because there is no server to receive one. What to include in a bug, model, privacy, security or accessibility report, and what is not promised.',
+        'One email address and no form, because no server could receive one. What to put in a bug, privacy or security report, and what is not promised.',
       h1: 'Contact',
       intro:
         'There is exactly one way to reach this project: email hello@securerag.app. This page explains why there is no contact form, what to put in a message so that it can be acted on, how to report a security problem, and which parts of the tool we cannot help you recover.',

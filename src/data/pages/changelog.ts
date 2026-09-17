@@ -8,14 +8,14 @@ export default {
   related: [
     { path: '/about/', labelEn: 'About this project', labelZh: '关于这个项目' },
     { path: '/how-it-works/', labelEn: 'How the pipeline works', labelZh: '管线如何运转' },
-    { path: '/accessibility/', labelEn: 'Accessibility statement', labelZh: '无障碍声明' },
+    { path: '/models/', labelEn: 'Model sizes and licences', labelZh: '模型体积与许可' },
     { path: '/contact/', labelEn: 'Report a problem', labelZh: '报告问题' },
   ],
   copy: {
     en: {
       title: 'Changelog: v0.1, the first release (2026-09-17)',
       description:
-        'The v0.1 release record for SecureRAG, published 17 September 2026: what shipped, the limitations knowingly left in, and what the next work is — no invented version history.',
+        'The v0.1 release record, published 17 September 2026: what shipped, the limitations knowingly left in, and what comes next, with no invented version history.',
       h1: 'Changelog',
       intro:
         'This page records what shipped in each released version of the site and the tool, what was knowingly left unfinished, and what changes next. There is one entry so far: v0.1, published 17 September 2026. Nothing earlier exists, and no entry here is backfilled to look like a longer history.',

@@ -22,7 +22,7 @@ steps:
   - title: "Confirm the cache, not the promise"
     text: "Open the Application tab, expand Cache Storage, and check that model files are present. Check IndexedDB in the same panel for chunk and vector entries."
   - title: "Request persistent storage"
-    text: "Press the persist control in the interface, or run navigator.storage.persist() in the console. The browser then treats this origin as less likely to be evicted."
+    text: "Let the tool ask for persistent storage while it sets itself up, or run navigator.storage.persist() in the console yourself. The browser then treats this origin as less likely to be evicted."
   - title: "Switch to airplane mode and reload"
     text: "Enable airplane mode or set DevTools throttling to Offline, then reload the page. The interface should load from the service worker cache instead of the network."
   - title: "Ask a question with the network off"
@@ -100,7 +100,7 @@ A useful habit once the test passes: keep the tab pinned for the sessions where 
 
 Browsers treat site data as theirs to manage. Under disk pressure, a browser may evict the cache, including the several megabytes of model weights it thinks you can download again. From the user's side this looks like a surprise re-download.
 
-Pressing the persist request is the mitigation. The interface exposes a control for it, and the underlying call is:
+Asking for persistent storage is the mitigation. The tool requests it while it sets itself up, and the underlying call is one you can make yourself at any time:
 
 `navigator.storage.persist()`
 

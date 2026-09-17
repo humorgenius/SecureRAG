@@ -26,9 +26,14 @@ function looksLikeHeading(line: string, next: string | undefined): boolean {
   // table rows and fenced code are structured content, never headings
   if (/^\|.*\|$/.test(t) || /^```/.test(t)) return false;
   if (isStructural(t) && !/^[\-(*•]/.test(t)) return true;
-  if (/[:：]$/.test(t)) return true;
-  if (next !== undefined && next.trim() === '') return true;
-  if (!/[。.!?；;]$/.test(t) && t.split(/\s+/).length <= 9) return true;
+  // Sentence punctuation vetoes a heading, and it has to be checked before the
+  // "next line is blank" rule: in Markdown EVERY paragraph is followed by a
+  // blank line, so that rule alone promotes ordinary prose into the heading
+  // stack and the real headings lose their path. Chinese commas count too —
+  // a line ending in ，is prose, not a title.
+  if (/[。！？.!?；;，,、：:]$/.test(t)) return false;
+  if (next !== undefined && next.trim() === '' && t.split(/\s+/).length <= 12) return true;
+  if (t.split(/\s+/).length <= 9) return true;
   return false;
 }
 
