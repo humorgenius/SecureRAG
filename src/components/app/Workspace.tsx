@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { ta } from '../../i18n/app';
 import type { Lang } from '../../i18n/utils';
 import { extractiveAnswer } from '../../lib/rag/answer/extractive';
+import { buildSessionExport } from '../../lib/rag/export';
 import type { MatchResult } from '../../lib/rag/match-all';
 import { HINTS_BY_CODE, LIMITS, RagError, hintFor, type RagErrorCode } from '../../lib/rag/limits';
 import { GENERATION_MODELS, hasWebGPU } from '../../lib/rag/models';
@@ -512,35 +513,24 @@ export default function Workspace({ lang, sessionId }: Props) {
   /* ------------------------------------------------------------- export */
 
   const exportSession = (format: 'md' | 'json' | 'txt') => {
-    const header = [
-      `# SecureRAG session — ${new Date().toISOString()}`,
-      `model: ${settings?.embeddingModel}${settings?.useGeneration ? ` + ${settings.generationModel}` : ''}`,
-      `strictness: ${settings?.strictness}`,
-      '',
-    ].join('\n');
-
-    let body: string;
-    if (format === 'json') {
-      body = JSON.stringify(
-        { exportedAt: new Date().toISOString(), settings, messages },
-        null,
-        2
-      );
-    } else if (format === 'txt') {
-      body = messages
-        .map((m) => (m.role === 'user' ? `Q: ${m.text}` : `A: ${m.text}${m.notFound ? ` (${ta(lang, 'chat.notFound')})` : ''}`))
-        .join('\n\n');
-    } else {
-      body = header + messages
-        .map((m) => {
-          if (m.role === 'user') return `**Q.** ${m.text}`;
-          const cites = (m.citations ?? [])
-            .map((c) => `  ${c.index}. ${c.docName}${c.page ? ` p.${c.page}` : ''} — ${c.quote}`)
-            .join('\n');
-          return `**A.** ${m.notFound ? ta(lang, 'chat.notFound') : m.text}${cites ? `\n\n${cites}` : ''}`;
-        })
-        .join('\n\n');
-    }
+    const body = buildSessionExport(
+      format,
+      messages,
+      {
+        at: new Date().toISOString(),
+        embeddingModel: settings?.embeddingModel ?? '',
+        generationModel: settings?.generationModel ?? '',
+        useGeneration: Boolean(settings?.useGeneration),
+        strictness: settings?.strictness ?? 'balanced',
+      },
+      {
+        notFound: ta(lang, 'chat.notFound'),
+        matchesTitle: (n) => ta(lang, 'match.title', { n }),
+        filesCount: (n) => ta(lang, 'match.files', { n }),
+        perDoc: (n) => ta(lang, 'match.count', { n }),
+        note: ta(lang, 'match.note'),
+      }
+    );
 
     const blob = new Blob([body], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
