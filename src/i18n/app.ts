@@ -1,0 +1,202 @@
+import type { Lang } from './utils';
+
+/**
+ * Workspace UI strings. Kept next to ui.ts rather than inside it because this
+ * namespace is only loaded by the tool page — the island imports it, the
+ * marketing pages never do.
+ */
+export const appStrings = {
+  en: {
+    'app.title': 'Your local document workspace',
+    'app.subtitle':
+      'Everything below happens inside this browser tab. Nothing is uploaded, and the network shield proves it.',
+    'app.privacyBanner': 'Files never leave your device — parsing, indexing and answering all run locally.',
+    'app.offlineReady': 'Offline-ready',
+
+    'drop.title': 'Drop documents here',
+    'drop.hint': 'or click to choose files',
+    'drop.formats': 'PDF · DOCX · TXT · Markdown · CSV · HTML · JSON',
+    'drop.limits': 'Up to {files} files · {size} MB each · {total} MB total',
+    'drop.mobileNote': 'On phones the limit is {files} files — browsers cap memory lower here.',
+    'drop.choose': 'Choose files',
+
+    'docs.title': 'Library',
+    'docs.count': '{n} documents · {chunks} chunks',
+    'docs.empty': 'No documents yet. Add one to start asking questions.',
+    'docs.rename': 'Rename',
+    'docs.delete': 'Delete',
+    'docs.disable': 'Exclude from search',
+    'docs.enable': 'Include in search',
+    'docs.reindex': 'Rebuild index',
+    'docs.excluded': 'excluded',
+    'docs.pages': '{n} pages',
+    'docs.save': 'Save',
+    'docs.cancel': 'Cancel',
+    'docs.confirmDelete': 'Delete this document and its local index?',
+
+    'chat.title': 'Ask your documents',
+    'chat.placeholder': 'Ask a question about your documents…',
+    'chat.send': 'Send',
+    'chat.thinking': 'Searching your documents…',
+    'chat.generating': 'Writing an answer locally…',
+    'chat.answerLabel': 'Answer from your documents',
+    'chat.answerGenerated': 'Answer · local model',
+    'chat.inferredLabel': 'inferred',
+    'chat.sources': 'Sources',
+    'chat.notFound': 'Not found in your documents.',
+    'chat.notFoundHelp':
+      'Nothing cleared the relevance threshold. Try different wording, or allow inference mode in settings.',
+    'chat.export': 'Export session',
+    'chat.clear': 'Clear conversation',
+    'chat.copy': 'Copy',
+    'chat.copied': 'Copied',
+    'chat.strictHint': 'Documents only — refuses rather than guesses.',
+    'chat.balancedHint': 'Allow inference — marked sentences may go beyond the source.',
+    'chat.empty': 'Add a document, then ask something you would not type into a cloud box.',
+    'chat.noDocs': 'There is nothing to search yet — add a document first.',
+    'chat.noDocsHelp': 'The library is empty or every document is excluded from search.',
+
+    'settings.title': 'Engine settings',
+    'settings.embedding': 'Embedding model',
+    'settings.generation': 'Generation model',
+    'settings.generationToggle': 'Enable local answer generation',
+    'settings.generationNote':
+      'Off by default. Enabling downloads the model first — the size is shown before anything starts.',
+    'settings.strictness': 'Strictness',
+    'settings.strict': 'Documents only',
+    'settings.balanced': 'Allow inference',
+    'settings.turns': 'Follow-up context: {n} turns',
+    'settings.download': 'Download {size} MB',
+    'settings.confirmTitle': 'This will download {size} MB',
+    'settings.confirmBody':
+      'Model weights contain no information about you, your files or your questions. After this they are cached and the app works offline.',
+    'settings.confirm': 'Download and enable',
+    'settings.cancel': 'Not now',
+
+    'shield.title': 'Network shield',
+    'shield.desc': 'Every outbound request this page has made, observed live in your browser.',
+    'shield.none': 'No outbound requests so far.',
+    'shield.model': 'Model weights',
+    'shield.local': 'Everything else — parsing, embedding, search, answering — happens locally.',
+    'shield.bytes': '{n} KB',
+    'shield.verify': 'Verify independently with DevTools → Network.',
+
+    'stage.parse': 'Reading',
+    'stage.chunk': 'Splitting',
+    'stage.embed': 'Embedding',
+    'stage.done': 'Indexed',
+    'stage.model': 'Downloading model',
+    'stage.working': 'Working…',
+
+    'stats.storage': 'Local storage used: {mb} MB',
+    'export.markdown': 'Markdown',
+    'export.json': 'JSON',
+    'export.text': 'Plain text',
+    'export.title': 'Export this session',
+    'export.note': 'Includes the model name, strictness setting and every citation.',
+
+    'nav.docs': 'Documents',
+    'nav.chat': 'Chat',
+    'nav.settings': 'Settings',
+  },
+  zh: {
+    'app.title': '你的本地文档工作区',
+    'app.subtitle': '下面发生的一切都在这个浏览器标签页内完成。没有任何上传，网络盾牌可以证明。',
+    'app.privacyBanner': '文件永不离开你的设备——解析、建索引、回答全部在本地完成。',
+    'app.offlineReady': '可离线使用',
+
+    'drop.title': '把文档拖到这里',
+    'drop.hint': '或点击选择文件',
+    'drop.formats': 'PDF · DOCX · TXT · Markdown · CSV · HTML · JSON',
+    'drop.limits': '最多 {files} 份 · 单份 {size}MB · 总计 {total}MB',
+    'drop.mobileNote': '手机上的上限是 {files} 份——移动浏览器内存限制更严。',
+    'drop.choose': '选择文件',
+
+    'docs.title': '文档库',
+    'docs.count': '{n} 份文档 · {chunks} 个文本块',
+    'docs.empty': '还没有文档。添加一份就能开始提问。',
+    'docs.rename': '重命名',
+    'docs.delete': '删除',
+    'docs.disable': '从检索中排除',
+    'docs.enable': '加入检索',
+    'docs.reindex': '重建索引',
+    'docs.excluded': '已排除',
+    'docs.pages': '{n} 页',
+    'docs.save': '保存',
+    'docs.cancel': '取消',
+    'docs.confirmDelete': '删除这份文档及其本地索引？',
+
+    'chat.title': '向你的文档提问',
+    'chat.placeholder': '就你的文档提一个问题…',
+    'chat.send': '发送',
+    'chat.thinking': '正在检索你的文档…',
+    'chat.generating': '正在本地生成回答…',
+    'chat.answerLabel': '来自你的文档的回答',
+    'chat.answerGenerated': '回答 · 本地模型',
+    'chat.inferredLabel': '推断',
+    'chat.sources': '来源',
+    'chat.notFound': '文档中未找到相关内容。',
+    'chat.notFoundHelp': '没有任何内容越过相关度阈值。换个说法，或在设置里允许推理模式。',
+    'chat.export': '导出会话',
+    'chat.clear': '清空对话',
+    'chat.copy': '复制',
+    'chat.copied': '已复制',
+    'chat.strictHint': '仅依据文档——找不到就拒答，不猜。',
+    'chat.balancedHint': '允许推理——标注过的句子可能超出原文。',
+    'chat.empty': '先加一份文档，然后问一个你绝不会打进云端输入框的问题。',
+    'chat.noDocs': '还没有可检索的内容——请先添加一份文档。',
+    'chat.noDocsHelp': '文档库是空的，或所有文档都被排除了。',
+
+    'settings.title': '引擎设置',
+    'settings.embedding': '嵌入模型',
+    'settings.generation': '生成模型',
+    'settings.generationToggle': '启用本地回答生成',
+    'settings.generationNote': '默认关闭。启用会先下载模型，开始前会明确写清体积。',
+    'settings.strictness': '严格度',
+    'settings.strict': '仅依据文档',
+    'settings.balanced': '允许推理',
+    'settings.turns': '追问上下文：{n} 轮',
+    'settings.download': '下载 {size} MB',
+    'settings.confirmTitle': '即将下载 {size} MB',
+    'settings.confirmBody':
+      '模型权重不包含关于你、你的文件或你的问题的任何信息。下载后会缓存到本地，之后可以离线使用。',
+    'settings.confirm': '下载并启用',
+    'settings.cancel': '暂不',
+
+    'shield.title': '网络盾牌',
+    'shield.desc': '下面是这个页面发出的全部外发请求，由你的浏览器实时观测。',
+    'shield.none': '目前没有任何外发请求。',
+    'shield.model': '模型权重',
+    'shield.local': '其余全部——解析、向量化、检索、回答——都在本地完成。',
+    'shield.bytes': '{n} KB',
+    'shield.verify': '也可以用开发者工具 → Network 独立验证。',
+
+    'stage.parse': '读取中',
+    'stage.chunk': '分块中',
+    'stage.embed': '向量化',
+    'stage.done': '已索引',
+    'stage.model': '正在下载模型',
+    'stage.working': '处理中…',
+
+    'stats.storage': '本地存储已用：{mb} MB',
+    'export.markdown': 'Markdown',
+    'export.json': 'JSON',
+    'export.text': '纯文本',
+    'export.title': '导出本次会话',
+    'export.note': '包含模型名、严格度设置与全部引用。',
+
+    'nav.docs': '文档',
+    'nav.chat': '对话',
+    'nav.settings': '设置',
+  },
+} as const;
+
+export type AppKey = keyof (typeof appStrings)['en'];
+
+export function ta(lang: Lang, key: AppKey, vars?: Record<string, string | number>): string {
+  const dict = appStrings[lang] as Record<string, string>;
+  const fallback = appStrings.en as Record<string, string>;
+  let text = dict[key] ?? fallback[key] ?? key;
+  if (vars) for (const [k, v] of Object.entries(vars)) text = text.replaceAll(`{${k}}`, String(v));
+  return text;
+}

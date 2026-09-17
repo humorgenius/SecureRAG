@@ -15,7 +15,7 @@ export default {
     en: {
       title: 'Privacy policy: what we never receive',
       description:
-        'Plain-language privacy policy for SecureRAG: no document content, no questions, no accounts, no tracking pixels. What the one model request contains, and how ads and cookies work.',
+        'Privacy policy in plain words: no document content, no questions, no accounts, no tracking pixels, one request carrying a file name, and how ad cookies work.',
       h1: 'Privacy policy',
       intro:
         'You can use this site without an account, and without any document or question ever reaching us. This policy lists what is not collected, where your data lives, the single outbound request the app makes, and how advertising cookies work.',

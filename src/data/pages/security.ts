@@ -15,7 +15,7 @@ export default {
     en: {
       title: 'Security and data flow: nothing your browser did not do',
       description:
-        'Where every step of document processing happens, the four layers of defence, the boundaries we cannot control, and a five-minute procedure to verify the claims yourself.',
+        'Where each processing step runs, the four layers of defence, the boundaries we cannot control, and a five-minute DevTools verification.',
       h1: 'Security and data flow, written so you can check it',
       intro:
         'Your documents are parsed, chunked, embedded, indexed and searched inside one browser tab. This page maps each step to where it happens, lists the four layers that keep it that way, and shows how to confirm the whole thing in DevTools.',
@@ -204,7 +204,7 @@ export default {
     zh: {
       title: '安全与数据流：全部发生在你的浏览器里',
       description:
-        '文档处理的每一步在哪里执行、四道防线分别是什么、我们控制不了的边界有哪些，以及五分钟就能自己验证的完整操作步骤。',
+        '文档处理的每一步在哪里执行、四道防线分别是什么、我们控制不了的边界有哪些，以及五分钟就能自己验证全过程的具体操作步骤与命令。',
       h1: '安全与数据流，写成你能亲手核对的样子',
       intro:
         '你的文档在一个浏览器标签页里完成解析、分块、向量化、建索引和检索。这一页把每一步对应到具体位置，列出维持这个状态的四道防线，并给出用开发者工具确认全过程的步骤。',

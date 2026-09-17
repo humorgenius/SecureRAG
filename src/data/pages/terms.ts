@@ -15,7 +15,7 @@ export default {
     en: {
       title: 'Terms of use: what this tool is and is not',
       description:
-        'Terms of use for SecureRAG in plain language: the service, acceptable use, who owns what, the limits of a small local model, liability, and how changes are announced.',
+        'Plain-language terms of use: the service, acceptable use, who owns what, the limits of a small local model, liability, and how changes are announced.',
       h1: 'Terms of use',
       intro:
         'SecureRAG is a free information tool you run in your browser. These terms describe what the service does, what you may use it for, who owns the documents and the code, and what happens when a local model gets something wrong.',

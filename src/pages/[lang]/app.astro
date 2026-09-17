@@ -1,0 +1,217 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/seo/Breadcrumbs.astro';
+import PrivacyBadge from '../../components/marketing/PrivacyBadge.astro';
+import AdSlot from '../../components/marketing/AdSlot.astro';
+import JsonLd from '../../components/seo/JsonLd.astro';
+import Workspace from '../../components/app/Workspace';
+import { ta } from '../../i18n/app';
+import { t, localizePath, type Lang } from '../../i18n/utils';
+import { articleSchema, breadcrumbSchema, howToSchema, orgSchema, softwareAppSchema, websiteSchema } from '../../lib/seo/schema';
+import '../../styles/app.css';
+
+export function getStaticPaths() {
+  return [{ params: { lang: 'en' } }, { params: { lang: 'zh' } }];
+}
+
+const { lang: langParam } = Astro.params as { lang: string };
+const lang: Lang = langParam === 'zh' ? 'zh' : 'en';
+
+const copy =
+  lang === 'zh'
+    ? {
+        title: '本地文档问答工具 — 文件不上传，全程在浏览器内运行',
+        titleShort: '本地文档问答工具 · SecureRAG',
+        description:
+          '拖入 PDF、Word、Markdown 文档即可提问。解析、向量化、检索与回答 100% 在浏览器本地完成，无需注册，缓存后可离线使用。',
+        h1: '你的文档工作区，全部在本地',
+        lede:
+          '支持 PDF、DOCX、TXT、Markdown、CSV、HTML、JSON。单文件不超过 25MB，最多 40 份。第一次加载会下载约 25MB 的嵌入模型，之后即可离线使用。',
+        steps: [
+          { title: '拖入或选择文件', text: '文件通过浏览器的 File API 读入内存，不会再传给任何服务器。' },
+          { title: '等待本地建索引', text: '解析、分块、向量化在 Web Worker 内完成，界面会显示实时进度。' },
+          { title: '提问并核对来源', text: '每条回答都带编号引用，点击即可跳到原文段落与页码。' },
+        ],
+        faq: [
+          { q: '文件真的不会被上传吗？', a: '不会。这个网站没有后端接口，页面里也不存在上传代码路径。你可以打开开发者工具 → Network，添加文档并提问，除了首次的模型下载之外不会看到任何请求。' },
+          { q: '关掉页面后数据还在吗？', a: '文本块与向量存在你浏览器的 IndexedDB 里，下次打开即可继续使用。清除站点数据就会彻底删除。' },
+          { q: '支持哪些文件？', a: 'PDF（需含文字层）、DOCX、TXT、Markdown、CSV、HTML、JSON。加密 PDF、无文字层的扫描件、旧版 .doc 不支持，界面会明确指出原因。' },
+        ],
+        adsNote: '本页的广告位在聊天工作区之外，且需要你同意后才会加载。',
+      }
+    : {
+        title: 'Local document Q&A tool — nothing is uploaded, everything runs in-browser',
+        titleShort: 'Local document Q&A in your browser · SecureRAG',
+        description:
+          'Drop in PDF, Word or Markdown files and ask questions. Parsing, embedding, retrieval and answering run entirely in your browser. No sign-up, offline-capable.',
+        h1: 'Your document workspace, entirely on your machine',
+        lede:
+          'PDF, DOCX, TXT, Markdown, CSV, HTML and JSON. Up to 25 MB per file and 40 files per library. The first visit downloads a ≈ 25 MB embedding model; after that it works offline.',
+        steps: [
+          { title: 'Drop or choose files', text: 'Files are read into memory through the browser File API and are never sent to a server.' },
+          { title: 'Wait for the local index', text: 'Parsing, chunking and embedding run in a Web Worker with live progress.' },
+          { title: 'Ask, then verify', text: 'Every answer carries numbered citations that jump to the source paragraph and page.' },
+        ],
+        faq: [
+          { q: 'Are my files really not uploaded?', a: 'Correct. There is no backend endpoint and no upload code path in the page. Open DevTools → Network, add a document and ask a question: apart from the one-time model download you will see no requests at all.' },
+          { q: 'Does my library survive closing the tab?', a: 'Chunks and vectors live in your browser IndexedDB, so the next visit is instant. Clearing site data deletes everything.' },
+          { q: 'Which formats work?', a: 'PDF with a text layer, DOCX, TXT, Markdown, CSV, HTML and JSON. Encrypted PDFs, scans without a text layer and legacy .doc are refused with a specific reason.' },
+        ],
+        adsNote: 'Ads on this page sit outside the chat workspace and load only after you consent.',
+      };
+
+const path = `/${lang}/app/`;
+const crumbs = [
+  { name: t(lang, 'common.home'), path: localizePath(lang, '/') },
+  { name: copy.h1, path },
+];
+
+const jsonLd = [
+  orgSchema(lang),
+  websiteSchema(lang),
+  softwareAppSchema(lang),
+  howToSchema({
+    lang,
+    name: copy.h1,
+    description: copy.lede,
+    steps: copy.steps.map((s) => ({ name: s.title, text: s.text })),
+  }),
+  breadcrumbSchema(crumbs),
+  articleSchema({ lang, title: copy.title, description: copy.description, path, datePublished: '2026-09-17' }),
+];
+---
+
+<BaseLayout lang={lang} path={path} title={lang === 'zh' ? copy.titleShort : copy.titleShort} description={copy.description} activeNav="/app/">
+  <Breadcrumbs items={crumbs} />
+
+  <section class="wrap app-hero">
+    <h1>{copy.h1}</h1>
+    <p class="lede">{copy.lede}</p>
+    <div class="promises">
+      <PrivacyBadge lang={lang} variant="light" />
+    </div>
+  </section>
+
+  <section class="wrap">
+    <Workspace client:only="preact" lang={lang} sessionId={`main-${lang}`} />
+  </section>
+
+  <section class="wrap section">
+    <p class="eyebrow">{lang === 'zh' ? '使用步骤' : 'How to use it'}</p>
+    <h2 class="h2">{lang === 'zh' ? '三步完成一次可溯源的问答' : 'Three steps to a cited answer'}</h2>
+    <div class="steps3">
+      {
+        copy.steps.map((step, i) => (
+          <article class="card step-card">
+            <span class="sn">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{step.title}</h3>
+            <p>{step.text}</p>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <p class="eyebrow">FAQ</p>
+    <h2 class="h2">{t(lang, 'faq.heading')}</h2>
+    <div class="faq">
+      {
+        copy.faq.map((item, i) => (
+          <details class="card" open={i === 0}>
+            <summary>{item.q}</summary>
+            <div class="body">{item.a}</div>
+          </details>
+        ))
+      }
+    </div>
+    <div class="links">
+      <a class="btn btn-white" href={localizePath(lang, '/models/')}>{t(lang, 'nav.models')}</a>
+      <a class="btn btn-white" href={localizePath(lang, '/security/')}>{t(lang, 'nav.trust')}</a>
+      <a class="btn btn-white" href={localizePath(lang, '/guides/')}>{t(lang, 'nav.guides')}</a>
+    </div>
+    <AdSlot lang={lang} />
+    <p class="note ads-note">{copy.adsNote}</p>
+  </section>
+
+  <JsonLd data={jsonLd} />
+</BaseLayout>
+
+<style>
+  .app-hero {
+    padding-top: 26px;
+    padding-bottom: 26px;
+  }
+  h1 {
+    font-size: clamp(28px, 3.6vw, 42px);
+    letter-spacing: -.03em;
+    max-width: 26ch;
+  }
+  .promises {
+    margin-top: 22px;
+  }
+  .steps3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 30px;
+  }
+  .step-card {
+    padding: 24px 22px;
+  }
+  .sn {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--blue);
+    font-weight: 600;
+  }
+  .step-card h3 {
+    font-size: 16.5px;
+    margin: 10px 0 8px;
+  }
+  .step-card p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .faq {
+    margin-top: 30px;
+    max-width: 88ch;
+  }
+  .faq details {
+    margin-bottom: 12px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .faq summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 19px 22px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq .body {
+    padding: 0 22px 20px;
+    font-size: 14.5px;
+    color: var(--muted);
+    line-height: 1.75;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 26px;
+  }
+  .ads-note {
+    margin-top: 12px;
+  }
+  @media (max-width: 900px) {
+    .steps3 {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

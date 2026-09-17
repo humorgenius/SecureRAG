@@ -6,7 +6,7 @@ export default {
     en: {
       title: 'SecureRAG vs NotebookLM, ChatPDF and ChatGPT file uploads',
       description:
-        'Head-to-head comparisons of NotebookLM, ChatPDF and ChatGPT file uploads: where your file actually goes, what each does better, and what the local route costs.',
+        'Head-to-head comparisons of NotebookLM, ChatPDF and ChatGPT file uploads: where your file goes, what each does better, and what the local route costs.',
       h1: 'Three ways to ask a document a question, and where your file ends up in each',
       intro:
         'NotebookLM, ChatPDF and ChatGPT all answer questions about a document you hand them, and all three copy that document onto a company server before anything is indexed. SecureRAG does the same job inside one browser tab: bge-small-zh-v1.5 (~25 MB) or all-MiniLM-L6-v2 (~23 MB) embeds your text locally, retrieval fuses vector search with BM25, and the only outbound request the application ever makes is the model download. These three pages compare each hosted tool against that approach, including the cases where the hosted tool wins.',
@@ -129,7 +129,7 @@ export default {
     zh: {
       title: '方案对比：SecureRAG 与 NotebookLM、ChatPDF、ChatGPT 上传文件',
       description:
-        '把 NotebookLM、ChatPDF 与 ChatGPT 文件上传逐项对比：文件究竟落在谁的服务器上、各自强在哪里、本地方案要付出什么代价，全部只依据厂商公开发布的文档，写于 2026 年 9 月。',
+        '把 NotebookLM、ChatPDF 与 ChatGPT 文件上传逐项对比：文件究竟落在谁的服务器上、各自强在哪里、本地方案要付出什么代价，全部只依据厂商公开发布的文档，写于 2026 年 9 月。每篇都写明竞品更强的功能与我们输在哪里，不确定的数字一律注明以对方官网为准。',
       h1: '把文档丢进去提问的三种做法，以及文件各自去了哪里',
       intro:
         'NotebookLM、ChatPDF、ChatGPT 都能就你给的文档回答问题，三者在索引之前都会先把文档复制一份到自家服务器。SecureRAG 把同样的事放在一个浏览器标签页里做：bge-small-zh-v1.5（约 25MB）或 all-MiniLM-L6-v2（约 23MB）在本地生成向量，检索把向量与 BM25 融合，整个应用唯一的外发请求就是下载模型权重。下面三篇分别把它们和这套做法逐项对照，包括对手确实更强的地方。',
@@ -242,7 +242,7 @@ export default {
     {
       slug: 'notebooklm',
       ads: 1,
-      schema: { article: true, faq: true },
+      schema: { article: true, faq: true, howTo: true },
       related: [
         { path: '/app/', labelEn: 'Open the tool', labelZh: '打开工具' },
         { path: '/how-it-works/', labelEn: 'How the local pipeline works', labelZh: '本地管线是怎么跑的' },
@@ -387,7 +387,7 @@ export default {
         zh: {
           title: 'NotebookLM 的本地替代：离线可用的浏览器内 RAG',
           description:
-            'NotebookLM 把来源索引在 Google 云端、需要保持登录。这篇写清它确实更强的几处、SecureRAG 换来的本地检索与离线能力、本地方案会输在哪里，并给出把笔记库搬到本地的五步做法。',
+            'NotebookLM 把来源索引在 Google 云端、需要保持登录。这篇写清它确实更强的几处、SecureRAG 换来的本地检索与离线能力、本地方案会输在哪里，并给出把笔记库搬到本地的五步做法，同时列出 25MB 单文件上限、没有 OCR、不能跨设备同步这几处短板。',
           h1: 'NotebookLM 把来源存在 Google 账号里，SecureRAG 把它留在标签页里。',
           intro:
             'NotebookLM 是一套托管笔记库：你添加来源，它在 Google 的服务器上建索引，并用可点开的引用回答。SecureRAG 保留这套流程里的检索部分并把它搬进浏览器——同一份文件在本地用 23–25MB 的模型完成解析、分块与向量化，文档库不离开这台机器。这一页就存储位置、引用、离线、限额与文笔逐项比较，并列出 NotebookLM 确实做得到的四件事。',
@@ -639,7 +639,7 @@ export default {
         zh: {
           title: 'ChatPDF 的本地替代：PDF 不上传的问答工具',
           description:
-            'ChatPDF 官网 FAQ 写明免费档每天可分析 2 份文档、核心功能无需注册。这篇对比这套便利与「文件不出本地」各自要付的代价。',
+            'ChatPDF 的官网 FAQ 写明免费档每天可分析 2 份文档、核心功能无需注册。这篇把它和「文件不出本地」逐项对比，写清页码锚点、文件上限、失败情形，以及本地方案要付出的下载与文笔代价，包括 25MB 单文件上限、不支持加密 PDF 与无文字层扫描件这几条硬限制。',
           h1: 'ChatPDF 靠上传的 PDF 回答，SecureRAG 回答同一份 PDF 而不把它搬走。',
           intro:
             'ChatPDF 就你上传的 PDF 作答，并把答案指回文档页码；它的官网 FAQ 也写明开始使用不需要账号。SecureRAG 覆盖同一段事情——解析 PDF 并保留页码、混合检索、句子级引用——而文件始终待在浏览器标签页里。这一页比较两者的上手成本、页码锚点、文件上限与失败情形，并明确写出云端方案在什么时候更实用。',
@@ -727,7 +727,7 @@ export default {
                 },
                 {
                   q: '用 SecureRAG 需要注册账号吗？',
-                  a: '无账号、无追踪像素、不要邮箱。所有数据只存在你的浏览器配置里，这也意味着没有密码找回，也没有任何客服渠道能帮你恢复误删的文档库。',
+                  a: '无账号、无追踪像素、不需要邮箱。所有数据只存在你的浏览器配置里，这也意味着没有密码找回，也没有任何客服渠道能帮你恢复误删的文档库。',
                 },
                 {
                   q: '一次能同时检索多少份 PDF？',
@@ -757,7 +757,7 @@ export default {
         en: {
           title: 'ChatGPT file upload vs a local document assistant',
           description:
-            'ChatGPT parses uploaded files on OpenAI\'s servers, and its help centre says consumer chats train models unless you opt out. Here is what a local-only alternative changes.',
+            'ChatGPT parses uploaded files on OpenAI\'s servers, and its help centre says consumer chats train models unless you opt out. What a local alternative changes.',
           h1: 'ChatGPT reads an uploaded file on OpenAI\'s servers. Here is what that changes.',
           intro:
             'Upload a PDF to ChatGPT and it is parsed, chunked and searched on OpenAI\'s infrastructure, with the answer written by a frontier model. SecureRAG does the parsing, chunking and searching in the browser tab and answers from your own retrieval, with the file never leaving the device. The interesting comparison is not raw capability — ChatGPT wins that outright — but what happens to the document, which setting decides it, and which jobs only a hosted model can do.',
@@ -865,7 +865,7 @@ export default {
         zh: {
           title: 'ChatGPT 上传文件与本地文档助手的区别',
           description:
-            'ChatGPT 在 OpenAI 的服务器上解析上传文件；其帮助中心写明消费级对话默认会被用于训练，除非你主动退出。这篇对比本地方案改了什么。',
+            'ChatGPT 在 OpenAI 的服务器上解析上传文件，其帮助中心写明消费级对话默认会用于训练、除非你主动退出。这篇对比本地方案改了什么、引用从哪来、它明显输在哪几处，并说明企业版、API 与消费级套餐在数据使用上的不同默认值，附一个用你手边文件就能跑完的五分钟测试。',
           h1: 'ChatGPT 在 OpenAI 的服务器上读你上传的文件。这篇讲这意味着什么。',
           intro:
             '把一份 PDF 上传给 ChatGPT，它会在 OpenAI 的基础设施上被解析、切分、检索，答案由前沿模型写成。SecureRAG 把解析、切分、检索放在浏览器标签页里完成，用你自己的检索结果作答，文件不离开设备。值得比的不只是能力——纯能力 ChatGPT 完胜——而是这份文档之后会怎样、由哪个开关决定，以及哪些活只有云端模型干得了。',

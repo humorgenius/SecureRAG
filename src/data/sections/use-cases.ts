@@ -10,7 +10,7 @@ export default {
     en: {
       title: 'Use cases — where local document Q&A fits',
       description:
-        'Four workflows that work in a browser-local RAG tool: contracts, literature, coursework, HR and finance files — the formats, question patterns and limits of each.',
+        'Four workflows in a browser-local RAG tool: contracts, literature, coursework, HR and finance files — the formats, question patterns and limits of each.',
       h1: 'Four kinds of document work this tool is built for',
       intro:
         'SecureRAG answers questions across PDF, Word, Markdown and CSV files inside a single browser tab. This section covers four workflows in detail: the files involved, the questions that retrieve well, and the limits that decide whether it fits. Files never leave the device.',
@@ -247,7 +247,7 @@ export default {
         en: {
           title: 'Contract and case-file Q&A that stays on your machine',
           description:
-            'Contract review, clause comparison and file interrogation in a browser-local RAG tool: supported formats, question patterns, retrieval limits, and when to use something else.',
+            'Contract review, clause comparison and interrogation in a browser-local tool: formats, question patterns, retrieval limits, and when to use something else.',
           h1: 'Reading a contract without sending it to a server',
           intro:
             'SecureRAG lets a lawyer, paralegal or compliance analyst ask questions across up to 40 PDF or DOCX files at once, with parsing, embedding and search all running in the browser. Files never leave the device. This page lists the formats that work, the questions that retrieve well, and the cases where a local tool is the wrong choice.',
@@ -399,7 +399,7 @@ export default {
         zh: {
           title: '合同与卷宗问答，全程留在你自己的机器上',
           description:
-            '在浏览器本地做合同审阅、条款比对与案卷检索：支持哪些格式、哪些提问方式检索得到、会在哪里失效，以及什么时候该换工具。',
+            '在浏览器本地做合同审阅、条款比对和案卷检索：支持哪些格式、引用里是否带页码、哪些提问方式检索得到、会在哪里失效，以及什么时候本地工具就是选错了。',
           h1: '不用把合同发给服务器，也能把它问一遍',
           intro:
             '律师、律师助理或合规人员可以一次对最多 40 份 PDF 或 DOCX 提问，解析、向量化、检索全部在浏览器里完成。文件永不离开你的设备。这一页写明哪些格式靠得住、哪些提问能检索到内容，以及什么时候本地工具就是选错了。',
@@ -564,7 +564,7 @@ export default {
         en: {
           title: 'Literature Q&A across 40 PDFs, entirely offline',
           description:
-            'A local literature-review workflow: what parses well in preprints, how to batch the 40-document cap, which questions retrieve, and the academic limits to respect.',
+            'A local literature-review workflow: what parses well in preprint PDFs, how to batch the 40-document cap, which questions retrieve, and the academic limits.',
           h1: 'Screening papers without uploading them',
           intro:
             'A researcher can ask questions across up to 40 PDFs at once without sending a single file anywhere: parsing, embedding and search run in the browser tab. This page covers what the parser does with preprint PDFs, how to split a larger screen into batches, and where a small local model stops being enough.',
@@ -692,7 +692,7 @@ export default {
         zh: {
           title: '40 篇 PDF 的文献问答，全程离线',
           description:
-            '本地文献阅读流程：预印本 PDF 里哪些内容解析得住、40 份上限怎么分批、哪些提问能检索到，以及在学术上要守住的边界。',
+            '本地文献阅读流程：预印本 PDF 里哪些内容解析得住、超过 40 份的初筛怎么分批、哪些提问能检索到原文，以及在学术上必须守住的边界。',
           h1: '不把论文传出去，也能把它们筛一遍',
           intro:
             '研究者可以一次对最多 40 份 PDF 提问，不用把任何文件发出去：解析、向量化、检索都跑在浏览器标签页里。这一页讲解析器对预印本 PDF 的实际表现、超过 40 篇的综述怎么分批，以及本地小模型在哪里就不够用了。',
@@ -833,7 +833,7 @@ export default {
         en: {
           title: 'Study from your own PDFs — no upload, no account',
           description:
-            'A study workflow for lecture PDFs, textbook chapters and past papers: what parses, how to revise from citations, phone memory limits, and the integrity boundary.',
+            'A study workflow for lecture PDFs, textbook chapters and past papers: what parses, revising from citations, phone limits, and the integrity boundary.',
           h1: 'Revising from lecture slides, textbook chapters and past papers',
           intro:
             'Course material can be queried without uploading anything: up to 40 files, 25 MB each, parsed and indexed inside the browser tab. This page shows what to load for one term, how to ask questions that lead back to slide and page numbers, and which uses cross the line your institution draws.',
@@ -941,7 +941,7 @@ export default {
         zh: {
           title: '用自己的 PDF 复习，不上传、不注册',
           description:
-            '面向讲义、教材章节和历年真题的复习流程：哪些材料解析得住、怎么靠引用复习、手机上的内存限制，以及学术诚信的边界。',
+            '面向讲义、教材章节和历年真题的复习流程：哪些材料解析得住、怎么靠带页码的引用复习、手机上的内存限制，以及学术诚信那条线在哪里。',
           h1: '用讲义、教材章节和历年真题复习',
           intro:
             '课程材料不用上传也能提问：最多 40 份文件、单份 ≤25MB，解析和索引都在浏览器标签页里完成。这一页讲一个学期该导入哪些文件、怎么问出能跳回幻灯片和页码的答案，以及哪些用法会越过学校划的那条线。',
@@ -1062,7 +1062,7 @@ export default {
         en: {
           title: 'HR and finance Q&A that never leaves the laptop',
           description:
-            'Query handbooks, expense policies, vendor contracts and invoices exported to CSV in a browser-local index: formats, question patterns, limits, and the controls you still need.',
+            'Query handbooks, expense policies, vendor contracts and CSV invoices in a local index: formats, question patterns, limits, and the controls you still need.',
           h1: 'Answering policy and expense questions on-device',
           intro:
             'An HR or finance team can put up to 40 documents — employee handbook, expense policy, vendor contracts, invoices exported to CSV — into one browser-local library and question them together. Nothing is uploaded. This page covers the supported formats, the question patterns that work, and the governance questions a local tool does not answer.',
@@ -1200,7 +1200,7 @@ export default {
         zh: {
           title: '人事与财务的问答，不出这台电脑',
           description:
-            '把员工手册、报销制度、供应商合同和导出成 CSV 的发票放进浏览器本地索引来提问：格式、提问方式、上限，以及工具解决不了的管控问题。',
+            '把员工手册、报销制度、供应商合同和导出成 CSV 的发票放进浏览器本地索引来提问：支持哪些格式、哪些提问方式管用、上限是多少，以及工具解决不了的管控问题。',
           h1: '在本地回答制度与报销类问题',
           intro:
             '人事或财务可以把最多 40 份文件——员工手册、报销制度、供应商合同、导出为 CSV 的发票——放进一个浏览器本地的库，一起提问。什么都不上传。这一页讲支持哪些格式、哪些提问方式管用，以及一个本地工具回答不了的管控问题。',
