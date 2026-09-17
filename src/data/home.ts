@@ -97,7 +97,6 @@ export interface HomeContent {
   };
   tiers: { eyebrow: string; heading: string; items: Tier[]; note: string };
   faq: { eyebrow: string; heading: string; items: QA[] };
-  end: { heading: string; body: string; ctaPrimary: string; ctaSecondary: string };
 }
 
 export const home: Record<Lang, HomeContent> = {
@@ -309,12 +308,6 @@ export const home: Record<Lang, HomeContent> = {
         },
       ],
     },
-    end: {
-      heading: 'Test the claim, not the copy',
-      body: 'Add one document, ask three questions, and watch the network panel stay empty. That takes less time than reading this page.',
-      ctaPrimary: 'Open the tool',
-      ctaSecondary: 'Read the privacy policy',
-    },
   },
 
   zh: {
@@ -520,12 +513,6 @@ export const home: Record<Lang, HomeContent> = {
           a: '明确标注的展示广告，每页最多三个，绝不放进聊天工作区，也不压在主要操作上方。没有订阅制、不卖数据、除广告网络自身必需之外没有额外追踪——且广告脚本加载前会有同意门。',
         },
       ],
-    },
-    end: {
-      heading: '去验那句话，而不是信这段文案',
-      body: '加一份文档，问三个问题，看网络面板保持空白。这比读完这一页还快。',
-      ctaPrimary: '打开工具',
-      ctaSecondary: '阅读隐私政策',
     },
   },
 };

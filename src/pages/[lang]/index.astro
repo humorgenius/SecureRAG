@@ -8,7 +8,6 @@ import CompareTable from '../../components/marketing/CompareTable.astro';
 import TierCards from '../../components/marketing/TierCards.astro';
 import AdSlot from '../../components/marketing/AdSlot.astro';
 import FaqAccordion from '../../components/marketing/FaqAccordion.astro';
-import EndCta from '../../components/marketing/EndCta.astro';
 import { home } from '../../data/home';
 import { orgSchema, websiteSchema, softwareAppSchema, faqSchema } from '../../lib/seo/schema';
 import type { Lang } from '../../i18n/utils';
@@ -41,7 +40,6 @@ const jsonLd = [
   <TierCards lang={lang} />
   <div class="wrap"><AdSlot lang={lang} /></div>
   <FaqAccordion lang={lang} />
-  <EndCta lang={lang} />
   <Fragment slot="head">
     <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
   </Fragment>
