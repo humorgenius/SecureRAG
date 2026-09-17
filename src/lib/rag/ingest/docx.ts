@@ -1,3 +1,4 @@
+import JSZip from 'jszip';
 import { RagError } from '../limits';
 import type { RawDoc, RawPage } from '../types';
 
@@ -47,7 +48,11 @@ function tableRows(paragraphXml: string): string | null {
 }
 
 export async function parseDocx(buffer: ArrayBuffer, name: string, id: string): Promise<RawDoc> {
-  const JSZip = (await import('jszip')).default;
+  // JSZip is a static import on purpose. As a dynamic `import('jszip')` inside the
+  // ingest worker it could fail to resolve at runtime ("Failed to fetch
+  // dynamically imported module") — every .docx upload then died and was
+  // reported as "unsupported file format". Bundling it with the worker removes
+  // that failure mode entirely.
   let zip: Awaited<ReturnType<typeof JSZip.loadAsync>>;
   try {
     zip = await JSZip.loadAsync(buffer);

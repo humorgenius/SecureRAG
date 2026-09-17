@@ -122,6 +122,9 @@ export class RagError extends Error {
   }
 }
 
+/** Every code the UI can explain. Anything else is reported as an unknown failure. */
+export const HINTS_BY_CODE: Record<string, { en: string; zh: string }> = HINTS;
+
 export function hintFor(code: RagErrorCode, lang: 'en' | 'zh'): string {
   return HINTS[code][lang];
 }

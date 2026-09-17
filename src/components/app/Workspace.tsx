@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { ta } from '../../i18n/app';
 import type { Lang } from '../../i18n/utils';
 import { extractiveAnswer } from '../../lib/rag/answer/extractive';
-import { LIMITS, hintFor, RagError, type RagErrorCode } from '../../lib/rag/limits';
+import { HINTS_BY_CODE, LIMITS, RagError, hintFor, type RagErrorCode } from '../../lib/rag/limits';
 import { GENERATION_MODELS, hasWebGPU } from '../../lib/rag/models';
 import {
   deleteIndex,
@@ -163,7 +163,17 @@ export default function Workspace({ lang, sessionId }: Props) {
         }
         case 'error': {
           const e = msg as unknown as { code: string; file: string; detail?: string };
-          setError(`${e.file ? `${e.file} — ` : ''}${safeHint(e.code as RagErrorCode, lang)}`);
+          // An unrecognised failure must never be described as "unsupported
+          // format" — the old fallback told the user their .docx was the wrong
+          // type while the real error was something else entirely.
+          const known = e.code in HINTS_BY_CODE ? hintFor(e.code as RagErrorCode, lang) : '';
+          const summary = known
+            ? known
+            : lang === 'zh'
+              ? '这个文件处理失败了（不是格式问题，也不是网络问题）。'
+              : 'This file could not be processed — the format is not the problem, and neither is the network.';
+          const detail = e.detail ? ` · ${e.detail.slice(0, 180)}` : '';
+          setError(`${e.file ? `${e.file} — ` : ''}${summary}${detail}`);
           setProgress(null);
           setModelProgress(null);
           setBusy(false);
