@@ -57,7 +57,12 @@ const { lang } = Astro.props;
      * get a non-personalized request instead (see adMode). The footer link can still
      * open it anywhere, which is how a non-EEA reader switches to personalized ads.
      */
-    gate.hidden = read() !== null || !isEeaLike(currentTimeZone());
+    /*
+     * Hidden whenever Google's CMP is enabled: it asks the same question in the EEA
+     * and we must not stack a second dialog on top of it. The footer control still
+     * opens ours anywhere, which is the only place it is needed now.
+     */
+    gate.hidden = ADS.googleCmp || read() !== null || !isEeaLike(currentTimeZone());
     gate.querySelectorAll<HTMLButtonElement>('[data-consent]').forEach((button) => {
       button.addEventListener('click', () => write(button.dataset.consent as 'granted' | 'denied'));
     });

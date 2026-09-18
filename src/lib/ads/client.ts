@@ -71,7 +71,18 @@ function applyConsent(): void {
   const mode = adMode(readConsent((key) => storage()?.getItem(key) ?? null), currentTimeZone());
   // 'none' covers both "no choice yet" and "declined inside the EEA/UK/CH".
   // Either way nothing is requested — see the note in consent.ts.
-  if (mode === 'none' || ADS.client.length === 0) return;
+  if (ADS.client.length === 0) return;
+  /*
+   * With Google's CMP enabled the consent question and the resulting ad mode are
+   * Google's to decide, for every region: their message has to be able to appear in
+   * the EEA, so the script loads before any choice exists and nothing here overrides
+   * the TC string it produces.
+   */
+  if (ADS.googleCmp) {
+    loadAdScript(ADS.client);
+    return;
+  }
+  if (mode === 'none') return;
   loadAdScript(ADS.client);
   fillSlots(mode);
 }
