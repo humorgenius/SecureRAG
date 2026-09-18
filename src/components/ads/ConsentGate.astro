@@ -28,7 +28,7 @@ const { lang } = Astro.props;
 </div>
 
 <script>
-  import { CONSENT_EVENT, CONSENT_KEY } from '../../lib/ads/consent';
+  import { CONSENT_EVENT, CONSENT_KEY, currentTimeZone, isEeaLike } from '../../lib/ads/consent';
 
   const gate = document.querySelector<HTMLElement>('[data-consent-gate]');
 
@@ -51,7 +51,13 @@ const { lang } = Astro.props;
   };
 
   if (gate) {
-    gate.hidden = read() !== null;
+    /*
+     * Shown only where consent is required and not yet given. Elsewhere the gate
+     * would be a dialog in front of every reader for no legal reason; those visitors
+     * get a non-personalized request instead (see adMode). The footer link can still
+     * open it anywhere, which is how a non-EEA reader switches to personalized ads.
+     */
+    gate.hidden = read() !== null || !isEeaLike(currentTimeZone());
     gate.querySelectorAll<HTMLButtonElement>('[data-consent]').forEach((button) => {
       button.addEventListener('click', () => write(button.dataset.consent as 'granted' | 'denied'));
     });

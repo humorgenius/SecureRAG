@@ -12,8 +12,9 @@
  *    at all — that is the compliant reading, not a broken slot.
  *  - Everywhere else a decline can be answered with an NPA request: the slot
  *    still earns, and the visitor is not tracked for personalisation.
- *  - Before any choice has been made, nothing is requested: the ad script is not
- *    even loaded, which is what the privacy page promises.
+ *  - Before any choice has been made, nothing is requested *where consent is
+ *    required*. Elsewhere the gate is not shown at all and the request is NPA;
+ *    the EEA still gets no request until it answers.
  */
 export type ConsentChoice = 'unset' | 'granted' | 'denied';
 
@@ -36,7 +37,15 @@ export function isEeaLike(timeZone: string): boolean {
 export function adMode(choice: ConsentChoice, timeZone: string): AdMode {
   if (choice === 'granted') return 'personalized';
   if (choice === 'denied') return isEeaLike(timeZone) ? 'none' : 'non-personalized';
-  return 'none';
+  /*
+   * No answer yet. Where consent is legally required (EEA, UK, Switzerland) nothing
+   * is requested until the visitor answers - that is the whole point of the gate.
+   * Everywhere else a Google policy does not require an answer, so asking anyway
+   * just put a dialog in front of the majority of readers for no reason: those
+   * visitors get a non-personalized request instead, which earns without tracking
+   * anyone and matches what the privacy page says about ads.
+   */
+  return isEeaLike(timeZone) ? 'none' : 'non-personalized';
 }
 
 /** Reads the stored choice, treating anything unrecognised as "no choice yet". */

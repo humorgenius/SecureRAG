@@ -26,9 +26,18 @@ describe('ad mode', () => {
     }
   });
 
-  it('requests nothing before a choice is made, anywhere', () => {
-    expect(adMode('unset', 'America/New_York')).toBe('none');
-    expect(adMode('unset', 'Asia/Shanghai')).toBe('none');
+  it('requests nothing before a choice is made, where consent is required', () => {
+    // The gate is shown in these zones, and nothing is fetched until it is answered.
+    expect(adMode('unset', 'Europe/Paris')).toBe('none');
+    expect(adMode('unset', 'Europe/Bucharest')).toBe('none');
+    expect(adMode('unset', 'Atlantic/Reykjavik')).toBe('none');
+  });
+
+  it('but sends a non-personalized request elsewhere, and shows no gate', () => {
+    // No policy requires an answer outside the EEA, UK and Switzerland, so those
+    // readers get an NPA request instead of a dialog in front of the article.
+    expect(adMode('unset', 'America/New_York')).toBe('non-personalized');
+    expect(adMode('unset', 'Asia/Shanghai')).toBe('non-personalized');
   });
 });
 
