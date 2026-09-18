@@ -31,6 +31,11 @@ jobs:
       - name: Prepare self-hosted runtime assets
         run: npm run prepare:runtime
 
+      - name: Generate Astro types
+
+        run: npx astro sync
+
+
       - name: Type check
         run: npx tsc --noEmit -p tsconfig.json
 
