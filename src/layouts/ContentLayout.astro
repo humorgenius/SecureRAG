@@ -25,7 +25,33 @@ interface Props {
 const { lang, path, title, description, h1, intro, updated, blocks, crumbs, related = [], schema = [], ads = 1 } = Astro.props;
 
 /** Block index the middle banner is inserted at: roughly the first third. */
-const adCut = Math.max(1, Math.floor(blocks.length / 3));
+/*
+ * Ad density guard. Google blocks pages where the ads outweigh the content
+ * (desktop > 50%, mobile > 30% of the viewport), and three banners are 474px of
+ * ad against a column that on a thin page can be barely taller than that. The
+ * weight below stands in for how tall the page renders - a table or a FAQ block
+ * carries far more text than a paragraph, and those are what fill a page.
+ */
+const prose = blocks.reduce((n, b) => n + JSON.stringify(b).length, 0);
+/*
+ * Calibrated against the built pages: the shortest content page carries about
+ * 2,600 characters of prose, so these are a safety net for a genuinely thin page
+ * rather than a change to the ones that already exist - every page today keeps the
+ * banner it had, and a new two-section page will not inherit three.
+ */
+/*
+ * Weight only, never the block count: a page can be three very long sections
+ * (en/about is 8,000 characters in three blocks) or a dozen short ones, and the
+ * count would drop the banner from the long page while keeping it on the short.
+ */
+/*
+ * Deliberately not gated on the ads prop: the original code inserted this banner
+ * for every content page regardless of it, and the pages that pass ads={0} (the
+ * trust set) still carry it. Gating on it silently removed their banner.
+ */
+const showMidAd = prose >= 1800;
+const showTopAd = prose >= 900;
+const adCut = showMidAd ? Math.max(1, Math.floor(blocks.length / 3)) : blocks.length;
 
 /** Table of contents is derived from the h2 blocks — no manual duplication. */
 const toc = blocks
@@ -34,7 +60,7 @@ const toc = blocks
   .map((entry) => ({ id: entry.id, text: (entry.b as Extract<Block, { t: 'h2' }>).text }));
 ---
 
-<BaseLayout lang={lang} path={path} title={title} description={description} type="article">
+<BaseLayout lang={lang} path={path} title={title} description={description} type="article" noTopAd={!showTopAd}>
   <Breadcrumbs items={crumbs} />
 
   <article class="wrap page">
@@ -51,11 +77,12 @@ const toc = blocks
         {/* The middle banner sits a third of the way down, not at the end: the page
             is read in order, and an ad after the last block is an ad nobody sees. */}
         <ContentBlocks blocks={blocks.slice(0, adCut)} lang={lang} />
+        {/* slices collapse to the whole list when showMidAd is false */}
       </div>
 
       {/* Every page carries the middle banner — the top and bottom ones, the two
           rails and the anchor are added by BaseLayout. */}
-      <AdSlot lang={lang} />
+      {showMidAd && <AdSlot lang={lang} />}
       <ContentBlocks blocks={blocks.slice(adCut)} lang={lang} />
 
       {
