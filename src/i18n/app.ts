@@ -91,13 +91,6 @@ export const appStrings = {
     'settings.confirm': 'Download and enable',
     'settings.cancel': 'Not now',
 
-    'shield.title': 'Network shield',
-    'shield.desc': 'Every outbound request this page has made, observed live in your browser.',
-    'shield.none': 'No outbound requests so far.',
-    'shield.model': 'Model weights',
-    'shield.local': 'Everything else — parsing, embedding, search, answering — happens locally.',
-    'shield.bytes': '{n} KB',
-    'shield.verify': 'Verify independently with DevTools → Network.',
 
     'stage.parse': 'Reading',
     'stage.chunk': 'Splitting',
@@ -154,7 +147,7 @@ export const appStrings = {
   },
   zh: {
     'app.title': '你的本地文档工作区',
-    'app.subtitle': '下面发生的一切都在这个浏览器标签页内完成。没有任何上传，网络盾牌可以证明。',
+    'app.subtitle': '下面发生的一切都在这个浏览器标签页内完成。',
     'app.privacyBanner': '文件永不离开你的设备——解析、建索引、回答全部在本地完成。',
     'app.offlineReady': '可离线使用',
 
@@ -234,13 +227,6 @@ export const appStrings = {
     'settings.confirm': '下载并启用',
     'settings.cancel': '暂不',
 
-    'shield.title': '网络盾牌',
-    'shield.desc': '下面是这个页面发出的全部外发请求，由你的浏览器实时观测。',
-    'shield.none': '目前没有任何外发请求。',
-    'shield.model': '模型权重',
-    'shield.local': '其余全部——解析、向量化、检索、回答——都在本地完成。',
-    'shield.bytes': '{n} KB',
-    'shield.verify': '也可以用开发者工具 → Network 独立验证。',
 
     'stage.parse': '读取中',
     'stage.chunk': '分块中',

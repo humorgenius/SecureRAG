@@ -464,47 +464,6 @@ export const ChatPanel: FunctionComponent<
   );
 };
 
-/* -------------------------------------------------------------- network shield */
-
-export const Shield: FunctionComponent<
-  Base & { requests: NetworkRequest[]; modelBytes: { loaded: number; total: number } | null }
-> = ({ lang, requests, modelBytes }) => (
-  <section class="sr-panel sr-shield" aria-label={ta(lang, 'shield.title')}>
-    <header class="sr-panel-head">
-      <h2>{ta(lang, 'shield.title')}</h2>
-      <span class="sr-badge is-local">{ta(lang, 'app.offlineReady')}</span>
-    </header>
-    <p class="sr-muted">{ta(lang, 'shield.desc')}</p>
-
-    {requests.length === 0 && !modelBytes ? (
-      <p class="sr-muted sr-empty">{ta(lang, 'shield.none')}</p>
-    ) : (
-      <ul class="sr-nets">
-        {modelBytes && (
-          <li>
-            <span class="sr-net-purpose">{ta(lang, 'shield.model')}</span>
-            <span class="sr-mono sr-trunc">
-              {(modelBytes.loaded / 1048576).toFixed(1)} / {(modelBytes.total / 1048576).toFixed(1)} MB
-            </span>
-          </li>
-        )}
-        {requests.map((r) => (
-          <li>
-            <span class="sr-net-purpose sr-trunc" title={r.url}>
-              {r.origin}
-            </span>
-            <span class="sr-mono">
-              {r.bytes === null ? '—' : ta(lang, 'shield.bytes', { n: Math.round(r.bytes / 1024) })}
-            </span>
-          </li>
-        ))}
-      </ul>
-    )}
-    <p class="sr-muted sr-shield-note">{ta(lang, 'shield.local')}</p>
-    <p class="sr-muted sr-shield-note">{ta(lang, 'shield.verify')}</p>
-  </section>
-);
-
 /* ------------------------------------------------------------------- settings */
 
 export const SettingsPanel: FunctionComponent<

@@ -33,7 +33,6 @@ import {
   DownloadConfirm,
   DropZone,
   SettingsPanel,
-  Shield,
   type NetworkRequest,
   type ProgressState,
 } from './Panels';
@@ -651,7 +650,6 @@ export default function Workspace({ lang, sessionId }: Props) {
             }}
             onOpenSource={openSource}
           />
-          <Shield lang={lang} requests={requests} modelBytes={busy || modelProgress ? modelProgress : null} />
         </div>
       </div>
 
