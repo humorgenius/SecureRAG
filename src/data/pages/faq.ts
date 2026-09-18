@@ -144,10 +144,6 @@ export default {
               q: 'Which browsers are supported?',
               a: 'Current Chrome and Edge, plus recent Firefox and Safari versions with WebAssembly. WebGPU, used only for the optional generation model, is present in current Chromium browsers; everywhere else the pipeline falls back to CPU/WASM, which is slower. A private window works, but its index is discarded when the window closes.',
             },
-            {
-              q: 'Do the ads receive my documents or my questions?',
-              a: 'Ad slots sit outside the chat workspace, and no document text, chunk or question is handed to the advertising script. What an ad request carries is the page address plus the standard device and browser details any ad request includes. If you would rather have no third-party script at all, decline the consent message — inside the EEA, UK and Switzerland that stops every ad request outright; elsewhere it narrows requests to non-personalized ones.',
-            },
           
           { q: 'Can I search several file formats at the same time?', a: 'Yes. Add PDFs, Word files, spreadsheets and notes together and they are searched as one collection; each result says which file and which paragraph it came from.' },
           { q: 'Can I upload many files and search across all of them?', a: 'You can add as many as you like. Strictly speaking there is no upload step: the browser opens the files for us straight from your disk, so they never leave your computer.' },
@@ -164,12 +160,6 @@ export default {
         {
           t: 'p',
           text: 'Send it to guweiicy@gmail.com with your browser name and version, the file type you were using and the exact wording of any message you saw. Questions that turn out to expose a real gap are answered and then added to this page, so the next person does not have to ask.',
-        },
-        {
-          t: 'callout',
-          kind: 'info',
-          title: 'This page carries ad slots too.',
-          text: 'It sits below the article and outside the chat workspace, and no document text or question is passed to it. The privacy policy, the terms and the security pages carry ad slots at all.',
         },
       ],
     },
@@ -305,10 +295,6 @@ export default {
               q: '支持哪些浏览器？',
               a: '当前的 Chrome 和 Edge，以及支持 WebAssembly 的较新 Firefox 和 Safari。WebGPU 只用于可选的生成模型，在当前 Chromium 内核浏览器上可用；其他环境会退回 CPU/WASM，速度更慢。隐私窗口也能用，但窗口关闭时索引会被丢弃。',
             },
-            {
-              q: '广告会拿到我的文档或提问吗？',
-              a: '广告位在聊天工作区之外，没有任何文档正文、文本块或提问交给广告脚本。广告请求携带的是页面地址，以及任何广告请求都会带的设备与浏览器信息。如果你希望页面里完全不出现第三方脚本，在同意提示里选择拒绝——在欧盟、英国、瑞士境内，拒绝会彻底停止一切广告请求；在其他地区则只保留非个性化广告请求。',
-            },
           
           { q: '支持哪些文件格式？', a: 'PDF、DOCX、TXT、Markdown、CSV、HTML、JSON，一共 7 种，纯文本也能放进来。混着加进去就能一次搜，不用先转格式。' },
           { q: '能不能一次把好几种格式的文件一起搜？', a: '能。把 PDF、Word、表格、笔记一起加进来，它们在同一批里被检索，结果里会标出每句出自哪份文件的哪一段。' },
@@ -326,12 +312,6 @@ export default {
         {
           t: 'p',
           text: '请写信到 guweiicy@gmail.com，附上浏览器名称与版本、你当时使用的文件类型，以及你看到的提示原文。如果一个问题暴露出真实的缺口，我们会回答它，并把它补进这一页，让下一个人不必再问。',
-        },
-        {
-          t: 'callout',
-          kind: 'info',
-          title: '这一页也有广告位。',
-          text: '它位于正文下方、聊天工作区之外，不会有任何文档正文或提问传到它那里。每个页面都是同样的安排，包括隐私政策与条款页。',
         },
       ],
     },
