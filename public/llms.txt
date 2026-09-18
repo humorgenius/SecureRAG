@@ -16,12 +16,12 @@
 
 ## 主要页面 / Main pages
 
-- [中文首页](https://www.lilink.com/zh/)：产品说明、能力对比、常见问题。
-- [在线工具](https://www.lilink.com/zh/app/)：上传文件并在本地检索，支持 PDF、DOCX、TXT、Markdown、CSV、HTML、JSON。
-- [工作原理](https://www.lilink.com/zh/how-it-works/)：从文件到引用的完整管线。
-- [常见问题](https://www.lilink.com/zh/faq/)：隐私、模型、格式、限额与广告的问答。
-- [隐私政策](https://www.lilink.com/zh/privacy/)：本地处理、数据流向与广告 Cookie 的说明。
-- [English home](https://www.lilink.com/en/) · [Tool](https://www.lilink.com/en/app/) · [FAQ](https://www.lilink.com/en/faq/)
+- [中文首页](https://lilink.net/zh/)：产品说明、能力对比、常见问题。
+- [在线工具](https://lilink.net/zh/app/)：上传文件并在本地检索，支持 PDF、DOCX、TXT、Markdown、CSV、HTML、JSON。
+- [工作原理](https://lilink.net/zh/how-it-works/)：从文件到引用的完整管线。
+- [常见问题](https://lilink.net/zh/faq/)：隐私、模型、格式、限额与广告的问答。
+- [隐私政策](https://lilink.net/zh/privacy/)：本地处理、数据流向与广告 Cookie 的说明。
+- [English home](https://lilink.net/en/) · [Tool](https://lilink.net/en/app/) · [FAQ](https://lilink.net/en/faq/)
 
 ## 适用场景 / Use cases
 

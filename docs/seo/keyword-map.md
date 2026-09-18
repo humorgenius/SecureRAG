@@ -1,6 +1,6 @@
 # 全站 SEO / GEO 关键词映射
 
-> 目标域：`https://www.lilink.com`（品牌：SecureRAG，出品方 Lilink）
+> 目标域：`https://lilink.net`（品牌：SecureRAG，出品方 Lilink）
 > 站点形态：纯静态、双语（`/zh/` 与 `/en/` 独立路径）、80 页、每页四道门禁把关。
 > 规则：**一个页面只主打一个短词 + 一个长尾词**，避免自我竞争；标题 ≤60 字符（中文 ≤30 字），
 > 描述中文 30–120 字、英文 60–175 字符（由 `check:seo` 强制）。
@@ -46,7 +46,7 @@ AI 引擎引用内容有三个偏好：**问答体、结构化实体、机器可
 2. JSON-LD 强化：`SoftwareApplication` 增加 `featureList`（格式清单）、`keywords`、`alternateName`、`applicationCategory`；
    组织节点带 `description` 与 `sameAs`。每页都带组织节点，等于每页都向引擎声明实体。
 3. FAQ 问答体：首页 FAQ 区与 `/faq/` 页，问题用**用户会问的原句**（含长尾词），答案 3–5 句、含具体数字，便于整段引用。
-4. 实体一致性：全站统一品牌写法 `SecureRAG`，出品方统一写 `Lilink`，域名统一 `www.lilink.com`
+4. 实体一致性：全站统一品牌写法 `SecureRAG`，出品方统一写 `Lilink`，域名统一 `lilink.net`
    （canonical / hreflang / sitemap / JSON-LD 四处同步）——引擎要靠重复出现的一致实体来做消歧。
 
 ## 站外（需要你亲自执行，代码库无法代劳）

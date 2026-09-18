@@ -2,7 +2,7 @@ import type { Lang } from '../i18n/utils';
 
 export const SITE = {
   name: 'SecureRAG',
-  url: 'https://www.lilink.com',
+  url: 'https://lilink.net',
   localeOf: { en: 'en_US', zh: 'zh_CN' } as const satisfies Record<Lang, string>,
   twitter: '@securerag',
   /** Replace before launch with the real AdSense publisher id. scripts/check-seo.mjs fails while this placeholder remains. */

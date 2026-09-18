@@ -9,7 +9,7 @@
  */
 export const ADS = {
   /** e.g. 'ca-pub-0000000000000000' */
-  client: '',
+  client: 'ca-pub-9680789453651246',
   /** one id per layout position */
   slots: {
     'banner-top': '',

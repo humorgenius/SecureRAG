@@ -67,7 +67,7 @@ export const ui = {
     'footer.colResources': 'Resources',
     'footer.colTrust': 'Trust',
     'footer.local': 'All processing is local to your device',
-    'footer.legal': '© 2026 SecureRAG · www.lilink.com',
+    'footer.legal': '© 2026 SecureRAG · lilink.net',
 
     // shared
     'common.home': 'Home',
@@ -148,7 +148,7 @@ export const ui = {
     'footer.colResources': '资源',
     'footer.colTrust': '信任',
     'footer.local': '全部处理都在你的设备本地完成',
-    'footer.legal': '© 2026 SecureRAG · www.lilink.com',
+    'footer.legal': '© 2026 SecureRAG · lilink.net',
 
     // 通用
     'common.home': '首页',

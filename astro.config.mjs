@@ -5,7 +5,7 @@ import preact from '@astrojs/preact';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  site: 'https://www.lilink.com',
+  site: 'https://lilink.net',
   /**
    * Astro's dev server binds `localhost`, which on Windows resolves to the IPv6
    * loopback `[::1]` only. Anything probing 127.0.0.1 (health checks, CI
@@ -28,7 +28,7 @@ export default defineConfig({
     preact({ compat: false }),
     sitemap({
       i18n: { defaultLocale: 'en', locales: { en: 'en', zh: 'zh-Hans' } },
-      filter: (page) => !page.includes('404') && page !== 'https://www.lilink.com/',
+      filter: (page) => !page.includes('404') && page !== 'https://lilink.net/',
     }),
   ],
   vite: { plugins: [tailwindcss()] },

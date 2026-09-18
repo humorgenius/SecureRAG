@@ -4,7 +4,7 @@
 
 ---
 
-## 一、域名切换 → `www.lilink.com`
+## 一、域名切换 → `lilink.net`
 
 代码里已同步的位置（无需再改）：`src/data/site.ts` 的 `url`、每页 `canonical` 与 `hreflang`、`sitemap`、
 JSON-LD 组织节点、页脚联系文案、`public/CNAME`、`public/robots.txt` 的 Sitemap 行、`astro.config.mjs`。
@@ -23,13 +23,13 @@ JSON-LD 组织节点、页脚联系文案、`public/CNAME`、`public/robots.txt`
 
 ### 2. GitHub Pages 侧
 
-1. 仓库 → Settings → Pages → Custom domain 填 `www.lilink.com` → Save（`public/CNAME` 已进产物，会自动带上）。
+1. 仓库 → Settings → Pages → Custom domain 填 `lilink.net` → Save（`public/CNAME` 已进产物，会自动带上）。
 2. 等 DNS 检查通过（几分钟到 24 小时）→ 勾选 **Enforce HTTPS**。
-3. 需要裸域 → `www` 的跳转：GitHub 会自动把 `lilink.com` 重定向到 `www.lilink.com`（前提是裸域 A 记录已配）。
+3. 需要裸域 → `www` 的跳转：GitHub 会自动把 `lilink.com` 重定向到 `lilink.net`（前提是裸域 A 记录已配）。
 
 ### 3. 搜索引擎侧（新域名重新建立索引）
 
-1. Search Console 添加**新资源** `https://www.lilink.com`（用 DNS 验证最稳），提交 `https://www.lilink.com/sitemap-index.xml`。
+1. Search Console 添加**新资源** `https://lilink.net`（用 DNS 验证最稳），提交 `https://lilink.net/sitemap-index.xml`。
 2. Bing Webmaster Tools 同样提交一次（GEO 里 Bing 的信源权重不低）。
 3. 旧域 `securerag.app` 若曾上线过：在 Search Console 里用**地址变更**工具指向新域；否则什么都不用做。
 4. 两三天后回来查一遍：新域收录页数、`sitemap-index.xml` 的发现状态、有无 "Alternate page with proper canonical tag" 报告（出现即说明 hreflang/canonical 正确）。

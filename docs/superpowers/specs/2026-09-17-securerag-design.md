@@ -3,7 +3,7 @@
 - 日期：2026-09-17
 - 项目根目录：`D:\【建立网站】\SecureRAG`
 - 品牌名：**SecureRAG**
-- 占位域名：`https://www.lilink.com`（部署时改 `astro.config.mjs` 的 `site` 与 `public/CNAME`，全站 canonical / sitemap / JSON-LD 自动跟随，无需改模板）
+- 占位域名：`https://lilink.net`（部署时改 `astro.config.mjs` 的 `site` 与 `public/CNAME`，全站 canonical / sitemap / JSON-LD 自动跟随，无需改模板）
 - 定位：**100% 浏览器本地的多文档 RAG 问答工具**，零上传、零注册、可离线
 
 ---
