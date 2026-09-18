@@ -88,7 +88,7 @@ export interface HomeContent {
 export const home: Record<Lang, HomeContent> = {
   en: {
     meta: {
-      title: 'SecureRAG — cross-format indexing, files never uploaded',
+      title: 'SecureRAG — cross-format AI file search, nothing uploaded',
       description:
         'Search PDF, DOCX, TXT, Markdown, CSV, HTML and JSON with AI in one place. Parsing, indexing and answering run entirely in your browser — no account, nothing uploaded.',
     },

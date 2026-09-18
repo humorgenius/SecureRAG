@@ -1,0 +1,32 @@
+# SecureRAG
+
+> SecureRAG 是一款由 Lilink 出品的跨格式文件索引工具：支持 PDF、DOCX、TXT、Markdown、CSV、HTML、JSON，
+> 借助 AI 在浏览器本地统一检索文件内容。文件永不上传，无需注册，模型缓存后可离线使用。
+> SecureRAG is a cross-format file indexing tool by Lilink. It searches PDF, DOCX, TXT, Markdown,
+> CSV, HTML and JSON files with AI entirely inside your browser. Files are never uploaded.
+
+## 核心功能 / Core capabilities
+
+- 跨格式文件搜索：一次检索多种文件格式的内容，无需先转换格式。
+- 智能文件索引：解析、分块、向量化、混合检索（向量 + BM25，RRF 融合）全部在浏览器内完成。
+- AI 文档搜索工具：回答由文档原句构成，带编号引用，可点击跳回原文段落与页码。
+- 两种检索模式：精准检索（只返回与输入完全相同的原文句子）与模糊检索（按词与语义匹配）。
+- 全部匹配处：列出所有包含检索词的句子，按文档顺序，不排序、不筛选、不去重丢句。
+- 本地优先：没有后端、没有账号、没有上传；唯一的外部请求是模型权重首次下载。
+
+## 主要页面 / Main pages
+
+- [中文首页](https://www.lilink.com/zh/)：产品说明、能力对比、常见问题。
+- [在线工具](https://www.lilink.com/zh/app/)：上传文件并在本地检索，支持 PDF、DOCX、TXT、Markdown、CSV、HTML、JSON。
+- [工作原理](https://www.lilink.com/zh/how-it-works/)：从文件到引用的完整管线。
+- [常见问题](https://www.lilink.com/zh/faq/)：隐私、模型、格式、限额与广告的问答。
+- [隐私政策](https://www.lilink.com/zh/privacy/)：本地处理、数据流向与广告 Cookie 的说明。
+- [English home](https://www.lilink.com/en/) · [Tool](https://www.lilink.com/en/app/) · [FAQ](https://www.lilink.com/en/faq/)
+
+## 适用场景 / Use cases
+
+合同与卷宗检索、人事与财务资料、文献与研究报告、制度手册、个人档案——凡是"文档本身不方便交给第三方"的场合。
+
+## 联系方式 / Contact
+
+guweiicy@gmail.com

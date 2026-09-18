@@ -39,13 +39,30 @@ export const softwareAppSchema = (
   operatingSystem: 'Any modern web browser',
   url: abs(override?.path ?? `/${lang}/app/`),
   ...(override?.description ? { description: override.description } : {}),
+  alternateName: lang === 'zh' ? 'Lilink 跨格式文件索引工具' : 'Intelligent file search tool',
+  // For engines that read structured data rather than prose (GEO).
+  keywords:
+    lang === 'zh'
+      ? 'AI 文件检索, 跨格式文件搜索, 智能文件索引, 多格式文档检索, AI 文档搜索工具'
+      : 'AI file search, cross-format document search, multi-format file retrieval, AI document indexer, intelligent file search tool',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   isAccessibleForFree: true,
   featureList:
     lang === 'zh'
-      ? ['本地文档解析', '本地向量索引', '多文档管理', '段落级引用', '离线可用', '可导出问答记录']
+      ? [
+          '跨格式文件检索 PDF / DOCX / TXT / Markdown / CSV / HTML / JSON',
+          'AI 语义搜索与跨格式索引',
+          '本地文档解析',
+          '本地向量索引',
+          '多文档管理',
+          '全部匹配处逐句列出',
+          '段落级引用',
+          '离线可用',
+          '可导出问答记录',
+        ]
       : [
           'Local document parsing',
+          'AI semantic search across formats',
           'Local vector index',
           'Multi-document collections',
           'Paragraph-level citations',
