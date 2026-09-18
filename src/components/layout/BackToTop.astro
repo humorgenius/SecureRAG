@@ -67,9 +67,5 @@ const { lang } = Astro.props;
     border-color: var(--blue);
     color: var(--blue-d);
   }
-  @media (max-width: 1100px) {
-    .to-top {
-      bottom: 160px;
-    }
-  }
+  /* No offset needed on phones: the bottom ad slot is hidden there. */
 </style>

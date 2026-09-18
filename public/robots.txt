@@ -6,4 +6,4 @@ Disallow: /zh/404/
 # The two language homes and every content page are crawlable.
 # Only the root gateway is noindex — it redirects immediately.
 
-Sitemap: https://securerag.app/sitemap-index.xml
+Sitemap: https://www.lilink.com/sitemap-index.xml

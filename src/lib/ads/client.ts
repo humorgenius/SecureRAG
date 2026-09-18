@@ -13,7 +13,7 @@ import { CONSENT_EVENT, adMode, currentTimeZone, readConsent, type AdMode } from
 
 const SCRIPT_SRC = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
 /** Share of the scrollable page after which the bottom slot folds itself away. */
-const AUTO_COLLAPSE_AT = 0.35;
+const AUTO_COLLAPSE_AT = 0.2;
 
 let booted = false;
 let scriptRequested = false;

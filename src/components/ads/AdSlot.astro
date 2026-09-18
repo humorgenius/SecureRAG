@@ -243,4 +243,16 @@ const label = t(lang, 'ad.label');
   .ad-anchor-spacer[hidden] {
     display: none;
   }
+
+  /*
+   * Phones get neither the side rails (they already needed a 1500px gutter) nor
+   * the bottom slot: a fixed band plus an in-flow banner eats the screen that the
+   * content needs, and Google's own density rule measures mobile separately.
+   */
+  @media (max-width: 760px) {
+    .ad-slot-anchor,
+    .ad-anchor-spacer {
+      display: none;
+    }
+  }
 </style>

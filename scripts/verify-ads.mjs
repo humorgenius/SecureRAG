@@ -173,8 +173,8 @@ try {
     await sleep(700);
     return evalJs(`(function(){var a=document.querySelector('[data-ad-variant="anchor"]');var s=document.documentElement.scrollHeight-window.innerHeight;return document.querySelector('[data-ad-collapse]').textContent + ' | collapsed=' + a.dataset.collapsed + ' | 深度=' + Math.round(window.scrollY/s*100) + '%';})()`);
   };
-  console.log('  滚到 30%:', await atDepth(0.3));
-  console.log('  滚到 40%:', await atDepth(0.4));
+  console.log('  滚到 15%:', await atDepth(0.15));
+  console.log('  滚到 25%:', await atDepth(0.25));
 
   console.log('  --- 回到顶部按钮 ---');
   const topCheck = await evalJs(`(function(){

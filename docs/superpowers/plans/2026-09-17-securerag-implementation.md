@@ -126,7 +126,7 @@ import preact from '@astrojs/preact';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  site: 'https://securerag.app',
+  site: 'https://www.lilink.com',
   output: 'static',
   trailingSlash: 'always',
   i18n: {
@@ -139,7 +139,7 @@ export default defineConfig({
     preact({ compat: false }),
     sitemap({
       i18n: { defaultLocale: 'en', locales: { en: 'en', zh: 'zh-Hans' } },
-      filter: (page) => !page.includes('404') && !page.endsWith('securerag.app/'),
+      filter: (page) => !page.includes('404') && !page.endsWith('www.lilink.com/'),
     }),
   ],
   vite: { plugins: [tailwindcss()] },
@@ -298,7 +298,7 @@ export const ui = {
     'cta.readMethod':'Read the pipeline','cta.privacy':'Read the privacy policy',
     'promise.noLeave':'Files never leave the device','promise.noAccount':'No account, no tracking pixels',
     'promise.noTraining':'Not used for training','promise.offline':'Works offline once cached',
-    'ad.label':'Advertisement','footer.legal':'© 2026 SecureRAG · securerag.app',
+    'ad.label':'Advertisement','footer.legal':'© 2026 SecureRAG · www.lilink.com',
     'footer.local':'All processing is local to your device','footer.ads':'Ads labeled · consent-gated · never inside the workspace',
     'common.readMore':'Read more','common.onThisPage':'On this page','common.related':'Related',
     'common.lastUpdated':'Last updated','common.minutes':'min read','common.home':'Home',
@@ -313,7 +313,7 @@ export const ui = {
     'cta.verify':'如何验证我们','cta.readMethod':'看处理管线','cta.privacy':'阅读隐私政策',
     'promise.noLeave':'文件永不离开你的设备','promise.noAccount':'无账号、无追踪像素',
     'promise.noTraining':'不用于训练','promise.offline':'缓存后可离线',
-    'ad.label':'广告','footer.legal':'© 2026 SecureRAG · securerag.app',
+    'ad.label':'广告','footer.legal':'© 2026 SecureRAG · www.lilink.com',
     'footer.local':'全部处理都在你的设备本地完成','footer.ads':'广告有标注 · 需同意加载 · 不进工作区',
     'common.readMore':'阅读更多','common.onThisPage':'本页目录','common.related':'相关内容',
     'common.lastUpdated':'最后更新','common.minutes':'分钟阅读','common.home':'首页',
@@ -402,13 +402,13 @@ Expected: `i18n check OK (34 keys)`
 - Create: `src/data/site.ts`, `src/lib/seo/schema.ts`, `src/components/seo/BaseHead.astro`, `src/components/seo/JsonLd.astro`, `src/components/seo/Breadcrumbs.astro`
 
 **Interfaces:**
-- Produces: `SITE = { name:'SecureRAG', url:'https://securerag.app', ... }`；`orgSchema(lang)`、`websiteSchema(lang)`、`softwareAppSchema(lang)`、`faqSchema(qa)`、`articleSchema(o)`、`breadcrumbSchema(items)`、`definedTermSetSchema(...)`、`howToSchema(...)`；`<BaseHead title description lang path type? image? />`。
+- Produces: `SITE = { name:'SecureRAG', url:'https://www.lilink.com', ... }`；`orgSchema(lang)`、`websiteSchema(lang)`、`softwareAppSchema(lang)`、`faqSchema(qa)`、`articleSchema(o)`、`breadcrumbSchema(items)`、`definedTermSetSchema(...)`、`howToSchema(...)`；`<BaseHead title description lang path type? image? />`。
 
 - [ ] **Step 1: 写 `src/data/site.ts`**
 
 ```ts
 export const SITE = {
-  name: 'SecureRAG', url: 'https://securerag.app', localeOf: { en: 'en_US', zh: 'zh_CN' } as const,
+  name: 'SecureRAG', url: 'https://www.lilink.com', localeOf: { en: 'en_US', zh: 'zh_CN' } as const,
   twitter: '@securerag', adsensePublisher: 'ca-pub-XXXXXXXXXXXXXXXX', // 上线前替换为真实 ID
   modelsRepo: 'https://huggingface.co/Xenova', contactEmail: 'guweiicy@gmail.com',
 } as const;
@@ -791,11 +791,11 @@ Expected: 18 个新页面均有唯一 title/description、canonical 与 hreflang
 User-agent: *
 Allow: /
 Disallow: /en/404/
-Sitemap: https://securerag.app/sitemap-index.xml
+Sitemap: https://www.lilink.com/sitemap-index.xml
 ```
 
 - [ ] **Step 2** `ads.txt`：`google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0`（替换为真实 ID）
-- [ ] **Step 3** `CNAME`：`securerag.app`
+- [ ] **Step 3** `CNAME`：`www.lilink.com`
 - [ ] **Step 4** `llms.txt`（站点导读 + 允许引用声明）/ `llms-full.txt`（核心页面纯文本摘要，构建脚本生成）
 - [ ] **Step 5** 写 `scripts/check-seo.mjs`：遍历 `dist/**/index.html`，断言 ① 每页有且仅有一个 `<title>` 且 ≤60 字符 ② description 120–158 字符 ③ 有 canonical ④ 有 en/zh-Hans 两条 hreflang ⑤ JSON-LD 可被 `JSON.parse` ⑥ 无重复 title ⑦ 无未替换的 `XXXXXXXXXXXXXXXX`
 - [ ] **Step 6** Run: `npm run build && node scripts/check-seo.mjs` → Expected: 全部 PASS → Commit `feat: sitemap, robots, ads.txt, llms.txt, seo gate`
