@@ -21,9 +21,10 @@ interface Props {
   activeNav?: string;
   /** the homepage opens with its own hero, so it carries no top banner */
   noTopAd?: boolean;
+  noAds?: boolean;
 }
 
-const { title, description, lang, path, type, image, noindex, activeNav, noTopAd = false } = Astro.props;
+const { title, description, lang, path, type, image, noindex, activeNav, noTopAd = false , noAds } = Astro.props;
 ---
 
 <!doctype html>
@@ -37,24 +38,37 @@ const { title, description, lang, path, type, image, noindex, activeNav, noTopAd
     <Header lang={lang} path={path} activeNav={activeNav} />
     {/* Two side rails: fixed to the gutters, and only shown where the gutter can
         hold them (see the 1500px breakpoint in AdSlot.astro). */}
-    <AdSlotUnit lang={lang} variant="rail" id="rail-left" />
-    <AdSlotUnit lang={lang} variant="rail" id="rail-right" />
+    {!noAds && (
+      <>
+        <AdSlotUnit lang={lang} variant="rail" id="rail-left" />
+        <AdSlotUnit lang={lang} variant="rail" id="rail-right" />
+      </>
+    )}
 
     <main id="main">
-      {!noTopAd && (
+      {!noAds && !noTopAd && (
         <div class="wrap">
           <AdSlotUnit lang={lang} variant="banner" id="banner-top" />
         </div>
       )}
       <slot />
-      <div class="wrap">
-        <AdSlotUnit lang={lang} variant="banner" id="banner-bottom" />
-      </div>
+      {!noAds && (
+        <div class="wrap">
+          <AdSlotUnit lang={lang} variant="banner" id="banner-bottom" />
+        </div>
+      )}
     </main>
 
     <Footer lang={lang} />
-    <AdSlotUnit lang={lang} variant="anchor" id="anchor" />
-    <ConsentGate lang={lang} />
+    {/* noAds is for pages Google's own policy keeps free of ads - the 404 is not a
+        content page. With no ad units there is nothing to consent to either, so the
+        gate goes with them. */}
+    {!noAds && (
+      <>
+        <AdSlotUnit lang={lang} variant="anchor" id="anchor" />
+        <ConsentGate lang={lang} />
+      </>
+    )}
     <BackToTop lang={lang} />
     <slot name="foot" />
   </body>

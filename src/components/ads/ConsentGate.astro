@@ -67,10 +67,21 @@ const { lang } = Astro.props;
 </script>
 
 <style>
+  /*
+   * Where the bottom ad band is on screen the gate must sit above it: they share
+   * the same corner and the band spans the width. Expressed as a variable so this
+   * rule does not depend on appearing after the .consent block.
+   */
+  @media (min-width: 761px) and (min-height: 561px) {
+    :root {
+      --consent-lift: 136px;
+    }
+  }
+
   .consent {
     position: fixed;
     left: 16px;
-    bottom: 16px;
+    bottom: calc(16px + var(--consent-lift, 0px));
     z-index: 60;
     width: min(360px, calc(100vw - 32px));
     padding: 16px 18px;

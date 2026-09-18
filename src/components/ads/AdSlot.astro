@@ -255,4 +255,19 @@ const label = t(lang, 'ad.label');
       display: none;
     }
   }
+
+  /*
+   * Short viewports - a landscape phone, a small laptop window - are where a
+   * fixed bottom band stops being a band and starts being a third of the screen:
+   * 127px of anchor against a 400px viewport trips Chrome's large-sticky-ad rule
+   * for mobile. Hiding it there costs one placement and removes the risk of the
+   * whole ad load being blocked. Not clipped, not shrunk: hidden, so no creative
+   * is ever truncated.
+   */
+  @media (max-height: 560px) {
+    .ad-slot-anchor,
+    .ad-anchor-spacer {
+      display: none;
+    }
+  }
 </style>
