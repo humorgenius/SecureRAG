@@ -37,7 +37,6 @@ const copy =
           { q: '关掉页面后数据还在吗？', a: '文本块与向量存在你浏览器的 IndexedDB 里，下次打开即可继续使用。清除站点数据就会彻底删除。' },
           { q: '支持哪些文件？', a: 'PDF（需含文字层）、DOCX、TXT、Markdown、CSV、HTML、JSON。加密 PDF、无文字层的扫描件、旧版 .doc 不支持，界面会明确指出原因。' },
         ],
-        adsNote: '本页的广告位在聊天工作区之外。个性化广告只在你同意后加载；在欧盟、英国、瑞士以外，拒绝后仍会展示非个性化广告。',
       }
     : {
         title: 'SecureRAG — multi-format file retrieval and AI search',
@@ -57,7 +56,6 @@ const copy =
           { q: 'Does my library survive closing the tab?', a: 'Chunks and vectors live in your browser IndexedDB, so the next visit is instant. Clearing site data deletes everything.' },
           { q: 'Which formats work?', a: 'PDF with a text layer, DOCX, TXT, Markdown, CSV, HTML and JSON. Encrypted PDFs, scans without a text layer and legacy .doc are refused with a specific reason.' },
         ],
-        adsNote: 'Ads on this page sit outside the chat workspace. Personalized ads load only after you consent; outside the EEA, UK and Switzerland a refusal still shows non-personalized ads.',
       };
 
 const path = `/${lang}/app/`;
@@ -135,7 +133,6 @@ const jsonLd = [
       <a class="btn btn-white" href={localizePath(lang, '/security/')}>{t(lang, 'nav.trust')}</a>
       <a class="btn btn-white" href={localizePath(lang, '/guides/')}>{t(lang, 'nav.guides')}</a>
     </div>
-    <p class="note ads-note">{copy.adsNote}</p>
   </section>
 
   <JsonLd data={jsonLd} />
