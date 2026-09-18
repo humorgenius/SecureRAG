@@ -33,6 +33,10 @@ const imageUrl = new URL(image, SITE.url).href;
 ---
 
 <meta charset="utf-8" />
+    {/* Site verification for AdSense. A meta tag rather than the ad script:
+        Google's verifier reads raw HTML, and the ad script only loads at runtime
+        after consent. This tag makes no request, so the privacy promise holds. */}
+    <meta name="google-adsense-account" content="ca-pub-9680789453651246" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>{title}</title>
 <meta name="description" content={description} />
