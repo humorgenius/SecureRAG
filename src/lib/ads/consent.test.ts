@@ -33,11 +33,16 @@ describe('ad mode', () => {
     expect(adMode('unset', 'Atlantic/Reykjavik')).toBe('none');
   });
 
-  it('but sends a non-personalized request elsewhere, and shows no gate', () => {
-    // No policy requires an answer outside the EEA, UK and Switzerland, so those
-    // readers get an NPA request instead of a dialog in front of the article.
-    expect(adMode('unset', 'America/New_York')).toBe('non-personalized');
-    expect(adMode('unset', 'Asia/Shanghai')).toBe('non-personalized');
+  it('but serves a personalized request elsewhere, and shows no gate', () => {
+    // Google requires consent only in the EEA, the UK and Switzerland, so readers
+    // outside those zones get personalized ads directly instead of a dialog.
+    expect(adMode('unset', 'America/New_York')).toBe('personalized');
+    expect(adMode('unset', 'Asia/Shanghai')).toBe('personalized');
+  });
+
+  it('honours a decline outside those zones with a non-personalized request', () => {
+    expect(adMode('denied', 'Asia/Shanghai')).toBe('non-personalized');
+    expect(adMode('denied', 'Europe/Paris')).toBe('none');
   });
 });
 

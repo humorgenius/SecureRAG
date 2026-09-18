@@ -40,12 +40,14 @@ export function adMode(choice: ConsentChoice, timeZone: string): AdMode {
   /*
    * No answer yet. Where consent is legally required (EEA, UK, Switzerland) nothing
    * is requested until the visitor answers - that is the whole point of the gate.
-   * Everywhere else a Google policy does not require an answer, so asking anyway
-   * just put a dialog in front of the majority of readers for no reason: those
-   * visitors get a non-personalized request instead, which earns without tracking
-   * anyone and matches what the privacy page says about ads.
+   * Everywhere else Google does not require consent for personalized ads, so those
+   * visitors get one directly and never see the gate: asking first was a dialog in
+   * front of the majority of readers for no reason the policy imposes.
+   *
+   * A visitor who explicitly declines is still answered with an NPA request - that
+   * is their choice being honoured, not a policy compliance step.
    */
-  return isEeaLike(timeZone) ? 'none' : 'non-personalized';
+  return isEeaLike(timeZone) ? 'none' : 'personalized';
 }
 
 /** Reads the stored choice, treating anything unrecognised as "no choice yet". */
