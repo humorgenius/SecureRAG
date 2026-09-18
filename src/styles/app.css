@@ -298,10 +298,14 @@
 }
 
 /* chat */
+/*
+ * Height raised by a third at the owner's request, growing downward: the panel's top
+ * edge is fixed, so only the height changes. 520 * 4/3 = 693.
+ */
 .sr-chat {
   display: flex;
   flex-direction: column;
-  min-height: 520px;
+  min-height: 693px;
 }
 .sr-badge {
   font-size: 11px;
@@ -331,7 +335,8 @@
   flex-direction: column;
   gap: 14px;
   overflow-y: auto;
-  max-height: 56vh;
+  /* Same third, so the answer list actually uses the taller panel: 56 * 4/3 = 75. */
+  max-height: 75vh;
   padding-right: 4px;
 }
 .sr-q {
@@ -468,7 +473,9 @@
 }
 .sr-textarea {
   resize: vertical;
-  min-height: 46px;
+  /* Three lines visible by default instead of two: 46px * 4/3 = 61. Owner's ask.
+     Still drag-resizable, and the ceiling is unchanged. */
+  min-height: 61px;
   max-height: 160px;
   line-height: 1.55;
 }
@@ -589,7 +596,8 @@
     display: none;
   }
   .sr-chat {
-    min-height: 420px;
+    /* Narrow screens keep their own base, raised by the same third: 420 * 4/3 = 560. */
+    min-height: 560px;
   }
   .sr-thread {
     max-height: none;
