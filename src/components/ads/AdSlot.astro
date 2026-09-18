@@ -25,13 +25,25 @@ interface Props {
   id: AdSlotId;
 }
 
+import { ADS, type AdSlotId } from '../../data/ads';
 const { lang, variant, id } = Astro.props;
 const label = t(lang, 'ad.label');
+/*
+ * Auto ads (option B): the site script alone serves the ads, Google picks the
+ * placements, and a slot with no unit id has nothing of its own to show. Rendering
+ * it would leave a labeled empty box and - for the bottom slot - a bar with
+ * nothing in it, so it renders disabled instead. Fill ADS.slots[id] and every
+ * position comes straight back.
+ */
+const unit = ADS.slots[id as AdSlotId] ?? '';
+const showSlot = ADS.client.length > 0 && unit.length > 0;
 ---
 
 <aside
   class={`ad-slot ad-slot-${variant}`}
   data-ad-id={id}
+  data-disabled={showSlot ? undefined : '1'}
+  style={showSlot ? undefined : 'display:none'}
   data-ad-variant={variant}
   data-collapsed="0"
   role="complementary"
@@ -270,4 +282,5 @@ const label = t(lang, 'ad.label');
       display: none;
     }
   }
+
 </style>
